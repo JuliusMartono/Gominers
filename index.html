@@ -1,560 +1,359 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoMiners.id — AI & Crypto SaaS</title>
+<title>GoMiners.id — AI & Crypto SaaS | PT Global Operasi Miners</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #050A0F;
-    --bg2: #080F18;
-    --surface: #0D1824;
-    --surface2: #111E2E;
-    --accent: #00C8FF;
-    --accent2: #0066FF;
-    --gold: #FFB800;
-    --text: #E8F0FE;
-    --muted: #6B7F9A;
-    --border: rgba(0,200,255,0.12);
-    --glow: rgba(0,200,255,0.15);
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
-  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+:root {
+  --bg:#050A0F;--bg2:#080F18;--surface:#0D1824;--surface2:#111E2E;
+  --accent:#00C8FF;--accent2:#0066FF;--gold:#FFB800;
+  --text:#E8F0FE;--muted:#6B7F9A;--border:rgba(0,200,255,0.12);--glow:rgba(0,200,255,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 48px;
-    background: rgba(5,10,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 22px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; -webkit-text-fill-color: white;
-  }
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a {
-    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
-    transition: color 0.2s; letter-spacing: 0.3px;
-  }
-  .nav-links a:hover { color: var(--accent); }
-  .nav-cta {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: var(--bg) !important; padding: 10px 24px; border-radius: 8px;
-    font-weight: 600; -webkit-text-fill-color: var(--bg) !important;
-  }
+/* ── LANG SCREEN ── */
+#lang-gate{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+.lang-gate-inner{text-align:center;padding:40px 24px}
+.lang-logo{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.lang-tagline{color:var(--muted);font-size:15px;margin-bottom:48px}
+.lang-prompt{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:28px}
+.lang-btns{display:flex;gap:16px;justify-content:center}
+.lang-choice{padding:18px 40px;border-radius:14px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;border:2px solid var(--border);background:var(--surface);color:var(--text);transition:all 0.25s;display:flex;align-items:center;gap:10px}
+.lang-choice:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,102,255,0.3)}
+.lang-choice.id-btn{border-color:rgba(255,184,0,0.4)}
+.lang-choice.id-btn:hover{background:rgba(255,184,0,0.08);border-color:var(--gold);color:var(--gold)}
+.lang-choice.en-btn{border-color:rgba(0,200,255,0.3)}
+.lang-choice.en-btn:hover{background:rgba(0,200,255,0.08);border-color:var(--accent);color:var(--accent)}
+.lang-flag{font-size:28px}
+.lang-divider{width:1px;height:60px;background:var(--border);margin:0 8px}
+.lang-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,200,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    text-align: center;
-    padding: 120px 24px 80px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,102,255,0.12) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,200,255,0.06) 0%, transparent 60%);
-  }
-  .grid-overlay {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.2);
-    border-radius: 100px; padding: 6px 16px; font-size: 12px;
-    color: var(--accent); letter-spacing: 1px; text-transform: uppercase;
-    font-weight: 600; margin-bottom: 28px;
-    animation: fadeUp 0.6s ease both;
-  }
-  .hero h1 {
-    font-size: clamp(40px, 7vw, 88px);
-    font-weight: 800; line-height: 1.04; letter-spacing: -2px;
-    margin-bottom: 24px;
-    animation: fadeUp 0.6s 0.1s ease both;
-  }
-  .hero h1 span {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, #8B5CF6 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .hero p {
-    font-size: 18px; color: var(--muted); max-width: 600px; margin: 0 auto 40px;
-    font-weight: 300; line-height: 1.7;
-    animation: fadeUp 0.6s 0.2s ease both;
-  }
-  .hero-ctas {
-    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-    animation: fadeUp 0.6s 0.3s ease both;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: var(--bg); padding: 14px 32px; border-radius: 10px;
-    font-weight: 700; font-size: 15px; cursor: pointer; border: none;
-    text-decoration: none; display: inline-block;
-    transition: transform 0.2s, box-shadow 0.2s;
-    font-family: 'Syne', sans-serif;
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,102,255,0.4); }
-  .btn-ghost {
-    background: transparent; color: var(--text); padding: 14px 32px; border-radius: 10px;
-    font-weight: 600; font-size: 15px; cursor: pointer;
-    border: 1px solid var(--border); text-decoration: none; display: inline-block;
-    transition: border-color 0.2s, background 0.2s;
-    font-family: 'Syne', sans-serif;
-  }
-  .btn-ghost:hover { border-color: var(--accent); background: var(--glow); }
-  .hero-stats {
-    display: flex; gap: 48px; justify-content: center; margin-top: 72px; flex-wrap: wrap;
-    animation: fadeUp 0.6s 0.4s ease both;
-  }
-  .stat { text-align: center; }
-  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent); }
-  .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+/* ── MAIN SITE ── */
+#site{display:none}
 
-  /* SECTIONS */
-  section { padding: 100px 48px; }
-  .section-label {
-    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--accent); font-weight: 600; margin-bottom: 16px;
-  }
-  .section-title {
-    font-size: clamp(28px, 4vw, 48px); font-weight: 800;
-    line-height: 1.1; letter-spacing: -1px; margin-bottom: 16px;
-  }
-  .section-sub { color: var(--muted); font-size: 16px; max-width: 540px; line-height: 1.7; }
-  .container { max-width: 1200px; margin: 0 auto; }
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(5,10,15,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:21px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:flex;align-items:center;gap:9px}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;-webkit-text-fill-color:white}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-cta{background:linear-gradient(135deg,var(--accent2),var(--accent));color:var(--bg)!important;padding:9px 22px;border-radius:8px;font-weight:700;-webkit-text-fill-color:var(--bg)!important}
+.lang-switcher{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;transition:all 0.2s}
+.lang-switcher:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* ABOUT */
-  .about { background: var(--bg2); }
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  .evolution-steps { display: flex; flex-direction: column; gap: 0; margin-top: 40px; }
-  .evo-step {
-    display: flex; gap: 20px; align-items: flex-start;
-    padding: 20px 0; border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-  .evo-step:last-child { border-bottom: none; }
-  .evo-num {
-    width: 36px; height: 36px; min-width: 36px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent);
-  }
-  .evo-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-  .evo-content p { font-size: 13px; color: var(--muted); }
-  .vision-card {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-    border: 1px solid var(--border);
-    border-radius: 20px; padding: 48px;
-    position: relative; overflow: hidden;
-  }
-  .vision-card::before {
-    content: ''; position: absolute;
-    top: -50px; right: -50px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(0,200,255,0.1) 0%, transparent 70%);
-  }
-  .vision-icon { font-size: 48px; margin-bottom: 24px; }
-  .vision-card h3 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
-  .vision-card p { color: var(--muted); line-height: 1.8; font-size: 15px; }
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,rgba(0,102,255,0.11) 0%,transparent 70%),radial-gradient(ellipse 50% 35% at 80% 80%,rgba(0,200,255,0.05) 0%,transparent 60%)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,200,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.03) 1px,transparent 1px);background-size:60px 60px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.2);border-radius:100px;padding:6px 16px;font-size:11px;color:var(--accent);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:28px;animation:fadeUp 0.6s ease both}
+.hero h1{font-size:clamp(38px,7vw,86px);font-weight:800;line-height:1.04;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp 0.6s 0.1s ease both}
+.hero h1 span{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 50%,#8B5CF6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:17px;color:var(--muted);max-width:580px;margin:0 auto 38px;font-weight:300;line-height:1.75;animation:fadeUp 0.6s 0.2s ease both}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp 0.6s 0.3s ease both}
+.btn-primary{background:linear-gradient(135deg,var(--accent2),var(--accent));color:var(--bg);padding:13px 30px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;border:none;text-decoration:none;display:inline-block;transition:transform 0.2s,box-shadow 0.2s;font-family:'Syne',sans-serif}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,102,255,0.4)}
+.btn-ghost{background:transparent;color:var(--text);padding:13px 30px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;border:1px solid var(--border);text-decoration:none;display:inline-block;transition:border-color 0.2s,background 0.2s;font-family:'Syne',sans-serif}
+.btn-ghost:hover{border-color:var(--accent);background:var(--glow)}
+.hero-stats{display:flex;gap:44px;justify-content:center;margin-top:68px;flex-wrap:wrap;animation:fadeUp 0.6s 0.4s ease both}
+.stat{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--accent)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:3px}
 
-  /* SERVICES */
-  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
-  .service-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px; padding: 32px;
-    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-    position: relative; overflow: hidden;
-  }
-  .service-card::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent 60%, var(--glow));
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .service-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 16px 40px rgba(0,200,255,0.08); }
-  .service-card:hover::after { opacity: 1; }
-  .service-icon {
-    width: 48px; height: 48px;
-    background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(0,200,255,0.2));
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-size: 22px; margin-bottom: 20px;
-  }
-  .service-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-  .service-card p { color: var(--muted); font-size: 14px; line-height: 1.7; }
-  .service-tag {
-    display: inline-block; margin-top: 16px;
-    background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.15);
-    border-radius: 100px; padding: 4px 12px; font-size: 11px;
-    color: var(--accent); letter-spacing: 0.5px;
-  }
+/* SECTIONS */
+section{padding:96px 48px}
+.sec-label{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+.sec-title{font-size:clamp(26px,4vw,46px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:14px}
+.sec-sub{color:var(--muted);font-size:15px;max-width:520px;line-height:1.75}
+.container{max-width:1160px;margin:0 auto}
 
-  /* CRYPTO */
-  .crypto { background: var(--bg2); }
-  .crypto-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 60px; }
-  .crypto-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 32px;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-  .crypto-card:hover { transform: translateY(-3px); border-color: var(--gold); }
-  .crypto-card-icon { font-size: 32px; margin-bottom: 16px; }
-  .crypto-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
-  .crypto-card p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+/* CARDS */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:56px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:56px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:30px;transition:transform 0.3s,border-color 0.3s,box-shadow 0.3s;position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,var(--glow));opacity:0;transition:opacity 0.3s}
+.card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 16px 40px rgba(0,200,255,0.07)}
+.card:hover::after{opacity:1}
+.card-icon{width:46px;height:46px;background:linear-gradient(135deg,rgba(0,102,255,0.18),rgba(0,200,255,0.18));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px}
+.card h3{font-size:17px;font-weight:700;margin-bottom:9px}
+.card p{color:var(--muted);font-size:13.5px;line-height:1.7}
+.tag{display:inline-block;margin-top:14px;background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.14);border-radius:100px;padding:3px 11px;font-size:10.5px;color:var(--accent)}
 
-  /* PROJECTS */
-  .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
-  .project-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .project-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-  .project-top {
-    height: 160px; display: flex; align-items: center; justify-content: center;
-    font-size: 48px; position: relative; overflow: hidden;
-  }
-  .project-top.fixmine { background: linear-gradient(135deg, #1a0533, #2d1b69); }
-  .project-top.cekgejala { background: linear-gradient(135deg, #003322, #00664d); }
-  .project-top.ruwang { background: linear-gradient(135deg, #1a1200, #664d00); }
-  .project-info { padding: 24px; }
-  .project-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-  .project-info p { color: var(--muted); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
-  .project-link {
-    color: var(--accent); font-size: 13px; font-weight: 600;
-    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
-  }
-  .project-link:hover { text-decoration: underline; }
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.evo-steps{display:flex;flex-direction:column;gap:0;margin-top:36px}
+.evo-step{display:flex;gap:18px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--border)}
+.evo-step:last-child{border-bottom:none}
+.evo-num{width:34px;height:34px;min-width:34px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent)}
+.evo-content h4{font-size:14px;font-weight:700;margin-bottom:3px}
+.evo-content p{font-size:13px;color:var(--muted)}
+.vision-card{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border:1px solid var(--border);border-radius:20px;padding:44px;position:relative;overflow:hidden}
+.vision-card::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,200,255,0.08) 0%,transparent 70%)}
+.vision-icon{font-size:44px;margin-bottom:22px}
+.vision-card h3{font-size:22px;font-weight:800;margin-bottom:14px}
+.vision-card p{color:var(--muted);line-height:1.85;font-size:14.5px}
 
-  /* TEAM */
-  .team { background: var(--bg2); }
-  .team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; margin-top: 60px; max-width: 700px; }
-  .team-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; overflow: hidden;
-    transition: transform 0.3s;
-  }
-  .team-card:hover { transform: translateY(-4px); }
-  .team-photo {
-    height: 240px; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--surface2);
-    position: relative;
-  }
-  .team-photo-placeholder {
-    width: 120px; height: 120px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40px; font-weight: 800; color: white;
-    font-family: 'Syne', sans-serif;
-  }
-  .team-photo img {
-    width: 100%; height: 100%; object-fit: cover;
-    filter: grayscale(20%) contrast(1.1);
-  }
-  .team-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(13,24,36,0.9) 0%, transparent 50%);
-  }
-  .team-info { padding: 24px; }
-  .team-info h3 { font-size: 18px; font-weight: 700; }
-  .team-info .role { color: var(--accent); font-size: 13px; margin: 4px 0 12px; }
-  .team-info p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+/* PROJECTS */
+.proj-top{height:150px;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden}
+.proj-top.fixmine{background:linear-gradient(135deg,#1a0533,#2d1b69)}
+.proj-top.cekgejala{background:linear-gradient(135deg,#003322,#00664d)}
+.proj-top.cryptosig{background:linear-gradient(135deg,#001a33,#003d66)}
+.proj-info{padding:22px}
+.proj-info h3{font-size:17px;font-weight:700;margin-bottom:7px}
+.proj-info p{color:var(--muted);font-size:13px;line-height:1.65;margin-bottom:14px}
+.proj-link{color:var(--accent);font-size:13px;font-weight:600;text-decoration:none}
+.proj-link:hover{text-decoration:underline}
 
-  /* AGENTS SECTION */
-  .agents { background: var(--bg); }
-  .agents-tabs { display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
-  .agent-tab {
-    padding: 10px 20px; border-radius: 8px; cursor: pointer;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 14px;
-    transition: all 0.2s;
-  }
-  .agent-tab.active { background: var(--accent2); border-color: var(--accent2); color: white; }
-  .agent-panel { display: none; }
-  .agent-panel.active { display: block; }
-  .agent-content {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 48px;
-  }
-  .agent-content h3 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
-  .agent-content p { color: var(--muted); line-height: 1.8; margin-bottom: 24px; }
-  .script-box {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 24px; margin-top: 16px;
-  }
-  .script-box p { color: var(--text); font-size: 14px; line-height: 1.9; margin: 0; }
-  .script-box strong { color: var(--accent); }
-  .marketing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
-  .marketing-item {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px;
-  }
-  .marketing-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
-  .marketing-item p { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0; }
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:40px;margin-top:56px;max-width:640px}
+.team-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:transform 0.3s}
+.team-card:hover{transform:translateY(-4px)}
+.team-photo{height:220px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--surface2);position:relative}
+.team-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;filter:grayscale(15%) contrast(1.1)}
+.team-placeholder{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:white;font-family:'Syne',sans-serif}
+.team-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(13,24,36,0.88) 0%,transparent 50%)}
+.team-info{padding:22px}
+.team-info h3{font-size:17px;font-weight:700}
+.team-info .role{color:var(--accent);font-size:12.5px;margin:4px 0 10px}
+.team-info p{color:var(--muted);font-size:13px;line-height:1.65}
 
-  /* CHATBOT */
-  .chatbot-wrapper {
-    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-  }
-  .chat-bubble {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; box-shadow: 0 8px 30px rgba(0,102,255,0.5);
-    font-size: 24px; transition: transform 0.2s;
-    border: none;
-  }
-  .chat-bubble:hover { transform: scale(1.1); }
-  .chat-window {
-    position: absolute; bottom: 76px; right: 0;
-    width: 380px; height: 520px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px; overflow: hidden;
-    display: none; flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-  .chat-window.open { display: flex; }
-  .chat-header {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    padding: 16px 20px; display: flex; align-items: center; gap: 12px;
-  }
-  .chat-header .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center; font-size: 18px;
-  }
-  .chat-header-info h4 { font-size: 14px; font-weight: 700; color: white; }
-  .chat-header-info p { font-size: 11px; color: rgba(255,255,255,0.7); }
-  .online-dot { width: 8px; height: 8px; background: #00ff88; border-radius: 50%; display: inline-block; margin-right: 4px; }
-  .lang-select-screen {
-    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 16px; padding: 32px;
-  }
-  .lang-select-screen p { color: var(--muted); text-align: center; font-size: 14px; }
-  .lang-btns { display: flex; gap: 12px; }
-  .lang-btn {
-    padding: 12px 24px; border-radius: 10px; cursor: pointer;
-    border: 1px solid var(--border); background: var(--surface2);
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    transition: all 0.2s;
-  }
-  .lang-btn:hover { border-color: var(--accent); background: var(--glow); color: var(--accent); }
-  .chat-body { flex: 1; overflow-y: auto; padding: 16px; display: none; flex-direction: column; gap: 12px; }
-  .chat-body.visible { display: flex; }
-  .chat-msg { max-width: 80%; }
-  .chat-msg.bot { align-self: flex-start; }
-  .chat-msg.user { align-self: flex-end; }
-  .chat-msg .bubble {
-    padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6;
-  }
-  .chat-msg.bot .bubble { background: var(--surface2); color: var(--text); border-bottom-left-radius: 4px; }
-  .chat-msg.user .bubble { background: var(--accent2); color: white; border-bottom-right-radius: 4px; }
-  .chat-input-area { padding: 12px; border-top: 1px solid var(--border); display: none; gap: 8px; }
-  .chat-input-area.visible { display: flex; }
-  .chat-input {
-    flex: 1; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 14px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
-  }
-  .chat-input:focus { border-color: var(--accent); }
-  .chat-send {
-    width: 38px; height: 38px; border-radius: 8px;
-    background: var(--accent2); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 16px;
-  }
-  .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
-  .typing-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
-    animation: bounce 1.2s infinite;
-  }
-  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+/* AGENTS */
+.agent-tabs{display:flex;gap:10px;margin-bottom:36px;flex-wrap:wrap}
+.agent-tab{padding:9px 18px;border-radius:8px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;transition:all 0.2s}
+.agent-tab.active{background:var(--accent2);border-color:var(--accent2);color:white}
+.agent-panel{display:none}
+.agent-panel.active{display:block}
+.agent-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px}
+.agent-box h3{font-size:22px;font-weight:800;margin-bottom:14px}
+.agent-box > p{color:var(--muted);line-height:1.85;margin-bottom:22px}
+.script-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:22px;margin-top:14px}
+.script-box p{color:var(--text);font-size:13.5px;line-height:2;margin:0}
+.script-box strong{color:var(--accent)}
+.mkt-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.mkt-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px}
+.mkt-item h4{font-size:13px;font-weight:700;margin-bottom:7px;color:var(--accent)}
+.mkt-item p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0}
 
-  /* CONTACT */
-  .contact { background: var(--bg2); }
-  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
-  .contact-info { display: flex; flex-direction: column; gap: 24px; }
-  .contact-item {
-    display: flex; gap: 16px; align-items: flex-start;
-  }
-  .contact-icon {
-    width: 44px; height: 44px; min-width: 44px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-  }
-  .contact-item h4 { font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
-  .contact-item p { font-size: 14px; color: var(--text); font-weight: 500; line-height: 1.5; }
-  .inquiry-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 40px;
-  }
-  .inquiry-box h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-  .inquiry-box p { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
-  .inquiry-btns { display: flex; flex-direction: column; gap: 12px; }
-  .inquiry-btn {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 20px; border-radius: 10px; text-decoration: none;
-    border: 1px solid var(--border); background: var(--surface2);
-    color: var(--text); transition: all 0.2s; font-size: 14px; font-weight: 500;
-  }
-  .inquiry-btn:hover { border-color: var(--accent); background: var(--glow); color: var(--accent); }
-  .inquiry-btn .icon { font-size: 20px; }
+/* HOW IT WORKS */
+.flow-step{display:flex;gap:24px;align-items:flex-start;padding:22px 0;position:relative;z-index:1}
+.flow-num{min-width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 18px rgba(0,102,255,0.35)}
+.flow-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;flex:1}
+.flow-card h3{font-size:16px;font-weight:800;margin-bottom:7px}
+.flow-card p{color:var(--muted);font-size:13.5px;line-height:1.75}
+.flow-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.flow-tag{background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.14);border-radius:5px;padding:2px 9px;font-size:10.5px;color:var(--accent)}
 
-  /* FOOTER */
-  footer {
-    background: var(--bg); border-top: 1px solid var(--border);
-    padding: 40px 48px; text-align: center;
-  }
-  footer p { color: var(--muted); font-size: 13px; }
-  footer a { color: var(--accent); text-decoration: none; }
+/* PRICING */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:56px}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;transition:transform 0.3s;position:relative}
+.price-card:hover{transform:translateY(-4px)}
+.price-card.popular{background:linear-gradient(135deg,rgba(0,102,255,0.1),rgba(0,200,255,0.05));border-color:rgba(0,200,255,0.3);transform:scale(1.02)}
+.price-card.popular:hover{transform:scale(1.02) translateY(-4px)}
+.popular-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:100px;padding:3px 14px;font-size:10.5px;font-weight:700;color:white;white-space:nowrap}
+.price-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px}
+.price-list{display:flex;flex-direction:column;gap:7px;margin-bottom:26px;font-size:13px}
+.pay-form{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:44px;max-width:660px;margin:0 auto}
+.pay-form h3{font-size:20px;font-weight:800;margin-bottom:7px;text-align:center}
+.pay-form > p{color:var(--muted);font-size:13.5px;margin-bottom:32px;text-align:center}
+.field{margin-bottom:18px}
+.field label{font-size:10.5px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 15px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select{appearance:none}
+.amount-wrap{position:relative}
+.amount-prefix{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;font-weight:600;pointer-events:none}
+.field input.has-prefix{padding-left:42px}
+#amount-info{margin-top:7px;font-size:12.5px;color:var(--muted)}
+.pay-summary{display:none;background:var(--bg);border:1px solid rgba(0,200,255,0.14);border-radius:11px;padding:15px;margin-bottom:18px}
+.pay-summary-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
+.pay-summary-row.total{border-top:1px solid var(--border);padding-top:10px;margin-top:4px;font-weight:800}
+.pay-summary-row.total span:last-child{color:var(--accent);font-size:17px;font-family:'Syne',sans-serif}
+.gw-selector{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.gw-btn{background:var(--surface2);border:2px solid var(--border);border-radius:11px;padding:15px;cursor:pointer;text-align:center;transition:all 0.2s}
+.gw-btn.selected-mid{border-color:var(--accent);background:rgba(0,200,255,0.07)}
+.gw-btn.selected-xen{border-color:var(--accent2);background:rgba(0,102,255,0.07)}
+.gw-name{font-size:14px;font-weight:700;margin:4px 0 2px}
+.gw-methods{font-size:11px;color:var(--muted)}
+.pay-btn-main{width:100%;padding:15px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:11px;color:var(--bg);font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 4px 20px rgba(0,102,255,0.28);transition:all 0.2s;margin-top:8px}
+.pay-btn-main:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,102,255,0.45)}
+.pay-secure{text-align:center;font-size:11.5px;color:var(--muted);margin-top:10px}
+.pay-secure a{color:var(--accent)}
 
-  /* ANIMATIONS */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes bounce {
-    0%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
+/* LEGAL */
+.legal-section{background:var(--bg2)}
+.legal-cards{display:flex;flex-direction:column;gap:22px;max-width:780px}
+.legal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px}
+.legal-card h3{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--accent)}
+.legal-card p{color:var(--muted);font-size:13.5px;line-height:1.8}
 
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg2); }
-  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
+.contact-item{display:flex;gap:15px;align-items:flex-start;margin-bottom:22px}
+.contact-icon{width:42px;height:42px;min-width:42px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.contact-item h4{font-size:12px;color:var(--muted);margin-bottom:3px;font-weight:500}
+.contact-item p{font-size:13.5px;font-weight:500;line-height:1.55}
+.inquiry-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px}
+.inquiry-box h3{font-size:19px;font-weight:700;margin-bottom:7px}
+.inquiry-box > p{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+.inq-btn{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:10px;text-decoration:none;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all 0.2s;font-size:13.5px;font-weight:500;margin-bottom:10px}
+.inq-btn:hover{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+.inq-icon{font-size:19px}
 
-  /* RESPONSIVE */
-  @media (max-width: 900px) {
-    nav { padding: 16px 20px; }
-    .nav-links { display: none; }
-    section { padding: 60px 20px; }
-    .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
-    .services-grid { grid-template-columns: 1fr; }
-    .crypto-grid { grid-template-columns: 1fr; }
-    .projects-grid { grid-template-columns: 1fr; }
-    .team-grid { grid-template-columns: 1fr 1fr; }
-    .marketing-grid { grid-template-columns: 1fr; }
-    .chat-window { width: 320px; }
-  }
+/* FOOTER */
+footer{background:var(--bg);border-top:1px solid var(--border);padding:40px 48px;text-align:center}
+footer p{color:var(--muted);font-size:12.5px}
+footer a{color:var(--accent);text-decoration:none}
+.foot-links{display:flex;gap:20px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+.foot-links a{color:var(--muted);font-size:12px;text-decoration:none;transition:color 0.2s}
+.foot-links a:hover{color:var(--accent)}
+
+/* CHATBOT */
+.chatbot-wrapper{position:fixed;bottom:24px;right:24px;z-index:9999}
+.chat-bubble{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 28px rgba(0,102,255,0.5);font-size:22px;transition:transform 0.2s;border:none}
+.chat-bubble:hover{transform:scale(1.1)}
+.chat-win{position:absolute;bottom:72px;right:0;width:365px;height:510px;background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.chat-win.open{display:flex}
+.chat-head{background:linear-gradient(135deg,var(--accent2),var(--accent));padding:14px 18px;display:flex;align-items:center;gap:11px}
+.chat-av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px}
+.chat-head h4{font-size:13px;font-weight:700;color:white}
+.chat-head p{font-size:10.5px;color:rgba(255,255,255,0.7)}
+.online-dot{width:7px;height:7px;background:#00ff88;border-radius:50%;display:inline-block;margin-right:3px}
+.lang-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;text-align:center}
+.lang-screen p{color:var(--muted);font-size:13px}
+.lang-btns-chat{display:flex;gap:10px}
+.lang-btn-chat{padding:11px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all 0.2s}
+.lang-btn-chat:hover{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+.chat-body{flex:1;overflow-y:auto;padding:14px;display:none;flex-direction:column;gap:11px}
+.chat-body.vis{display:flex}
+.chat-msg{max-width:80%}
+.chat-msg.bot{align-self:flex-start}
+.chat-msg.user{align-self:flex-end}
+.chat-msg .bub{padding:9px 13px;border-radius:11px;font-size:12.5px;line-height:1.65}
+.chat-msg.bot .bub{background:var(--surface2);border-bottom-left-radius:3px}
+.chat-msg.user .bub{background:var(--accent2);color:white;border-bottom-right-radius:3px}
+.chat-inp-area{padding:11px;border-top:1px solid var(--border);display:none;gap:7px}
+.chat-inp-area.vis{display:flex}
+.chat-inp{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none}
+.chat-inp:focus{border-color:var(--accent)}
+.chat-send{width:36px;height:36px;border-radius:8px;background:var(--accent2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-size:15px}
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:9px 13px}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:14px 18px}
+  .nav-links{display:none}
+  section{padding:60px 18px}
+  .about-grid,.contact-grid{grid-template-columns:1fr;gap:36px}
+  .grid-3{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr}
+  .price-card.popular{transform:none}
+  .team-grid{grid-template-columns:1fr 1fr}
+  .mkt-grid{grid-template-columns:1fr}
+  .chat-win{width:310px}
+}
 </style>
 </head>
 <body>
 
+<!-- ══ LANGUAGE GATE ══════════════════════════════════════════════ -->
+<div id="lang-gate">
+  <div class="lang-grid"></div>
+  <div class="lang-gate-inner">
+    <div class="lang-logo">⚡ GoMiners.id</div>
+    <div class="lang-tagline">PT Global Operasi Miners — AI & Crypto SaaS</div>
+    <div class="lang-prompt" id="gate-prompt">Please choose your language / Pilih bahasa Anda</div>
+    <div class="lang-btns">
+      <button class="lang-choice en-btn" onclick="chooseLang('en')">
+        <span class="lang-flag">🇺🇸</span> English
+      </button>
+      <div class="lang-divider"></div>
+      <button class="lang-choice id-btn" onclick="chooseLang('id')">
+        <span class="lang-flag">🇮🇩</span> Bahasa Indonesia
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN SITE ══════════════════════════════════════════════════ -->
+<div id="site">
+
 <!-- NAV -->
 <nav>
-  <div class="logo">
-    <div class="logo-icon">⚡</div>
-    GoMiners<span style="opacity:0.5">.id</span>
-  </div>
+  <div class="logo"><div class="logo-icon">⚡</div>GoMiners<span style="opacity:0.45">.id</span></div>
   <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#crypto">Crypto</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#team">Team</a></li>
-    <li><a href="#agents">AI Agents</a></li>
-    <li><a href="#contact" class="nav-cta">Contact</a></li>
+    <li><a href="#about" data-en="About" data-id="Tentang">About</a></li>
+    <li><a href="#services" data-en="Services" data-id="Layanan">Services</a></li>
+    <li><a href="#crypto" data-en="Crypto" data-id="Kripto">Crypto</a></li>
+    <li><a href="#projects" data-en="Projects" data-id="Proyek">Projects</a></li>
+    <li><a href="#how-it-works" data-en="How It Works" data-id="Cara Kerja">How It Works</a></li>
+    <li><a href="#pricing" data-en="Pricing" data-id="Harga">Pricing</a></li>
+    <li><a href="#contact" class="nav-cta" data-en="Contact" data-id="Kontak">Contact</a></li>
   </ul>
+  <button class="lang-switcher" onclick="toggleLang()">
+    <span id="flag-icon">🇮🇩</span>
+    <span id="lang-label">ID</span>
+  </button>
 </nav>
 
 <!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-bg"></div>
-  <div class="grid-overlay"></div>
+  <div class="hero-bg"></div><div class="grid"></div>
   <div style="position:relative;z-index:1">
-    <div class="hero-badge">🚀 Est. 2017 · Now SaaS + AI</div>
-    <h1>Making Earth a Better<br><span>Place with AI</span></h1>
-    <p>From GPU mining rigs to AI-powered SaaS — GoMiners is Indonesia's leading platform specializing in Crypto intelligence and AI automation for the modern enterprise.</p>
+    <div class="hero-badge" data-en="🚀 Est. 2017 · Now SaaS + AI" data-id="🚀 Berdiri 2017 · Kini SaaS + AI">🚀 Est. 2017 · Now SaaS + AI</div>
+    <h1 data-en="Making Earth a Better<br><span>Place with AI</span>" data-id="Menjadikan Bumi Tempat<br><span>Lebih Baik dengan AI</span>">Making Earth a Better<br><span>Place with AI</span></h1>
+    <p data-en="From GPU mining rigs to AI-powered SaaS — GoMiners is Indonesia's leading platform specializing in Crypto intelligence and AI automation for the modern enterprise." data-id="Dari rig GPU mining hingga SaaS berbasis AI — GoMiners adalah platform terdepan Indonesia yang mengkhususkan diri dalam kecerdasan Kripto dan otomasi AI untuk bisnis modern.">From GPU mining rigs to AI-powered SaaS — GoMiners is Indonesia's leading platform specializing in Crypto intelligence and AI automation for the modern enterprise.</p>
     <div class="hero-ctas">
-      <a href="#services" class="btn-primary">Explore Services</a>
-      <a href="#contact" class="btn-ghost">Get in Touch</a>
+      <a href="#services" class="btn-primary" data-en="Explore Services" data-id="Lihat Layanan">Explore Services</a>
+      <a href="#contact" class="btn-ghost" data-en="Get in Touch" data-id="Hubungi Kami">Get in Touch</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><div class="stat-num">2017</div><div class="stat-label">Founded</div></div>
-      <div class="stat"><div class="stat-num">3+</div><div class="stat-label">SaaS Products</div></div>
-      <div class="stat"><div class="stat-num">PT</div><div class="stat-label">Legal Entity</div></div>
-      <div class="stat"><div class="stat-num">AI</div><div class="stat-label">Powered</div></div>
+      <div class="stat"><div class="stat-num">2017</div><div class="stat-label" data-en="Founded" data-id="Berdiri">Founded</div></div>
+      <div class="stat"><div class="stat-num">3+</div><div class="stat-label" data-en="SaaS Products" data-id="Produk SaaS">SaaS Products</div></div>
+      <div class="stat"><div class="stat-num">PT</div><div class="stat-label" data-en="Legal Entity" data-id="Badan Hukum">Legal Entity</div></div>
+      <div class="stat"><div class="stat-num">AI</div><div class="stat-label" data-en="Powered" data-id="Bertenaga">Powered</div></div>
     </div>
   </div>
 </section>
 
 <!-- ABOUT -->
-<section class="about" id="about">
+<section style="background:var(--bg2)" id="about">
   <div class="container">
     <div class="about-grid">
       <div>
-        <div class="section-label">Our Journey</div>
-        <h2 class="section-title">From Mining Rigs<br>to AI SaaS</h2>
-        <p class="section-sub">A decade of tech evolution — starting from tech services, pivoting to crypto, and now leading AI-powered digital transformation.</p>
-        <div class="evolution-steps">
-          <div class="evo-step">
-            <div class="evo-num">01</div>
-            <div class="evo-content">
-              <h4>Tech Services (2017)</h4>
-              <p>Started as an IT services & computer assembly company under PT Global Operasi Miners.</p>
-            </div>
-          </div>
-          <div class="evo-step">
-            <div class="evo-num">02</div>
-            <div class="evo-content">
-              <h4>Crypto Mining Era</h4>
-              <p>Evolved into crypto mining — GPU rigs, ASIC hardware, cloud hosting, and trading automation.</p>
-            </div>
-          </div>
-          <div class="evo-step">
-            <div class="evo-num">03</div>
-            <div class="evo-content">
-              <h4>AI SaaS Company (Now)</h4>
-              <p>Now a full SaaS company specializing in AI automation, crypto intelligence, and digital transformation.</p>
-            </div>
-          </div>
+        <div class="sec-label" data-en="Our Journey" data-id="Perjalanan Kami">Our Journey</div>
+        <h2 class="sec-title" data-en="From Mining Rigs<br>to AI SaaS" data-id="Dari Rig Mining<br>ke AI SaaS">From Mining Rigs<br>to AI SaaS</h2>
+        <p class="sec-sub" data-en="A decade of tech evolution — from tech services to crypto mining, now leading AI-powered digital transformation." data-id="Satu dekade evolusi teknologi — dari layanan IT ke crypto mining, kini memimpin transformasi digital berbasis AI.">A decade of tech evolution — from tech services to crypto mining, now leading AI-powered digital transformation.</p>
+        <div class="evo-steps">
+          <div class="evo-step"><div class="evo-num">01</div><div class="evo-content"><h4 data-en="Tech Services (2017)" data-id="Layanan IT (2017)">Tech Services (2017)</h4><p data-en="Started as IT services & computer assembly under PT Global Operasi Miners." data-id="Dimulai sebagai layanan IT & perakitan komputer di bawah PT Global Operasi Miners.">Started as IT services & computer assembly under PT Global Operasi Miners.</p></div></div>
+          <div class="evo-step"><div class="evo-num">02</div><div class="evo-content"><h4 data-en="Crypto Mining Era" data-id="Era Crypto Mining">Crypto Mining Era</h4><p data-en="Evolved into GPU rigs, ASIC hardware, cloud hosting, and trading automation." data-id="Berkembang ke rig GPU, hardware ASIC, cloud hosting, dan otomasi trading.">Evolved into GPU rigs, ASIC hardware, cloud hosting, and trading automation.</p></div></div>
+          <div class="evo-step"><div class="evo-num">03</div><div class="evo-content"><h4 data-en="AI SaaS Company (Now)" data-id="Perusahaan AI SaaS (Kini)">AI SaaS Company (Now)</h4><p data-en="Full SaaS company specializing in AI automation, crypto intelligence, and digital transformation." data-id="Perusahaan SaaS penuh yang mengkhususkan diri dalam otomasi AI, kecerdasan kripto, dan transformasi digital.">Full SaaS company specializing in AI automation, crypto intelligence, and digital transformation.</p></div></div>
         </div>
       </div>
       <div class="vision-card">
         <div class="vision-icon">🌍</div>
-        <h3>Our Vision</h3>
-        <p>We believe Artificial Intelligence is humanity's greatest lever for making the Earth a more convenient, equitable, and intelligent place to live. GoMiners exists to put that power in the hands of Indonesian businesses — and beyond.</p>
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Legal Entity</div>
-          <div style="font-size:13px;color:var(--text)">PT Global Operasi Miners</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">NIB: 1509230205682 · Est. Sep 2023</div>
+        <h3 data-en="Our Vision" data-id="Visi Kami">Our Vision</h3>
+        <p data-en="We believe Artificial Intelligence is humanity's greatest lever for making the Earth a more convenient, equitable, and intelligent place to live. GoMiners exists to put that power in the hands of Indonesian businesses — and beyond." data-id="Kami percaya Kecerdasan Buatan adalah pengungkit terbesar manusia untuk menjadikan Bumi tempat yang lebih nyaman, adil, dan cerdas. GoMiners hadir untuk menempatkan kekuatan itu di tangan bisnis Indonesia — dan seluruh dunia.">We believe Artificial Intelligence is humanity's greatest lever for making the Earth a more convenient, equitable, and intelligent place to live. GoMiners exists to put that power in the hands of Indonesian businesses — and beyond.</p>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+          <div style="font-size:10.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px" data-en="Legal Entity" data-id="Badan Hukum">Legal Entity</div>
+          <div style="font-size:13px">PT Global Operasi Miners</div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:3px">NIB: 1509230205682 · AHU-064510 · Sep 2023</div>
         </div>
       </div>
     </div>
@@ -564,87 +363,33 @@
 <!-- SERVICES -->
 <section id="services">
   <div class="container">
-    <div class="section-label">What We Do</div>
-    <h2 class="section-title">AI-Powered SaaS Services</h2>
-    <p class="section-sub">We deploy intelligent systems that run automatically — so your business grows with minimal human intervention.</p>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">🤖</div>
-        <h3>AI Automation Service</h3>
-        <p>Our AI digs deep to understand your exact customer needs — then compiles a full "Know Your Customer Need" report and sends it directly to your inbox. Every inquiry is captured, analyzed, and acted upon.</p>
-        <span class="service-tag">AI Automation</span>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">⚡</div>
-        <h3>Digital Transformation Agent</h3>
-        <p>We deploy AI agents that automate your entire business workflow — from lead capture to reporting. Built for local Indonesian businesses scaling to international markets.</p>
-        <span class="service-tag">SaaS Agent</span>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">📊</div>
-        <h3>Sales Intelligence</h3>
-        <p>AI-generated cold outreach scripts, customer segmentation, and pipeline automation. We help you sell smarter — reaching the right people with the right message at the right time.</p>
-        <span class="service-tag">Sales AI</span>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🧠</div>
-        <h3>Marketing Automation</h3>
-        <p>Out-of-the-box growth strategies powered by AI — content generation, audience targeting, and campaign optimization that runs 24/7 without constant human oversight.</p>
-        <span class="service-tag">Growth AI</span>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">💬</div>
-        <h3>AI Chatbot (Bilingual)</h3>
-        <p>A polished, caring AI assistant in Bahasa Indonesia & English — understanding customers deeply, generating full conversation reports, and identifying their real business needs.</p>
-        <span class="service-tag">Conversational AI</span>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">🔗</div>
-        <h3>Crypto Intelligence</h3>
-        <p>Signal aggregation from multiple sources, autotrading on Polymarket & crypto exchanges, and mining infrastructure consulting — backed by years of hands-on experience.</p>
-        <span class="service-tag">Crypto SaaS</span>
-      </div>
+    <div class="sec-label" data-en="What We Do" data-id="Apa yang Kami Lakukan">What We Do</div>
+    <h2 class="sec-title" data-en="AI-Powered SaaS Services" data-id="Layanan SaaS Bertenaga AI">AI-Powered SaaS Services</h2>
+    <p class="sec-sub" data-en="Intelligent systems that run automatically — so your business grows with minimal human intervention." data-id="Sistem cerdas yang berjalan otomatis — bisnis Anda tumbuh dengan campur tangan manusia yang minimal.">Intelligent systems that run automatically — so your business grows with minimal human intervention.</p>
+    <div class="grid-3">
+      <div class="card"><div class="card-icon">🤖</div><h3 data-en="AI Automation" data-id="Otomasi AI">AI Automation</h3><p data-en="Our AI uncovers exact customer needs and compiles full KYC reports sent directly to your inbox — automatically." data-id="AI kami menggali kebutuhan customer secara mendalam dan menyusun laporan KYC lengkap yang langsung terkirim ke inbox Anda — secara otomatis.">Our AI uncovers exact customer needs and compiles full KYC reports sent directly to your inbox — automatically.</p><span class="tag">AI Automation</span></div>
+      <div class="card"><div class="card-icon">⚡</div><h3 data-en="Digital Transformation Agent" data-id="Agen Transformasi Digital">Digital Transformation Agent</h3><p data-en="AI agents automating your entire business workflow — from lead capture to reporting. Built for Indonesian SMEs scaling internationally." data-id="Agen AI yang mengotomasi seluruh alur bisnis Anda — dari tangkap prospek hingga pelaporan. Dirancang untuk UMKM Indonesia yang berkembang ke pasar internasional.">AI agents automating your entire business workflow — from lead capture to reporting. Built for Indonesian SMEs scaling internationally.</p><span class="tag">SaaS Agent</span></div>
+      <div class="card"><div class="card-icon">📊</div><h3 data-en="Sales Intelligence" data-id="Kecerdasan Penjualan">Sales Intelligence</h3><p data-en="AI-generated cold outreach scripts, customer segmentation, and pipeline automation. Sell smarter, not harder." data-id="Skrip cold outreach buatan AI, segmentasi pelanggan, dan otomasi pipeline. Jual lebih cerdas, bukan lebih keras.">AI-generated cold outreach scripts, customer segmentation, and pipeline automation. Sell smarter, not harder.</p><span class="tag">Sales AI</span></div>
+      <div class="card"><div class="card-icon">🧠</div><h3 data-en="Marketing Automation" data-id="Otomasi Pemasaran">Marketing Automation</h3><p data-en="AI-powered growth strategies — content generation, audience targeting, and campaign optimization running 24/7." data-id="Strategi pertumbuhan bertenaga AI — pembuatan konten, penargetan audiens, dan optimasi kampanye yang berjalan 24/7.">AI-powered growth strategies — content generation, audience targeting, and campaign optimization running 24/7.</p><span class="tag">Growth AI</span></div>
+      <div class="card"><div class="card-icon">💬</div><h3 data-en="AI Chatbot (Bilingual)" data-id="Chatbot AI (Bilingual)">AI Chatbot (Bilingual)</h3><p data-en="A professional AI assistant in Bahasa Indonesia & English — understanding customers deeply, generating conversation reports, and identifying real business needs." data-id="Asisten AI profesional dalam Bahasa Indonesia & Inggris — memahami customer secara mendalam, menghasilkan laporan percakapan, dan mengidentifikasi kebutuhan bisnis nyata.">A professional AI assistant in Bahasa Indonesia & English — understanding customers deeply, generating conversation reports, and identifying real business needs.</p><span class="tag">Conversational AI</span></div>
+      <div class="card"><div class="card-icon">🔗</div><h3 data-en="Crypto Intelligence" data-id="Kecerdasan Kripto">Crypto Intelligence</h3><p data-en="Signal aggregation from multiple sources, autotrading on Polymarket & crypto exchanges — backed by years of real-world experience." data-id="Agregasi sinyal dari berbagai sumber, autotrading di Polymarket & bursa kripto — didukung pengalaman nyata bertahun-tahun.">Signal aggregation from multiple sources, autotrading on Polymarket & crypto exchanges — backed by years of real-world experience.</p><span class="tag">Crypto SaaS</span></div>
     </div>
   </div>
 </section>
 
-<!-- CRYPTO SOLUTIONS -->
-<section class="crypto" id="crypto">
+<!-- CRYPTO -->
+<section style="background:var(--bg2)" id="crypto">
   <div class="container">
-    <div class="section-label">Crypto Experience</div>
-    <h2 class="section-title">Battle-Tested Crypto Solutions</h2>
-    <p class="section-sub">Years of real-world mining, trading, and infrastructure experience — now packaged as intelligent services.</p>
-    <div class="crypto-grid">
-      <div class="crypto-card">
-        <div class="crypto-card-icon">🖥️</div>
-        <h3>GPU Mining</h3>
-        <p>Custom GPU rig setup, optimization, and management. From single-card builds to large-scale GPU farms — we've built and operated them all.</p>
-      </div>
-      <div class="crypto-card">
-        <div class="crypto-card-icon">⚙️</div>
-        <h3>ASIC Mining</h3>
-        <p>ASIC miner procurement, configuration, firmware optimization, and facility consulting. Maximum hash rate, minimum downtime.</p>
-      </div>
-      <div class="crypto-card">
-        <div class="crypto-card-icon">☁️</div>
-        <h3>Cloud Hosting & Infrastructure</h3>
-        <p>Scalable cloud mining infrastructure deployment. Host your operations without the hardware headaches.</p>
-      </div>
-      <div class="crypto-card">
-        <div class="crypto-card-icon">🤖</div>
-        <h3>Autotrading Bot</h3>
-        <p>Automated trading strategies on Polymarket prediction markets and major crypto exchanges. AI-driven signal execution, 24/7.</p>
-      </div>
-      <div class="crypto-card">
-        <div class="crypto-card-icon">📡</div>
-        <h3>Crypto Signal Compiler</h3>
-        <p>Aggregating signals from multiple premium sources — on-chain data, social sentiment, technical analysis — compiled into actionable intelligence.</p>
-      </div>
-      <div class="crypto-card">
-        <div class="crypto-card-icon">🔐</div>
-        <h3>Portfolio & Risk Management</h3>
-        <p>AI-powered portfolio rebalancing, risk scoring, and automated stop-loss management for crypto asset portfolios.</p>
-      </div>
+    <div class="sec-label" data-en="Crypto Experience" data-id="Pengalaman Kripto">Crypto Experience</div>
+    <h2 class="sec-title" data-en="Battle-Tested Crypto Solutions" data-id="Solusi Kripto Teruji">Battle-Tested Crypto Solutions</h2>
+    <p class="sec-sub" data-en="Years of real-world mining, trading, and infrastructure experience — packaged as intelligent services." data-id="Pengalaman nyata bertahun-tahun dalam mining, trading, dan infrastruktur — dikemas sebagai layanan cerdas.">Years of real-world mining, trading, and infrastructure experience — packaged as intelligent services.</p>
+    <div class="grid-2">
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">🖥️</div><h3 data-en="GPU Mining" data-id="Mining GPU">GPU Mining</h3><p data-en="Custom GPU rig setup, optimization, and management. From single-card builds to large-scale GPU farms." data-id="Setup, optimasi, dan manajemen rig GPU kustom. Dari build satu kartu hingga farm GPU skala besar.">Custom GPU rig setup, optimization, and management. From single-card builds to large-scale GPU farms.</p></div>
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">⚙️</div><h3 data-en="ASIC Mining" data-id="Mining ASIC">ASIC Mining</h3><p data-en="ASIC miner procurement, configuration, firmware optimization, and facility consulting. Maximum hash rate, minimum downtime." data-id="Pengadaan, konfigurasi, optimasi firmware ASIC, dan konsultasi fasilitas. Hash rate maksimal, downtime minimal.">ASIC miner procurement, configuration, firmware optimization, and facility consulting. Maximum hash rate, minimum downtime.</p></div>
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">☁️</div><h3 data-en="Cloud Mining & Hosting" data-id="Mining & Hosting Cloud">Cloud Mining & Hosting</h3><p data-en="Scalable cloud mining infrastructure deployment — host your operations without hardware headaches." data-id="Deployment infrastruktur cloud mining yang skalabel — operasikan bisnis Anda tanpa repot hardware.">Scalable cloud mining infrastructure deployment — host your operations without hardware headaches.</p></div>
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">🤖</div><h3 data-en="Autotrading Bot" data-id="Bot Autotrading">Autotrading Bot</h3><p data-en="Automated trading on Polymarket and major crypto exchanges. AI-driven signal execution, 24/7." data-id="Trading otomatis di Polymarket dan bursa kripto utama. Eksekusi sinyal bertenaga AI, 24/7.">Automated trading on Polymarket and major crypto exchanges. AI-driven signal execution, 24/7.</p></div>
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">📡</div><h3 data-en="Crypto Signal Compiler" data-id="Kompilator Sinyal Kripto">Crypto Signal Compiler</h3><p data-en="Signals from multiple premium sources — on-chain data, social sentiment, technical analysis — compiled into actionable intelligence." data-id="Sinyal dari berbagai sumber premium — data on-chain, sentimen sosial, analisis teknikal — dikompilasi menjadi intelijen yang bisa ditindaklanjuti.">Signals from multiple premium sources — on-chain data, social sentiment, technical analysis — compiled into actionable intelligence.</p></div>
+      <div class="card" style="border-color:rgba(255,184,0,0.15)"><div style="font-size:28px;margin-bottom:14px">🔐</div><h3 data-en="Portfolio & Risk Management" data-id="Manajemen Portfolio & Risiko">Portfolio & Risk Management</h3><p data-en="AI-powered portfolio rebalancing, risk scoring, and automated stop-loss management for crypto assets." data-id="Rebalancing portfolio bertenaga AI, penilaian risiko, dan manajemen stop-loss otomatis untuk aset kripto.">AI-powered portfolio rebalancing, risk scoring, and automated stop-loss management for crypto assets.</p></div>
     </div>
   </div>
 </section>
@@ -652,260 +397,215 @@
 <!-- PROJECTS -->
 <section id="projects">
   <div class="container">
-    <div class="section-label">Our Products</div>
-    <h2 class="section-title">Projects We've Built</h2>
-    <p class="section-sub">Live SaaS products deployed and serving real users across Indonesia.</p>
-    <div class="projects-grid">
-      <div class="project-card">
-        <div class="project-top fixmine">⛏️</div>
-        <div class="project-info">
-          <h3>Fixmine</h3>
-          <p>AI powered diagnostic for your PC.</p>
-          <a href="https://fixmine.app" target="_blank" class="project-link">Visit Fixmine →</a>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-top cekgejala">🩺</div>
-        <div class="project-info">
-          <h3>CekGejala.id</h3>
-          <p>AI-powered health symptom checker for Indonesia. Users input symptoms and receive preliminary assessments — making healthcare more accessible nationwide.</p>
-          <a href="https://cekgejala.id" target="_blank" class="project-link">Visit CekGejala →</a>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="project-top cryptosignal">🏠</div>
-        <div class="project-info">
-          <h3>Cryptosignal.id</h3>
-          <p>The fastest Crypto news compiler in your hand.</p>
-          <a href="https://cryptosignal.id" target="_blank" class="project-link">Visit Cryptosignal →</a>
-        </div>
-      </div>
+    <div class="sec-label" data-en="Our Products" data-id="Produk Kami">Our Products</div>
+    <h2 class="sec-title" data-en="Live SaaS Products" data-id="Produk SaaS Live">Live SaaS Products</h2>
+    <p class="sec-sub" data-en="Real products serving real users across Indonesia." data-id="Produk nyata yang melayani pengguna nyata di seluruh Indonesia.">Real products serving real users across Indonesia.</p>
+    <div class="grid-3" style="margin-top:48px">
+      <div class="card" style="padding:0;overflow:hidden"><div class="proj-top fixmine">⛏️</div><div class="proj-info"><h3>Fixmine</h3><p data-en="Comprehensive mining management and monitoring platform. Track rigs, optimize performance, and maximize yields — all in one dashboard." data-id="Platform manajemen dan pemantauan mining komprehensif. Pantau rig, optimalkan performa, dan maksimalkan hasil — semuanya dalam satu dashboard.">Comprehensive mining management and monitoring platform. Track rigs, optimize performance, and maximize yields — all in one dashboard.</p><a href="https://fixmine.id" target="_blank" class="proj-link">fixmine.id →</a></div></div>
+      <div class="card" style="padding:0;overflow:hidden"><div class="proj-top cekgejala">🩺</div><div class="proj-info"><h3>CekGejala.id</h3><p data-en="AI-powered health symptom checker for Indonesia. Users input symptoms and receive preliminary assessments — making healthcare more accessible." data-id="Pemeriksa gejala kesehatan bertenaga AI untuk Indonesia. Pengguna memasukkan gejala dan menerima penilaian awal — menjadikan layanan kesehatan lebih mudah diakses.">AI-powered health symptom checker for Indonesia. Users input symptoms and receive preliminary assessments — making healthcare more accessible.</p><a href="https://cekgejala.id" target="_blank" class="proj-link">cekgejala.id →</a></div></div>
+      <div class="card" style="padding:0;overflow:hidden"><div class="proj-top cryptosig">📡</div><div class="proj-info"><h3>Cryptosignal.id</h3><p data-en="Indonesia's fastest crypto data feeder — real-time signals, market intelligence, and trading alerts aggregated from top sources." data-id="Feeder data kripto tercepat di Indonesia — sinyal real-time, intelijen pasar, dan peringatan trading yang diagregasi dari sumber terbaik.">Indonesia's fastest crypto data feeder — real-time signals, market intelligence, and trading alerts aggregated from top sources.</p><a href="https://cryptosignal.id" target="_blank" class="proj-link">cryptosignal.id →</a></div></div>
     </div>
   </div>
 </section>
 
 <!-- TEAM -->
-<section class="team" id="team">
+<section style="background:var(--bg2)" id="team">
   <div class="container">
-    <div class="section-label">Leadership</div>
-    <h2 class="section-title">Meet the Directors</h2>
-    <p class="section-sub">The minds behind GoMiners — combining technical expertise with business vision.</p>
+    <div class="sec-label" data-en="Leadership" data-id="Kepemimpinan">Leadership</div>
+    <h2 class="sec-title" data-en="Meet the Directors" data-id="Kenali Para Direktur">Meet the Directors</h2>
+    <p class="sec-sub" data-en="The minds behind GoMiners — combining technical expertise with business vision." data-id="Pikiran di balik GoMiners — memadukan keahlian teknis dengan visi bisnis.">The minds behind GoMiners — combining technical expertise with business vision.</p>
     <div class="team-grid">
       <div class="team-card">
-        <div class="team-photo">
-          <div class="team-photo-placeholder">J</div>
-          <div class="team-overlay"></div>
-        </div>
-        <div class="team-info">
-          <h3>Julius</h3>
-          <div class="role">Director — PT Global Operasi Miners</div>
-          <p>Visionary technologist and crypto infrastructure pioneer. Leading GoMiners' strategic direction in AI automation and SaaS development.</p>
-        </div>
+        <div class="team-photo"><div class="team-placeholder">J</div><div class="team-overlay"></div></div>
+        <div class="team-info"><h3>Julius</h3><div class="role" data-en="Director — PT Global Operasi Miners" data-id="Direktur — PT Global Operasi Miners">Director — PT Global Operasi Miners</div><p data-en="Visionary technologist and crypto infrastructure pioneer. Leading GoMiners' strategic direction in AI automation and SaaS." data-id="Teknolog visioner dan pelopor infrastruktur kripto. Memimpin arah strategis GoMiners dalam otomasi AI dan SaaS.">Visionary technologist and crypto infrastructure pioneer. Leading GoMiners' strategic direction in AI automation and SaaS.</p></div>
       </div>
       <div class="team-card">
-        <div class="team-photo" style="background:transparent">
-          <img src="/mnt/user-data/uploads/WhatsApp_Image_20260412_at_06_49_02.jpeg" alt="Natalia Kwartika Atimeta - Director" onerror="this.parentElement.innerHTML='<div class=\'team-photo-placeholder\'>N</div>'">
-          <div class="team-overlay"></div>
-        </div>
-        <div class="team-info">
-          <h3>Natalia Kwartika Atimeta</h3>
-          <div class="role">Director — PT Global Operasi Miners</div>
-          <p>Operations and business development leader. Driving partnerships, client success, and the expansion of GoMiners' SaaS ecosystem.</p>
-        </div>
+        <div class="team-photo" style="background:transparent"><img src="/mnt/user-data/uploads/WhatsApp_Image_20260412_at_06_49_02.jpeg" alt="Nona - Director" onerror="this.parentElement.innerHTML='<div class=\'team-placeholder\'>N</div>'"><div class="team-overlay"></div></div>
+        <div class="team-info"><h3>Natalia Kwartika Atimeta</h3><div class="role" data-en="Director — PT Global Operasi Miners" data-id="Direktur — PT Global Operasi Miners">Director — PT Global Operasi Miners</div><p data-en="Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion." data-id="Pemimpin operasional dan pengembangan bisnis. Mendorong kemitraan, kesuksesan klien, dan ekspansi ekosistem SaaS GoMiners.">Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion.</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- AI AGENTS SECTION -->
-<section class="agents" id="agents">
+<!-- AI AGENTS -->
+<section id="agents">
   <div class="container">
-    <div class="section-label">AI Agent Suite</div>
-    <h2 class="section-title">Intelligent Agents,<br>Working for You</h2>
-    <p class="section-sub">Four specialized AI agents designed to grow, sell, and automate your business — 24/7, with minimal human intervention.</p>
-    <div class="agents-tabs" style="margin-top:40px">
-      <button class="agent-tab active" onclick="switchAgent(0)">🤖 AI Automation</button>
-      <button class="agent-tab" onclick="switchAgent(1)">📈 Marketing Agent</button>
-      <button class="agent-tab" onclick="switchAgent(2)">📞 Sales Script</button>
-      <button class="agent-tab" onclick="switchAgent(3)">💬 Chat Report System</button>
+    <div class="sec-label" data-en="AI Agent Suite" data-id="Rangkaian Agen AI">AI Agent Suite</div>
+    <h2 class="sec-title" data-en="Intelligent Agents, Working for You" data-id="Agen Cerdas, Bekerja untuk Anda">Intelligent Agents, Working for You</h2>
+    <p class="sec-sub" data-en="Four specialized AI agents designed to grow, sell, and automate your business — 24/7." data-id="Empat agen AI khusus dirancang untuk menumbuhkan, menjual, dan mengotomasi bisnis Anda — 24/7.">Four specialized AI agents designed to grow, sell, and automate your business — 24/7.</p>
+    <div class="agent-tabs" style="margin-top:36px">
+      <button class="agent-tab active" onclick="switchAgent(0)" data-en="🤖 AI Automation" data-id="🤖 Otomasi AI">🤖 AI Automation</button>
+      <button class="agent-tab" onclick="switchAgent(1)" data-en="📈 Marketing Agent" data-id="📈 Agen Marketing">📈 Marketing Agent</button>
+      <button class="agent-tab" onclick="switchAgent(2)" data-en="📞 Sales Script" data-id="📞 Skrip Penjualan">📞 Sales Script</button>
+      <button class="agent-tab" onclick="switchAgent(3)" data-en="💬 Chat Reports" data-id="💬 Laporan Chat">💬 Chat Reports</button>
+    </div>
+    <div class="agent-panel active" id="ap0"><div class="agent-box">
+      <h3 data-en="🤖 Know Your Customer — AI Report System" data-id="🤖 Know Your Customer — Sistem Laporan AI">🤖 Know Your Customer — AI Report System</h3>
+      <p data-en="Our AI doesn't just chat — it investigates. Through a structured conversation flow, it uncovers the real business need. Once conversation ends, a complete KYC report is emailed to pt.globaloperasiminers@gmail.com automatically." data-id="AI kami tidak sekadar mengobrol — ia menginvestigasi. Melalui alur percakapan terstruktur, ia mengungkap kebutuhan bisnis nyata. Setelah percakapan berakhir, laporan KYC lengkap dikirimkan ke pt.globaloperasiminers@gmail.com secara otomatis.">Our AI doesn't just chat — it investigates. Through a structured conversation flow, it uncovers the real business need. Once conversation ends, a complete KYC report is emailed to pt.globaloperasiminers@gmail.com automatically.</p>
+      <div class="script-box"><p data-en="✅ Customer Name & Contact<br>✅ Industry / Business Type<br>✅ Core Problem Identified<br>✅ Budget Range<br>✅ Urgency Level (Immediate / 3 months / Exploring)<br>✅ Recommended Service Package<br>✅ Full Conversation Transcript<br>✅ AI Analysis: What does this customer really need?" data-id="✅ Nama & Kontak Customer<br>✅ Industri / Jenis Bisnis<br>✅ Masalah Inti yang Teridentifikasi<br>✅ Rentang Anggaran<br>✅ Tingkat Urgensi (Segera / 3 bulan / Eksplorasi)<br>✅ Paket Layanan yang Direkomendasikan<br>✅ Transkrip Percakapan Lengkap<br>✅ Analisis AI: Apa yang sebenarnya dibutuhkan customer ini?">✅ Customer Name & Contact<br>✅ Industry / Business Type<br>✅ Core Problem Identified<br>✅ Budget Range<br>✅ Urgency Level (Immediate / 3 months / Exploring)<br>✅ Recommended Service Package<br>✅ Full Conversation Transcript<br>✅ AI Analysis: What does this customer really need?</p></div>
+    </div></div>
+    <div class="agent-panel" id="ap1"><div class="agent-box">
+      <h3 data-en="📈 Marketing Agent — Out-of-the-Box Growth" data-id="📈 Agen Marketing — Pertumbuhan Tak Terduga">📈 Marketing Agent — Out-of-the-Box Growth</h3>
+      <p data-en="An autonomous marketing playbook that thinks like a growth hacker and executes like a machine — 24/7, minimal human touch." data-id="Buku panduan pemasaran otonom yang berpikir seperti growth hacker dan mengeksekusi seperti mesin — 24/7, campur tangan manusia minimal.">An autonomous marketing playbook that thinks like a growth hacker and executes like a machine — 24/7, minimal human touch.</p>
+      <div class="mkt-grid">
+        <div class="mkt-item"><h4 data-en="🎯 Micro-Niche Targeting" data-id="🎯 Penargetan Niche Mikro">🎯 Micro-Niche Targeting</h4><p data-en="Hit underserved Indonesian SMEs via WA broadcast & Instagram DM automation with hyper-relevant messaging." data-id="Sasar UMKM Indonesia yang kurang terlayani via broadcast WA & otomasi DM Instagram dengan pesan yang sangat relevan.">Hit underserved Indonesian SMEs via WA broadcast & Instagram DM automation with hyper-relevant messaging.</p></div>
+        <div class="mkt-item"><h4 data-en="📹 Content Flywheel" data-id="📹 Roda Konten">📹 Content Flywheel</h4><p data-en="AI generates weekly Reels/TikTok scripts showing 'before vs after AI automation' for local businesses." data-id="AI menghasilkan skrip Reels/TikTok mingguan yang menampilkan 'sebelum vs sesudah otomasi AI' untuk bisnis lokal.">AI generates weekly Reels/TikTok scripts showing 'before vs after AI automation' for local businesses.</p></div>
+        <div class="mkt-item"><h4 data-en="🤝 Channel Partnership" data-id="🤝 Kemitraan Kanal">🤝 Channel Partnership</h4><p data-en="Partner with accounting software companies and offer GoMiners AI as a bolt-on service — instant distribution." data-id="Bermitra dengan perusahaan software akuntansi dan tawarkan AI GoMiners sebagai layanan tambahan — distribusi instan.">Partner with accounting software companies and offer GoMiners AI as a bolt-on service — instant distribution.</p></div>
+        <div class="mkt-item"><h4 data-en="🔄 Referral Loop" data-id="🔄 Loop Referral">🔄 Referral Loop</h4><p data-en="Every customer who refers another gets a free month. AI tracks referrals and sends commissions automatically." data-id="Setiap customer yang mereferensikan orang lain mendapat satu bulan gratis. AI melacak referral dan mengirim komisi secara otomatis.">Every customer who refers another gets a free month. AI tracks referrals and sends commissions automatically.</p></div>
+      </div>
+    </div></div>
+    <div class="agent-panel" id="ap2"><div class="agent-box">
+      <h3 data-en="📞 Cold Outbound Sales Script" data-id="📞 Skrip Penjualan Cold Outbound">📞 Cold Outbound Sales Script</h3>
+      <p data-en="Targeting: Indonesian SME owners, clinic managers, property agents, regional business managers. Use via WhatsApp, phone, or email." data-id="Target: pemilik UMKM Indonesia, manajer klinik, agen properti, manajer bisnis regional. Gunakan via WhatsApp, telepon, atau email.">Targeting: Indonesian SME owners, clinic managers, property agents, regional business managers. Use via WhatsApp, phone, or email.</p>
+      <div class="script-box"><p>
+        <strong data-en="OPENING (5 seconds):" data-id="PEMBUKA (5 detik):">OPENING (5 seconds):</strong><br>
+        <span data-en='"Hi [Name]! I\'m from GoMiners.id — we help businesses like [industry] automate operations using AI, without hiring more staff."' data-id='"Selamat pagi, [Nama]! Saya dari GoMiners.id — kami bantu bisnis seperti [industri mereka] otomasi operasional pakai AI, bukan karyawan tambahan."'>"Hi [Name]! I'm from GoMiners.id — we help businesses like [industry] automate operations using AI, without hiring more staff."</span><br><br>
+        <strong data-en="PAIN POINT:" data-id="PAIN POINT:">PAIN POINT:</strong><br>
+        <span data-en='"Most business owners I speak with lose customers due to slow responses, or their admins are overwhelmed with manual WhatsApp. Does that resonate?"' data-id='"Banyak pemilik bisnis yang saya ajak bicara kehilangan customer karena respons lambat, atau admin kelelahan handle WhatsApp manual. Apakah itu juga jadi tantangan Bapak/Ibu?"'>"Most business owners I speak with lose customers due to slow responses, or their admins are overwhelmed with manual WhatsApp. Does that resonate?"</span><br><br>
+        <strong data-en="SOLUTION PIVOT:" data-id="SOLUSI:">SOLUTION PIVOT:</strong><br>
+        <span data-en='"We have AI that answers customers 24/7 on WhatsApp, generates reports automatically, and follows up — without hiring anyone new. Our clients save 40% in operational costs within 3 months."' data-id='"Kami punya AI yang bisa jawab customer 24/7 di WhatsApp, buat laporan otomatis, dan follow-up — tanpa perlu hire orang baru. Klien kami rata-rata hemat 40% biaya operasional dalam 3 bulan."'>"We have AI that answers customers 24/7 on WhatsApp, generates reports automatically, and follows up — without hiring anyone new. Our clients save 40% in operational costs within 3 months."</span><br><br>
+        <strong data-en="CALL TO ACTION:" data-id="AJAKAN BERTINDAK:">CALL TO ACTION:</strong><br>
+        <span data-en='"Can I send a quick demo via WhatsApp? Just 5 minutes — no obligation if it\'s not a fit."' data-id='"Boleh saya kirim demo singkat via WhatsApp? Cuma 5 menit — kalau tidak cocok, tidak ada kewajiban."'>"Can I send a quick demo via WhatsApp? Just 5 minutes — no obligation if it's not a fit."</span>
+      </p></div>
+    </div></div>
+    <div class="agent-panel" id="ap3"><div class="agent-box">
+      <h3 data-en="💬 Chat Report System" data-id="💬 Sistem Laporan Chat">💬 Chat Report System</h3>
+      <p data-en="Every chatbot conversation is recorded, analyzed, and turned into an actionable business intelligence report. Sent automatically to the GoMiners team." data-id="Setiap percakapan chatbot direkam, dianalisis, dan diubah menjadi laporan intelijen bisnis yang bisa ditindaklanjuti. Dikirim otomatis ke tim GoMiners.">Every chatbot conversation is recorded, analyzed, and turned into an actionable business intelligence report. Sent automatically to the GoMiners team.</p>
+      <div class="script-box"><p>
+        <strong data-en="PRIMARY NEED IDENTIFIED:" data-id="KEBUTUHAN UTAMA TERIDENTIFIKASI:">PRIMARY NEED IDENTIFIED:</strong><br>
+        <span data-en="□ Needs Quotation/Proposal &nbsp; □ Needs Demo/Presentation<br>□ Technical Consultation &nbsp; □ Exploring / Research<br>□ Ready to Buy — Needs Pricing &nbsp; □ Partnership Inquiry" data-id="□ Butuh Penawaran/Proposal &nbsp; □ Butuh Demo/Presentasi<br>□ Konsultasi Teknis &nbsp; □ Eksplorasi / Riset<br>□ Siap Beli — Butuh Harga &nbsp; □ Inquiry Kemitraan">□ Needs Quotation/Proposal &nbsp; □ Needs Demo/Presentation<br>□ Technical Consultation &nbsp; □ Exploring / Research<br>□ Ready to Buy — Needs Pricing &nbsp; □ Partnership Inquiry</span><br><br>
+        <strong data-en="AI ANALYSIS:" data-id="ANALISIS AI:">AI ANALYSIS:</strong><br>
+        <span data-en='"Customer appears to be a [profile]. Their core challenge is [X]. Recommended next step: [send proposal / schedule demo]. Urgency: [High/Medium/Low]."' data-id='"Customer tampaknya adalah [profil]. Tantangan utama mereka adalah [X]. Langkah berikutnya yang direkomendasikan: [kirim proposal / jadwalkan demo]. Urgensi: [Tinggi/Sedang/Rendah]."'>"Customer appears to be a [profile]. Their core challenge is [X]. Recommended next step: [send proposal / schedule demo]. Urgency: [High/Medium/Low]."</span><br><br>
+        <em style="color:var(--muted)" data-en="→ Report auto-sent to pt.globaloperasiminers@gmail.com within 5 minutes of conversation end." data-id="→ Laporan terkirim otomatis ke pt.globaloperasiminers@gmail.com dalam 5 menit setelah percakapan berakhir.">→ Report auto-sent to pt.globaloperasiminers@gmail.com within 5 minutes of conversation end.</em>
+      </p></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:var(--bg2)" id="how-it-works">
+  <div class="container">
+    <div class="sec-label" data-en="End-to-End Process" data-id="Proses End-to-End">End-to-End Process</div>
+    <h2 class="sec-title" data-en="From First Chat to Payment —<br>Fully Structured" data-id="Dari Chat Pertama ke Pembayaran —<br>Terstruktur Penuh">From First Chat to Payment —<br>Fully Structured</h2>
+    <p class="sec-sub" style="margin-bottom:48px" data-en="Complete process from first consultation to payment — transparent, professional, and AI-powered." data-id="Proses lengkap dari konsultasi pertama hingga pembayaran — transparan, profesional, dan bertenaga AI.">Complete process from first consultation to payment — transparent, professional, and AI-powered.</p>
+    <div style="position:relative">
+      <div style="position:absolute;left:26px;top:40px;bottom:40px;width:2px;background:linear-gradient(to bottom,var(--accent2),var(--accent),transparent)"></div>
+      <!-- Steps -->
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,var(--accent2),var(--accent))">💬</div><div class="flow-card"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px" data-en="STEP 1 — CUSTOMER" data-id="LANGKAH 1 — CUSTOMER">STEP 1 — CUSTOMER</div><h3 data-en="Chat with GoMiners AI" data-id="Chat dengan AI GoMiners">Chat with GoMiners AI</h3><p data-en="Customer opens the chatbot at gominers.id. Selects language (EN/ID). AI warmly and professionally uncovers: service type, business scale, timeline, and budget estimate." data-id="Customer membuka chatbot di gominers.id. Pilih bahasa (EN/ID). AI dengan hangat dan profesional menggali: jenis layanan, skala bisnis, timeline, dan estimasi anggaran.">Customer opens the chatbot at gominers.id. Selects language (EN/ID). AI warmly and professionally uncovers: service type, business scale, timeline, and budget estimate.</p></div></div>
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#8B5CF6,var(--accent2))">📧</div><div class="flow-card"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#8B5CF6;font-weight:700;margin-bottom:6px" data-en="STEP 2 — AI AUTOMATIC" data-id="LANGKAH 2 — AI OTOMATIS">STEP 2 — AI AUTOMATIC</div><h3 data-en="AI Sends KYC Report to GoMiners" data-id="AI Kirim Laporan KYC ke GoMiners">AI Sends KYC Report to GoMiners</h3><p data-en="AI compiles a 'Know Your Customer Need' report automatically and sends it to pt.globaloperasiminers@gmail.com within minutes. Contains: name, contact, identified need, budget, urgency." data-id="AI menyusun laporan 'Know Your Customer Need' secara otomatis dan mengirimkannya ke pt.globaloperasiminers@gmail.com dalam hitungan menit. Berisi: nama, kontak, kebutuhan teridentifikasi, anggaran, urgensi.">AI compiles a 'Know Your Customer Need' report automatically and sends it to pt.globaloperasiminers@gmail.com within minutes. Contains: name, contact, identified need, budget, urgency.</p></div></div>
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,var(--gold),#FF6B00)">📋</div><div class="flow-card"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px" data-en="STEP 3 — PT GOMINERS" data-id="LANGKAH 3 — PT GOMINERS">STEP 3 — PT GOMINERS</div><h3 data-en="PT Sends Official Quote" data-id="PT Kirim Penawaran Resmi">PT Sends Official Quote</h3><p data-en="Team prepares an official Price Offer Letter (SPH) and sends it to customer's email/WhatsApp. Contains: service details, price in IDR, unique reference number, terms & conditions. Target: within 1 business day." data-id="Tim menyiapkan Surat Penawaran Harga (SPH) resmi dan mengirimkannya ke email/WA customer. Berisi: rincian layanan, harga dalam IDR, nomor referensi unik, syarat & ketentuan. Target: dalam 1 hari kerja.">Team prepares an official Price Offer Letter (SPH) and sends it to customer's email/WhatsApp. Contains: service details, price in IDR, unique reference number, terms & conditions. Target: within 1 business day.</p><div class="flow-tags"><span class="flow-tag" data-en="IDR Pricing" data-id="Harga IDR">IDR Pricing</span><span class="flow-tag" data-en="Quote Reference" data-id="Referensi Quote">Quote Reference</span></div></div></div>
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#00D4AA,#00C8FF)">✅</div><div class="flow-card"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#00D4AA;font-weight:700;margin-bottom:6px" data-en="STEP 4 — CUSTOMER AGREES" data-id="LANGKAH 4 — CUSTOMER SETUJU">STEP 4 — CUSTOMER AGREES</div><h3 data-en="Approval & Directed to Payment" data-id="Persetujuan & Diarahkan ke Pembayaran">Approval & Directed to Payment</h3><p data-en="Customer reviews the quote, clarifies via WhatsApp/email if needed, and confirms agreement. Directed to the Pricing & Payment page at gominers.id/#pricing." data-id="Customer meninjau penawaran, melakukan klarifikasi via WA/email jika perlu, dan mengkonfirmasi persetujuan. Diarahkan ke halaman Pricing & Payment di gominers.id/#pricing.">Customer reviews the quote, clarifies via WhatsApp/email if needed, and confirms agreement. Directed to the Pricing & Payment page at gominers.id/#pricing.</p></div></div>
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#0066FF,#00C8FF)">💳</div><div class="flow-card" style="border-color:rgba(0,200,255,0.25)"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px" data-en="STEP 5 — PAYMENT" data-id="LANGKAH 5 — PEMBAYARAN">STEP 5 — PAYMENT</div><h3 data-en="Pay via Midtrans or Xendit" data-id="Bayar via Midtrans atau Xendit">Pay via Midtrans or Xendit</h3><p data-en="Customer fills the payment form at gominers.id — entering the amount from their quote (IDR 5,000,000 – IDR 50,000,000). Selects payment method via Midtrans or Xendit — both licensed by Bank Indonesia." data-id="Customer mengisi form pembayaran di gominers.id — memasukkan nominal dari penawaran mereka (IDR 5.000.000 – IDR 50.000.000). Memilih metode pembayaran via Midtrans atau Xendit — keduanya berlisensi Bank Indonesia.">Customer fills the payment form at gominers.id — entering the amount from their quote (IDR 5,000,000 – IDR 50,000,000). Selects payment method via Midtrans or Xendit — both licensed by Bank Indonesia.</p><div class="flow-tags"><span class="flow-tag">Midtrans</span><span class="flow-tag">Xendit</span><span class="flow-tag">VA Bank</span><span class="flow-tag">GoPay</span><span class="flow-tag">QRIS</span><span class="flow-tag">OVO</span></div></div></div>
+      <div class="flow-step"><div class="flow-num" style="background:linear-gradient(135deg,#00D4AA,#00ff88)">🚀</div><div class="flow-card" style="border-color:rgba(0,212,170,0.2)"><div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#00D4AA;font-weight:700;margin-bottom:6px" data-en="STEP 6 — ONBOARDING" data-id="LANGKAH 6 — ONBOARDING">STEP 6 — ONBOARDING</div><h3 data-en="Confirmation & Project Starts" data-id="Konfirmasi & Proyek Dimulai">Confirmation & Project Starts</h3><p data-en="Payment confirmed in real-time. Customer receives automated confirmation email. GoMiners team contacts within 1 business day for kick-off. Project officially begins. 🎉" data-id="Pembayaran dikonfirmasi secara real-time. Customer menerima email konfirmasi otomatis. Tim GoMiners menghubungi dalam 1 hari kerja untuk kick-off. Proyek resmi dimulai. 🎉">Payment confirmed in real-time. Customer receives automated confirmation email. GoMiners team contacts within 1 business day for kick-off. Project officially begins. 🎉</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="sec-label" data-en="Pricing & Payment" data-id="Harga & Pembayaran">Pricing & Payment</div>
+    <h2 class="sec-title" data-en="Invest in Your<br>Business Transformation" data-id="Investasi untuk<br>Transformasi Bisnis Anda">Invest in Your<br>Business Transformation</h2>
+    <p class="sec-sub" data-en="Final price is based on official quote from our team. Packages below are a guide. Secure payment via Midtrans & Xendit." data-id="Harga final sesuai penawaran resmi dari tim kami. Paket di bawah adalah panduan. Pembayaran aman via Midtrans & Xendit.">Final price is based on official quote from our team. Packages below are a guide. Secure payment via Midtrans & Xendit.</p>
+    <div style="margin:14px 0 48px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.2);border-radius:100px;padding:5px 14px;font-size:12px;color:var(--gold)" data-en="⚠️ Already received a quote? Scroll to the Payment Form below." data-id="⚠️ Sudah terima quote? Langsung scroll ke Form Pembayaran di bawah.">⚠️ Already received a quote? Scroll to the Payment Form below.</div>
+    <div class="price-grid">
+      <div class="price-card"><div style="font-size:26px;margin-bottom:14px">🌱</div><h3 style="font-size:18px;font-weight:800;margin-bottom:8px" data-en="Starter" data-id="Starter">Starter</h3><div class="price-num">Rp 5 Jt<span style="color:var(--muted);font-size:14px;font-weight:400"> – 10 Jt</span></div><p style="color:var(--muted);font-size:13px;line-height:1.65;margin:12px 0 18px" data-en="Best for SMEs & startups taking their first AI automation step." data-id="Terbaik untuk UMKM & startup yang memulai langkah otomasi AI pertama.">Best for SMEs & startups taking their first AI automation step.</p><div class="price-list"><div data-en="✅ AI Chatbot 1 platform (WA/Web)" data-id="✅ AI Chatbot 1 platform (WA/Web)">✅ AI Chatbot 1 platform (WA/Web)</div><div data-en="✅ Automated KYC Reports" data-id="✅ Laporan KYC Otomatis">✅ Automated KYC Reports</div><div data-en="✅ Setup & onboarding 2 weeks" data-id="✅ Setup & onboarding 2 minggu">✅ Setup & onboarding 2 weeks</div><div style="color:var(--muted)" data-en="— Support 1 month" data-id="— Support 1 bulan">— Support 1 month</div></div><button onclick="scrollToPayment(5000000)" style="width:100%;padding:11px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text)'" data-en="Choose Starter →" data-id="Pilih Starter →">Choose Starter →</button></div>
+      <div class="price-card popular"><div class="popular-badge" data-en="✨ MOST POPULAR" data-id="✨ PALING POPULER">✨ MOST POPULAR</div><div style="font-size:26px;margin-bottom:14px">🚀</div><h3 style="font-size:18px;font-weight:800;margin-bottom:8px" data-en="Growth" data-id="Growth">Growth</h3><div class="price-num" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Rp 15 Jt<span style="color:var(--muted);font-size:14px;-webkit-text-fill-color:var(--muted)"> – 30 Jt</span></div><p style="color:var(--muted);font-size:13px;line-height:1.65;margin:12px 0 18px" data-en="For businesses ready for full digital transformation with multi-platform AI." data-id="Untuk bisnis yang siap transformasi digital penuh dengan AI multi-platform.">For businesses ready for full digital transformation with multi-platform AI.</p><div class="price-list"><div data-en="✅ Multi-platform AI Chatbot" data-id="✅ AI Chatbot multi-platform">✅ Multi-platform AI Chatbot</div><div data-en="✅ Marketing automation agent" data-id="✅ Agen marketing automation">✅ Marketing automation agent</div><div data-en="✅ Sales script + cold outreach AI" data-id="✅ Skrip penjualan + cold outreach AI">✅ Sales script + cold outreach AI</div><div data-en="✅ Full KYC reporting dashboard" data-id="✅ Dashboard laporan KYC lengkap">✅ Full KYC reporting dashboard</div><div data-en="✅ 4-week setup + training" data-id="✅ Setup 4 minggu + pelatihan">✅ 4-week setup + training</div><div data-en="✅ Support 3 months" data-id="✅ Support 3 bulan">✅ Support 3 months</div></div><button onclick="scrollToPayment(15000000)" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:10px;color:var(--bg);font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 4px 18px rgba(0,102,255,0.28)" data-en="Choose Growth →" data-id="Pilih Growth →">Choose Growth →</button></div>
+      <div class="price-card" style="border-color:rgba(255,184,0,0.18)"><div style="font-size:26px;margin-bottom:14px">🏢</div><h3 style="font-size:18px;font-weight:800;margin-bottom:8px" data-en="Enterprise" data-id="Enterprise">Enterprise</h3><div class="price-num" style="color:var(--gold)">Rp 35 Jt<span style="color:var(--muted);font-size:14px;font-weight:400"> – 50 Jt</span></div><p style="color:var(--muted);font-size:13px;line-height:1.65;margin:12px 0 18px" data-en="For corporations needing a fully custom end-to-end AI solution." data-id="Untuk korporasi yang membutuhkan solusi AI end-to-end yang sepenuhnya kustom.">For corporations needing a fully custom end-to-end AI solution.</p><div class="price-list"><div data-en="✅ Full custom AI agent suite" data-id="✅ Rangkaian agen AI kustom penuh">✅ Full custom AI agent suite</div><div data-en="✅ ERP/CRM system integration" data-id="✅ Integrasi sistem ERP/CRM">✅ ERP/CRM system integration</div><div data-en="✅ Dedicated project manager" data-id="✅ Manajer proyek dedicated">✅ Dedicated project manager</div><div data-en="✅ SLA & performance guarantee" data-id="✅ Jaminan SLA & performa">✅ SLA & performance guarantee</div><div data-en="✅ Support 6 months + retainer option" data-id="✅ Support 6 bulan + opsi retainer">✅ Support 6 months + retainer option</div><div data-en="✅ On-site visit (Jabodetabek)" data-id="✅ Kunjungan on-site (Jabodetabek)">✅ On-site visit (Jabodetabek)</div></div><button onclick="scrollToPayment(35000000)" style="width:100%;padding:11px;background:rgba(255,184,0,0.09);border:1px solid rgba(255,184,0,0.28);border-radius:10px;color:var(--gold);font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;transition:all 0.2s" onmouseenter="this.style.background='rgba(255,184,0,0.18)'" onmouseleave="this.style.background='rgba(255,184,0,0.09)'" data-en="Choose Enterprise →" data-id="Pilih Enterprise →">Choose Enterprise →</button></div>
     </div>
 
-    <div class="agent-panel active" id="agent-0">
-      <div class="agent-content">
-        <h3>🤖 AI Automation — Know Your Customer</h3>
-        <p>Our AI doesn't just chat — it investigates. Through a structured conversation flow, it uncovers the real business need behind every inquiry. Once the conversation concludes, a complete "Know Your Customer Need" report is automatically compiled and emailed to <strong style="color:var(--accent)">pt.globaloperasiminers@gmail.com</strong>.</p>
-        <div class="script-box">
-          <p><strong>Report Includes:</strong><br><br>
-          ✅ Customer Name & Contact Details<br>
-          ✅ Industry / Business Type<br>
-          ✅ Core Problem or Need Identified<br>
-          ✅ Budget Range (if disclosed)<br>
-          ✅ Urgency Level (Immediate / Within 3 months / Exploring)<br>
-          ✅ Recommended Service Package<br>
-          ✅ Full Conversation Transcript<br>
-          ✅ AI Analysis: What does this customer really need?
-          </p>
+    <!-- PAYMENT FORM -->
+    <div id="payment-section" class="pay-form">
+      <div style="font-size:34px;text-align:center;margin-bottom:12px">💳</div>
+      <h3 data-en="GoMiners Payment Form" data-id="Form Pembayaran GoMiners">GoMiners Payment Form</h3>
+      <p data-en="Enter the amount from your official quote. Secure payment via Midtrans or Xendit." data-id="Masukkan nominal sesuai penawaran resmi Anda. Pembayaran aman via Midtrans atau Xendit.">Enter the amount from your official quote. Secure payment via Midtrans or Xendit.</p>
+      <div class="field"><label data-en="Full Name *" data-id="Nama Lengkap *">Full Name *</label><input id="pay-name" type="text" placeholder="" data-en-ph="e.g. Budi Santoso" data-id-ph="cth: Budi Santoso"></div>
+      <div class="field"><label data-en="Email *" data-id="Email *">Email *</label><input id="pay-email" type="email" placeholder="" data-en-ph="business@email.com" data-id-ph="email@bisnis.com"></div>
+      <div class="field"><label data-en="WhatsApp Number *" data-id="Nomor WhatsApp *">WhatsApp Number *</label><input id="pay-phone" type="tel" placeholder="" data-en-ph="+628xxxxxxxxxx" data-id-ph="08xxxxxxxxxx"></div>
+      <div class="field"><label data-en="Service Ordered *" data-id="Layanan yang Dipesan *">Service Ordered *</label>
+        <select id="pay-service" onchange="updateSummary()">
+          <option value="" data-en="-- Select Service --" data-id="-- Pilih Layanan --">-- Select Service --</option>
+          <option value="AI Automation" data-en="AI Automation" data-id="Otomasi AI">AI Automation</option>
+          <option value="Digital Transformation SaaS" data-en="Digital Transformation SaaS" data-id="SaaS Transformasi Digital">Digital Transformation SaaS</option>
+          <option value="Marketing AI Agent" data-en="Marketing AI Agent" data-id="Agen Marketing AI">Marketing AI Agent</option>
+          <option value="Crypto Intelligence" data-en="Crypto Intelligence" data-id="Kecerdasan Kripto">Crypto Intelligence</option>
+          <option value="Custom Enterprise Solution" data-en="Custom Enterprise Solution" data-id="Solusi Enterprise Kustom">Custom Enterprise Solution</option>
+          <option value="Other (per quote)" data-en="Other (per quote)" data-id="Lainnya (sesuai quote)">Other (per quote)</option>
+        </select>
+      </div>
+      <div class="field"><label data-en="Quote Reference No. (optional)" data-id="No. Referensi Quote (opsional)">Quote Reference No. (optional)</label><input id="pay-ref" type="text" placeholder="" data-en-ph="e.g. GM-2025-001" data-id-ph="cth: GM-2025-001"></div>
+      <div class="field"><label data-en="Payment Amount (IDR) *" data-id="Nominal Pembayaran (IDR) *">Payment Amount (IDR) *</label>
+        <div class="amount-wrap"><span class="amount-prefix">Rp</span><input id="pay-amount" type="number" class="has-prefix" min="5000000" max="50000000" step="500000" oninput="updateSummary()"></div>
+        <div id="amount-info" data-en="Range: IDR 5,000,000 – IDR 50,000,000" data-id="Rentang: IDR 5.000.000 – IDR 50.000.000">Range: IDR 5,000,000 – IDR 50,000,000</div>
+      </div>
+      <div class="pay-summary" id="pay-summary">
+        <div class="pay-summary-row"><span data-en="Service" data-id="Layanan">Service</span><span id="sum-svc">-</span></div>
+        <div class="pay-summary-row"><span data-en="Transaction Fee" data-id="Biaya Transaksi">Transaction Fee</span><span style="color:var(--muted)" data-en="Covered by GoMiners ✓" data-id="Ditanggung GoMiners ✓">Covered by GoMiners ✓</span></div>
+        <div class="pay-summary-row total"><span data-en="Total" data-id="Total">Total</span><span id="sum-total">-</span></div>
+      </div>
+      <div class="field"><label data-en="Select Payment Gateway *" data-id="Pilih Payment Gateway *">Select Payment Gateway *</label>
+        <div class="gw-selector">
+          <div class="gw-btn" id="gw-mid" onclick="selectGW('mid')"><div style="font-size:18px">🟢</div><div class="gw-name">Midtrans</div><div class="gw-methods">GoPay · QRIS · VA · Cards</div></div>
+          <div class="gw-btn" id="gw-xen" onclick="selectGW('xen')"><div style="font-size:18px">🔵</div><div class="gw-name">Xendit</div><div class="gw-methods">VA · OVO · Dana · Retail</div></div>
         </div>
       </div>
+      <button class="pay-btn-main" onclick="doPay()" data-en="Pay Now 🔒" data-id="Bayar Sekarang 🔒">Pay Now 🔒</button>
+      <div class="pay-secure">🔐 <span data-en="Licensed by Bank Indonesia · PCI-DSS Certified · 256-bit Encryption" data-id="Berlisensi Bank Indonesia · Bersertifikat PCI-DSS · Enkripsi 256-bit">Licensed by Bank Indonesia · PCI-DSS Certified · 256-bit Encryption</span><br><span data-en="Need help?" data-id="Butuh bantuan?">Need help?</span> <a href="https://wa.me/6285284200530" data-en="WhatsApp us" data-id="WA kami">WhatsApp us</a></div>
     </div>
+  </div>
+</section>
 
-    <div class="agent-panel" id="agent-1">
-      <div class="agent-content">
-        <h3>📈 Marketing Agent — Out-of-the-Box Growth</h3>
-        <p>Forget traditional marketing. This agent thinks like a growth hacker and executes like a machine. Here's the autonomous playbook it follows:</p>
-        <div class="marketing-grid">
-          <div class="marketing-item">
-            <h4>🎯 Micro-Niche Targeting</h4>
-            <p>Identify underserved Indonesian SMEs (warung, klinik, properti, logistik) and hit them with hyper-relevant AI automation messaging via WhatsApp broadcast + Instagram DM automation.</p>
-          </div>
-          <div class="marketing-item">
-            <h4>📹 Content Flywheel</h4>
-            <p>AI generates weekly Reels/TikTok scripts showing "before vs after AI automation" for local businesses. Low production cost, high virality potential.</p>
-          </div>
-          <div class="marketing-item">
-            <h4>🤝 Channel Partnership</h4>
-            <p>Partner with accounting software companies (Jurnal, Accurate) and offer GoMiners AI as a bolt-on service to their existing client base — instant distribution.</p>
-          </div>
-          <div class="marketing-item">
-            <h4>🔄 Referral Loop</h4>
-            <p>Every customer who refers another gets a free month of service. AI tracks referrals automatically and sends thank-you + commission via WhatsApp.</p>
-          </div>
-          <div class="marketing-item">
-            <h4>📧 Cold Email Sequences</h4>
-            <p>AI scrapes LinkedIn for decision-makers at SMEs, personalizes emails based on company profile, and sends 5-touch drip sequences automatically.</p>
-          </div>
-          <div class="marketing-item">
-            <h4>🌐 SEO Content Engine</h4>
-            <p>Publish weekly SEO articles targeting "AI untuk bisnis", "chatbot WhatsApp Indonesia" — capturing organic traffic from business owners actively searching.</p>
-          </div>
-        </div>
-      </div>
+<!-- LEGAL SECTIONS -->
+<section id="privacy-policy" class="legal-section" style="padding:80px 48px">
+  <div class="container"><div class="sec-label" data-en="Privacy Policy" data-id="Kebijakan Privasi">Privacy Policy</div><h2 class="sec-title" data-en="Privacy Policy" data-id="Kebijakan Privasi">Privacy Policy</h2><p style="color:var(--muted);font-size:12.5px;margin-bottom:36px" data-en="Effective: January 1, 2024 · PT Global Operasi Miners · gominers.id" data-id="Berlaku: 1 Januari 2024 · PT Global Operasi Miners · gominers.id">Effective: January 1, 2024 · PT Global Operasi Miners · gominers.id</p>
+    <div class="legal-cards">
+      <div class="legal-card"><h3 data-en="1. Data We Collect" data-id="1. Data yang Kami Kumpulkan">1. Data We Collect</h3><p data-en="We collect data you provide directly: full name, email, phone/WhatsApp, business information, and AI conversation data. Used solely to process your service requests and payments." data-id="Kami mengumpulkan data yang Anda berikan secara langsung: nama lengkap, email, telepon/WA, informasi bisnis, dan data percakapan AI. Digunakan semata-mata untuk memproses permintaan layanan dan pembayaran Anda.">We collect data you provide directly: full name, email, phone/WhatsApp, business information, and AI conversation data. Used solely to process your service requests and payments.</p></div>
+      <div class="legal-card"><h3 data-en="2. Use of Data" data-id="2. Penggunaan Data">2. Use of Data</h3><p data-en="Your data is used to: (a) process payments via Midtrans & Xendit, (b) send service confirmations, (c) improve AI service quality, (d) communicate about ongoing projects. We do not sell your personal data to third parties." data-id="Data Anda digunakan untuk: (a) memproses pembayaran via Midtrans & Xendit, (b) mengirimkan konfirmasi layanan, (c) meningkatkan kualitas layanan AI, (d) komunikasi terkait proyek yang berjalan. Kami tidak menjual data pribadi Anda kepada pihak ketiga.">Your data is used to: (a) process payments via Midtrans & Xendit, (b) send service confirmations, (c) improve AI service quality, (d) communicate about ongoing projects. We do not sell your personal data to third parties.</p></div>
+      <div class="legal-card"><h3 data-en="3. Payment Security" data-id="3. Keamanan Pembayaran">3. Payment Security</h3><p data-en="All transactions are processed by Midtrans (PT Midtrans) and Xendit (PT Sinar Digital Terdepan) — both licensed by Bank Indonesia. GoMiners does not store your credit/debit card data. Payment data is encrypted to PCI-DSS standard." data-id="Semua transaksi diproses oleh Midtrans (PT Midtrans) dan Xendit (PT Sinar Digital Terdepan) — keduanya berlisensi Bank Indonesia. GoMiners tidak menyimpan data kartu kredit/debit Anda. Data pembayaran dienkripsi dengan standar PCI-DSS.">All transactions are processed by Midtrans (PT Midtrans) and Xendit (PT Sinar Digital Terdepan) — both licensed by Bank Indonesia. GoMiners does not store your credit/debit card data. Payment data is encrypted to PCI-DSS standard.</p></div>
+      <div class="legal-card"><h3 data-en="4. Your Rights" data-id="4. Hak Pengguna">4. Your Rights</h3><p data-en="You have the right to access, correct, or delete your personal data at any time. Contact us at pt.globaloperasiminers@gmail.com for data requests." data-id="Anda berhak untuk mengakses, mengoreksi, atau menghapus data pribadi Anda kapan saja. Hubungi kami di pt.globaloperasiminers@gmail.com untuk permintaan terkait data.">You have the right to access, correct, or delete your personal data at any time. Contact us at pt.globaloperasiminers@gmail.com for data requests.</p></div>
     </div>
+  </div>
+</section>
 
-    <div class="agent-panel" id="agent-2">
-      <div class="agent-content">
-        <h3>📞 Cold Outbound Sales Script</h3>
-        <p>Targeting: Indonesian SME owners, clinic managers, property agents, and regional business managers. Use via WhatsApp, phone, or email.</p>
-        <div class="script-box">
-          <p>
-          <strong style="color:var(--gold)">OPENING (5 seconds to grab attention):</strong><br>
-          "Selamat pagi, [Nama]! Saya dari GoMiners.id — kami bantu bisnis seperti [industri mereka] di Tangerang dan sekitarnya untuk otomasi operasional pakai AI, bukan karyawan tambahan."<br><br>
-
-          <strong style="color:var(--gold)">PAIN POINT (surface the problem):</strong><br>
-          "Banyak pemilik bisnis yang saya ajak bicara bilang mereka kehilangan customer karena respons lambat, atau admin mereka kelelahan handle WhatsApp manual. Apakah itu juga jadi tantangan di bisnis Bapak/Ibu?"<br><br>
-
-          <strong style="color:var(--gold)">THE PIVOT (introduce solution):</strong><br>
-          "Nah, kami punya AI yang bisa jawab customer 24/7 di WhatsApp, buat laporan otomatis, dan kirim follow-up — tanpa perlu hire orang baru. Klien kami rata-rata hemat 40% biaya operasional dalam 3 bulan pertama."<br><br>
-
-          <strong style="color:var(--gold)">SOCIAL PROOF:</strong><br>
-          "Kami sudah bangun Fixmine, CekGejala.id, dan Cryptosignal.id — jadi kami bukan sekadar konsultan, kami builder yang paham teknologinya langsung."<br><br>
-
-          <strong style="color:var(--gold)">CALL TO ACTION (low friction):</strong><br>
-          "Boleh saya kirim demo singkat via WhatsApp dulu? Cuma 5 menit — kalau tidak cocok, tidak ada kewajiban. Nomor WA Bapak/Ibu masih yang ini?"<br><br>
-
-          <strong style="color:var(--gold)">OBJECTION: 'Sudah ada tim IT'</strong><br>
-          "Bagus sekali! AI kami justru bisa membantu tim IT fokus ke hal strategis, sementara tugas repetitif seperti reply customer, buat laporan, dan data entry dikerjakan otomatis."
-          </p>
-        </div>
-      </div>
+<section id="terms" style="padding:80px 48px">
+  <div class="container"><div class="sec-label" data-en="Terms & Conditions" data-id="Syarat & Ketentuan">Terms & Conditions</div><h2 class="sec-title" data-en="Terms & Conditions" data-id="Syarat & Ketentuan">Terms & Conditions</h2><p style="color:var(--muted);font-size:12.5px;margin-bottom:36px">PT Global Operasi Miners</p>
+    <div class="legal-cards">
+      <div class="legal-card"><h3 data-en="1. Services" data-id="1. Layanan">1. Services</h3><p data-en="GoMiners (PT Global Operasi Miners) provides AI-based SaaS and technology consulting services. All services are provided based on an official Price Offer Letter (SPH/Quote) agreed between PT and the customer before payment." data-id="GoMiners (PT Global Operasi Miners) menyediakan layanan SaaS berbasis AI dan konsultasi teknologi. Semua layanan diberikan berdasarkan Surat Penawaran Harga (SPH/Quote) resmi yang disepakati antara PT dan customer sebelum pembayaran dilakukan.">GoMiners (PT Global Operasi Miners) provides AI-based SaaS and technology consulting services. All services are provided based on an official Price Offer Letter (SPH/Quote) agreed between PT and the customer before payment.</p></div>
+      <div class="legal-card"><h3 data-en="2. Payment" data-id="2. Pembayaran">2. Payment</h3><p data-en="Payments are made through Midtrans or Xendit platforms licensed by Bank Indonesia. Prices in Indonesian Rupiah (IDR). Payment is considered valid after confirmation from the payment gateway system." data-id="Pembayaran dilakukan melalui platform Midtrans atau Xendit yang berlisensi Bank Indonesia. Harga dalam Rupiah Indonesia (IDR). Pembayaran dianggap sah setelah konfirmasi dari sistem payment gateway.">Payments are made through Midtrans or Xendit platforms licensed by Bank Indonesia. Prices in Indonesian Rupiah (IDR). Payment is considered valid after confirmation from the payment gateway system.</p></div>
+      <div class="legal-card"><h3 data-en="3. Refund Policy" data-id="3. Kebijakan Pengembalian Dana">3. Refund Policy</h3><p data-en="Refund can be requested within 7 days after payment if the service has not started (onboarding not yet done). After onboarding begins, payment cannot be refunded but can be transferred to another service of equal value. Refund requests via: pt.globaloperasiminers@gmail.com. Processing time: 5–14 business days." data-id="Refund dapat diajukan dalam 7 hari setelah pembayaran jika layanan belum dimulai (onboarding belum dilakukan). Setelah onboarding dimulai, pembayaran tidak dapat dikembalikan namun dapat dialihkan ke layanan lain senilai sama. Pengajuan refund melalui: pt.globaloperasiminers@gmail.com. Proses refund 5–14 hari kerja.">Refund can be requested within 7 days after payment if the service has not started (onboarding not yet done). After onboarding begins, payment cannot be refunded but can be transferred to another service of equal value. Refund requests via: pt.globaloperasiminers@gmail.com. Processing time: 5–14 business days.</p></div>
+      <div class="legal-card"><h3 data-en="4. Service Delivery" data-id="4. Pengiriman Layanan">4. Service Delivery</h3><p data-en="GoMiners is a digital service provider (SaaS/Services). There is no physical delivery. Services are activated and handed over digitally after payment confirmation and onboarding completion, according to the timeline in the quote." data-id="GoMiners adalah penyedia layanan digital (SaaS/Jasa). Tidak ada pengiriman fisik. Layanan diaktifkan dan diserahterimakan secara digital setelah pembayaran terkonfirmasi dan proses onboarding selesai, sesuai timeline yang tercantum dalam penawaran.">GoMiners is a digital service provider (SaaS/Services). There is no physical delivery. Services are activated and handed over digitally after payment confirmation and onboarding completion, according to the timeline in the quote.</p></div>
     </div>
+  </div>
+</section>
 
-    <div class="agent-panel" id="agent-3">
-      <div class="agent-content">
-        <h3>💬 Chat Report System</h3>
-        <p>Every chatbot conversation is recorded, analyzed, and turned into an actionable business intelligence report. Here's what gets captured:</p>
-        <div class="script-box">
-          <p>
-          <strong>📋 CONVERSATION REPORT TEMPLATE</strong><br><br>
-          <strong style="color:var(--accent)">Customer Profile:</strong> [Name, Language, Contact]<br>
-          <strong style="color:var(--accent)">Session Date/Time:</strong> [Auto-captured]<br>
-          <strong style="color:var(--accent)">Industry Detected:</strong> [e.g., Klinik, Properti, Retail]<br><br>
-
-          <strong style="color:var(--gold)">PRIMARY NEED IDENTIFIED:</strong><br>
-          □ Needs a Quotation / Proposal<br>
-          □ Needs a Presentation / Demo<br>
-          □ Needs Technical Consultation<br>
-          □ Exploring / Research Phase<br>
-          □ Ready to Buy — Needs Pricing<br>
-          □ Partnership Inquiry<br>
-          □ Support / Existing Client<br><br>
-
-          <strong style="color:var(--gold)">AI ANALYSIS SUMMARY:</strong><br>
-          "Customer appears to be a [profile]. Their core challenge is [X]. Recommended next step: [send proposal / schedule demo / connect to sales]. Urgency: [High/Medium/Low]."<br><br>
-
-          <strong style="color:var(--gold)">FULL TRANSCRIPT:</strong><br>
-          [Auto-appended below]<br><br>
-
-          <em style="color:var(--muted)">→ Report auto-sent to mediakomindo@gmail.com within 5 minutes of conversation end.</em>
-          </p>
-        </div>
-      </div>
+<section id="refund" style="padding:80px 48px;background:var(--bg2)">
+  <div class="container"><div class="sec-label" data-en="Refund Policy" data-id="Kebijakan Pengembalian">Refund Policy</div><h2 class="sec-title" data-en="Refund & Cancellation Policy" data-id="Kebijakan Refund & Pembatalan">Refund & Cancellation Policy</h2>
+    <div class="legal-cards" style="margin-top:36px">
+      <div class="legal-card" style="border-color:rgba(0,212,170,0.2)"><h3 style="color:#00D4AA" data-en="✅ Full Refund (100%)" data-id="✅ Refund Penuh (100%)">✅ Full Refund (100%)</h3><p data-en="Request within 7 calendar days after payment, AND service/onboarding has not started. Refund processed 5–14 business days to original payment account/method." data-id="Pengajuan dalam 7 hari kalender setelah pembayaran, DAN layanan/onboarding belum dimulai. Refund diproses 5–14 hari kerja ke rekening/metode pembayaran asal.">Request within 7 calendar days after payment, AND service/onboarding has not started. Refund processed 5–14 business days to original payment account/method.</p></div>
+      <div class="legal-card" style="border-color:rgba(255,184,0,0.2)"><h3 style="color:var(--gold)" data-en="🔄 Service Credit (100% value)" data-id="🔄 Kredit Layanan (100% nilai)">🔄 Service Credit (100% value)</h3><p data-en="After onboarding starts or >7 days, payment can be transferred as 100% service credit for use with other GoMiners services. Valid 12 months." data-id="Setelah onboarding dimulai atau lebih dari 7 hari, pembayaran dapat dialihkan menjadi kredit layanan senilai 100% untuk digunakan di layanan GoMiners lainnya. Berlaku 12 bulan.">After onboarding starts or >7 days, payment can be transferred as 100% service credit for use with other GoMiners services. Valid 12 months.</p></div>
+      <div class="legal-card"><h3 data-en="📧 How to Request a Refund" data-id="📧 Cara Mengajukan Refund">📧 How to Request a Refund</h3><p data-en='Send email to pt.globaloperasiminers@gmail.com with subject: "REFUND - [Your Order Number]". Include: full name, order number, proof of payment, and reason for refund. Our team will respond within 1 business day.' data-id='Kirim email ke pt.globaloperasiminers@gmail.com dengan subject: "REFUND - [Nomor Order Anda]". Sertakan: nama lengkap, nomor order, bukti pembayaran, dan alasan refund. Tim kami akan merespons dalam 1 hari kerja.'>Send email to pt.globaloperasiminers@gmail.com with subject: "REFUND - [Your Order Number]". Include: full name, order number, proof of payment, and reason for refund. Our team will respond within 1 business day.</p></div>
     </div>
   </div>
 </section>
 
 <!-- CONTACT -->
-<section class="contact" id="contact">
+<section id="contact">
   <div class="container">
-    <div class="section-label">Get in Touch</div>
-    <h2 class="section-title">Let's Build Something<br>Intelligent Together</h2>
-    <div class="contact-grid" style="margin-top:60px">
-      <div class="contact-info">
-        <div class="contact-item">
-          <div class="contact-icon">📍</div>
-          <div>
-            <h4>Office Address</h4>
-            <p>Komplek Multiguna Pakualam B10,<br>Alam Sutera, Pakualam, Serpong Utara<br>Kota Tangerang Selatan, Banten<br><em style="color:var(--muted);font-size:12px">(Alam Sutera Area)</em></p>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-icon">📞</div>
-          <div>
-            <h4>Phone</h4>
-            <p><a href="tel:02150932379" style="color:var(--text);text-decoration:none">021-5093-2379</a></p>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-icon">📧</div>
-          <div>
-            <h4>Email</h4>
-            <p><a href="mailto:pt.globaloperasiminers@gmail.com" style="color:var(--accent);text-decoration:none">pt.globaloperasiminers@gmail.com</a></p>
-          </div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-icon">🌐</div>
-          <div>
-            <h4>Website</h4>
-            <p><a href="https://gominers.id" style="color:var(--accent);text-decoration:none">gominers.id</a></p>
-          </div>
-        </div>
+    <div class="sec-label" data-en="Get in Touch" data-id="Hubungi Kami">Get in Touch</div>
+    <h2 class="sec-title" data-en="Let's Build Something<br>Intelligent Together" data-id="Mari Bangun Sesuatu<br>yang Cerdas Bersama">Let's Build Something<br>Intelligent Together</h2>
+    <div class="contact-grid" style="margin-top:56px">
+      <div>
+        <div class="contact-item"><div class="contact-icon">📍</div><div><h4 data-en="Office Address" data-id="Alamat Kantor">Office Address</h4><p>Komplek Multiguna Pakualam B10,<br>Serpong Utara, Kota Tangerang Selatan,<br>Banten 15325</p></div></div>
+        <div class="contact-item"><div class="contact-icon">📞</div><div><h4 data-en="Phone" data-id="Telepon">Phone</h4><p><a href="tel:02150932379" style="color:var(--text);text-decoration:none">021-5093-2379</a></p></div></div>
+        <div class="contact-item"><div class="contact-icon">📧</div><div><h4 data-en="Email" data-id="Email">Email</h4><p><a href="mailto:pt.globaloperasiminers@gmail.com" style="color:var(--accent);text-decoration:none">pt.globaloperasiminers@gmail.com</a></p></div></div>
+        <div class="contact-item"><div class="contact-icon">🌐</div><div><h4>Website</h4><p><a href="https://gominers.id" style="color:var(--accent);text-decoration:none">www.gominers.id</a></p></div></div>
       </div>
       <div class="inquiry-box">
-        <h3>Ready to Automate?</h3>
-        <p>For AI inquiries, proposals, or demos — reach us directly via email or WhatsApp. Our AI agent will follow up within minutes.</p>
-        <div class="inquiry-btns">
-          <a href="mailto:pt.globaloperasiminers@gmail.com" class="inquiry-btn">
-            <span class="icon">📧</span>
-            <div>
-              <div style="font-size:12px;color:var(--muted)">Send Email</div>
-              <div>pt.globaloperasiminers@gmail.com</div>
-            </div>
-          </a>
-          <a href="https://wa.me/6285284200530" target="_blank" class="inquiry-btn">
-            <span class="icon">💬</span>
-            <div>
-              <div style="font-size:12px;color:var(--muted)">WhatsApp</div>
-              <div>+6285284200530</div>
-            </div>
-          </a>
-          <a href="tel:02150932379" class="inquiry-btn">
-            <span class="icon">📞</span>
-            <div>
-              <div style="font-size:12px;color:var(--muted)">Phone</div>
-              <div>021-5093-2379</div>
-            </div>
-          </a>
-        </div>
+        <h3 data-en="Ready to Automate?" data-id="Siap untuk Otomasi?">Ready to Automate?</h3>
+        <p data-en="For AI inquiries, proposals, or demos — reach us directly via email or WhatsApp. Our AI agent will follow up within minutes." data-id="Untuk pertanyaan AI, proposal, atau demo — hubungi kami langsung via email atau WhatsApp. Agen AI kami akan menindaklanjuti dalam hitungan menit.">For AI inquiries, proposals, or demos — reach us directly via email or WhatsApp. Our AI agent will follow up within minutes.</p>
+        <a href="mailto:pt.globaloperasiminers@gmail.com" class="inq-btn"><span class="inq-icon">📧</span><div><div style="font-size:11.5px;color:var(--muted)" data-en="Send Email" data-id="Kirim Email">Send Email</div><div>pt.globaloperasiminers@gmail.com</div></div></a>
+        <a href="https://wa.me/6285284200530" target="_blank" class="inq-btn"><span class="inq-icon">💬</span><div><div style="font-size:11.5px;color:var(--muted)">WhatsApp</div><div>+62 852-8420-0530</div></div></a>
+        <a href="tel:02150932379" class="inq-btn"><span class="inq-icon">📞</span><div><div style="font-size:11.5px;color:var(--muted)" data-en="Phone Call" data-id="Telepon">Phone Call</div><div>021-5093-2379</div></div></a>
       </div>
     </div>
   </div>
@@ -913,175 +613,251 @@
 
 <!-- FOOTER -->
 <footer>
-  <p style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#00C8FF,#0066FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">GoMiners.id</p>
-  <p>PT Global Operasi Miners · NIB: 1509230205682 · Alam Sutera, Tangerang</p>
-  <p style="margin-top:8px">© 2024 GoMiners.id · <a href="mailto:pt.globaloperasiminers@gmail.com">pt.globaloperasiminers@gmail.com</a></p>
+  <p style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:7px;background:linear-gradient(135deg,#00C8FF,#0066FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">GoMiners.id</p>
+  <p>PT Global Operasi Miners · NIB: 1509230205682 · Tangerang Selatan</p>
+  <div class="foot-links">
+    <a href="#privacy-policy" data-en="Privacy Policy" data-id="Kebijakan Privasi">Privacy Policy</a>
+    <a href="#terms" data-en="Terms & Conditions" data-id="Syarat & Ketentuan">Terms & Conditions</a>
+    <a href="#refund" data-en="Refund Policy" data-id="Kebijakan Refund">Refund Policy</a>
+    <a href="#contact" data-en="Contact" data-id="Kontak">Contact</a>
+  </div>
+  <p>© 2025 GoMiners.id · <a href="mailto:pt.globaloperasiminers@gmail.com">pt.globaloperasiminers@gmail.com</a></p>
+  <p style="margin-top:5px;font-size:11px;color:var(--muted)" data-en="Payments processed by Midtrans (PT Midtrans) & Xendit (PT Sinar Digital Terdepan) · Licensed by Bank Indonesia" data-id="Pembayaran diproses oleh Midtrans (PT Midtrans) & Xendit (PT Sinar Digital Terdepan) · Berlisensi Bank Indonesia">Payments processed by Midtrans (PT Midtrans) & Xendit (PT Sinar Digital Terdepan) · Licensed by Bank Indonesia</p>
 </footer>
 
+</div><!-- #site -->
+
 <!-- CHATBOT -->
-<div class="chatbot-wrapper">
-  <div class="chat-window" id="chatWindow">
-    <div class="chat-header">
-      <div class="avatar">🤖</div>
-      <div class="chat-header-info">
-        <h4>GoMiners AI Assistant</h4>
-        <p><span class="online-dot"></span>Online · Powered by AI</p>
-      </div>
+<div class="chatbot-wrapper" id="chatbot" style="display:none">
+  <div class="chat-win" id="chatWin">
+    <div class="chat-head"><div class="chat-av">🤖</div><div><h4>GoMiners AI</h4><p><span class="online-dot"></span>Online</p></div></div>
+    <div class="lang-screen" id="chatLangScreen">
+      <div style="font-size:28px">👋</div>
+      <p id="chat-lang-prompt">Welcome! / Selamat datang!<br>Choose language / Pilih bahasa:</p>
+      <div class="lang-btns-chat"><button class="lang-btn-chat" onclick="startChatLang('en')">🇺🇸 English</button><button class="lang-btn-chat" onclick="startChatLang('id')">🇮🇩 Indonesia</button></div>
     </div>
-    <!-- Lang Select -->
-    <div class="lang-select-screen" id="langSelect">
-      <div style="font-size:32px">👋</div>
-      <p>Welcome to GoMiners.id!<br>Please select your language:<br><br>Selamat datang di GoMiners.id!<br>Pilih bahasa Anda:</p>
-      <div class="lang-btns">
-        <button class="lang-btn" onclick="startChat('en')">🇺🇸 English</button>
-        <button class="lang-btn" onclick="startChat('id')">🇮🇩 Indonesia</button>
-      </div>
-    </div>
-    <!-- Chat Body -->
     <div class="chat-body" id="chatBody"></div>
-    <!-- Input -->
-    <div class="chat-input-area" id="chatInputArea">
-      <input class="chat-input" id="chatInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendMsg()">
-      <button class="chat-send" onclick="sendMsg()">➤</button>
-    </div>
+    <div class="chat-inp-area" id="chatInpArea"><input class="chat-inp" id="chatInp" onkeydown="if(event.key==='Enter')sendMsg()"><button class="chat-send" onclick="sendMsg()">➤</button></div>
   </div>
   <button class="chat-bubble" onclick="toggleChat()">💬</button>
 </div>
 
 <script>
-// Agent tabs
-function switchAgent(idx) {
-  document.querySelectorAll('.agent-tab').forEach((t,i) => {
-    t.classList.toggle('active', i===idx);
-  });
-  document.querySelectorAll('.agent-panel').forEach((p,i) => {
-    p.classList.toggle('active', i===idx);
-  });
-}
-
-// Chatbot
+// ════════ LANGUAGE ENGINE ════════
+let siteLang = 'en';
+let chatLang = 'en';
 let chatOpen = false;
-let lang = 'en';
 let chatHistory = [];
-let sessionStart = new Date();
-let customerNeeds = [];
+let selectedGW = null;
 
-function toggleChat() {
-  chatOpen = !chatOpen;
-  document.getElementById('chatWindow').classList.toggle('open', chatOpen);
+function chooseLang(lang) {
+  siteLang = lang;
+  document.getElementById('lang-gate').style.display = 'none';
+  document.getElementById('site').style.display = 'block';
+  document.getElementById('chatbot').style.display = 'block';
+  applyLang(lang);
+  updateLangToggle(lang);
 }
 
-function startChat(selectedLang) {
-  lang = selectedLang;
-  document.getElementById('langSelect').style.display = 'none';
-  document.getElementById('chatBody').classList.add('visible');
-  document.getElementById('chatInputArea').classList.add('visible');
-  document.getElementById('chatInput').placeholder = lang === 'id' ? 'Ketik pesan Anda...' : 'Type your message...';
-
-  const greeting = lang === 'id'
-    ? `Selamat datang di GoMiners.id! 🙏\n\nSaya adalah asisten AI GoMiners. Saya di sini untuk membantu Anda.\n\nBoleh saya tahu nama Anda dan apa yang sedang Anda cari hari ini? Apakah Anda tertarik dengan:\n• 🤖 AI Automation\n• ₿ Crypto Solutions\n• 📊 SaaS untuk bisnis Anda?`
-    : `Welcome to GoMiners.id! 👋\n\nI'm the GoMiners AI Assistant. I'm here to understand exactly what your business needs.\n\nMay I know your name and what brings you here today? Are you looking for:\n• 🤖 AI Automation\n• ₿ Crypto Solutions\n• 📊 SaaS for your business?`;
-
-  addBotMsg(greeting);
+function toggleLang() {
+  siteLang = siteLang === 'en' ? 'id' : 'en';
+  applyLang(siteLang);
+  updateLangToggle(siteLang);
 }
 
-function addBotMsg(text) {
-  const body = document.getElementById('chatBody');
-  const msg = document.createElement('div');
-  msg.className = 'chat-msg bot';
-  msg.innerHTML = `<div class="bubble">${text.replace(/\n/g,'<br>')}</div>`;
-  body.appendChild(msg);
-  body.scrollTop = body.scrollHeight;
-  chatHistory.push({role: 'assistant', content: text});
+function updateLangToggle(lang) {
+  document.getElementById('flag-icon').textContent = lang === 'en' ? '🇺🇸' : '🇮🇩';
+  document.getElementById('lang-label').textContent = lang === 'en' ? 'EN' : 'ID';
 }
 
-function addUserMsg(text) {
-  const body = document.getElementById('chatBody');
-  const msg = document.createElement('div');
-  msg.className = 'chat-msg user';
-  msg.innerHTML = `<div class="bubble">${text}</div>`;
-  body.appendChild(msg);
-  body.scrollTop = body.scrollHeight;
-  chatHistory.push({role: 'user', content: text});
-}
-
-function showTyping() {
-  const body = document.getElementById('chatBody');
-  const t = document.createElement('div');
-  t.className = 'chat-msg bot'; t.id = 'typing';
-  t.innerHTML = `<div class="bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
-  body.appendChild(t);
-  body.scrollTop = body.scrollHeight;
-}
-
-function removeTyping() {
-  const t = document.getElementById('typing');
-  if (t) t.remove();
-}
-
-async function sendMsg() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-  addUserMsg(text);
-  showTyping();
-
-  const systemPrompt = lang === 'id'
-    ? `Kamu adalah asisten AI GoMiners.id — perusahaan SaaS dan AI asal Indonesia. Tugasmu adalah:
-1. Menyambut customer dengan hangat, sopan, tegas, bermartabat, dan penuh kepedulian
-2. Menggali kebutuhan nyata mereka melalui pertanyaan yang cerdas dan empatik
-3. Merekomendasikan layanan GoMiners yang paling sesuai (AI Automation, Crypto Solutions, SaaS agent, atau produk seperti Fixmine/CekGejala/cryptosignal)
-4. Selalu tutup dengan menawarkan: kirim proposal via email pt.globaloperasiminers@gmail.com atau WhatsApp +6285284200530
-
-Layanan GoMiners: AI Automation, Digital Transformation SaaS, Crypto Intelligence (GPU mining, ASIC, autotrading), Chatbot AI bilingual, Marketing automation.
-Produk: Fixmine (PC services), CekGejala.id (health AI), Cryptosignal.id (Fastest Crypto data feeder).
-
-Jawab dalam Bahasa Indonesia yang profesional, hangat, dan percaya diri. Maksimal 3-4 kalimat per respons.`
-    : `You are GoMiners.id's AI assistant — an Indonesian AI & SaaS company. Your role:
-1. Welcome customers warmly, professionally, with dignity and genuine care
-2. Uncover their real business needs through smart, empathetic questions
-3. Recommend the most relevant GoMiners service (AI Automation, Crypto Solutions, SaaS agents, or products like Fixmine/CekGejala/Cryptosignal)
-4. Always close by offering: send proposal via email pt.globaloperasiminers@gmail.com or WhatsApp +6285284200530
-
-GoMiners services: AI Automation, Digital Transformation SaaS, Crypto Intelligence (GPU mining, ASIC, autotrading), Bilingual AI Chatbot, Marketing automation.
-Products: Fixmine (PC Services), CekGejala.id (health AI), Cryptosignal.id (Fastest Crypto data feeder).
-
-Respond in professional, warm, confident English. Maximum 3-4 sentences per response.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        system: systemPrompt,
-        messages: chatHistory.filter(m => m.role !== 'system').slice(-10)
-      })
-    });
-    const data = await res.json();
-    removeTyping();
-      const reply = data.content?.[0]?.text || (lang === 'id' ? 'Mohon maaf, ada gangguan. Hubungi kami di pt.globaloperasiminers@gmail.com' : 'Sorry, there was an issue. Contact us at pt.globaloperasiminers@gmail.com');
-    addBotMsg(reply);
-
-    // Generate report after 5 exchanges
-    if (chatHistory.filter(m=>m.role==='user').length >= 5 && chatHistory.filter(m=>m.role==='user').length % 5 === 0) {
-      generateReport();
+function applyLang(lang) {
+  document.documentElement.lang = lang;
+  // All elements with data-en / data-id
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const txt = el.getAttribute('data-' + lang);
+    if (!txt) return;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      el.placeholder = el.getAttribute('data-' + lang + '-ph') || txt;
+    } else {
+      el.innerHTML = txt;
     }
-  } catch(e) {
-    removeTyping();
-      addBotMsg(lang === 'id' ? 'Hubungi kami langsung: pt.globaloperasiminers@gmail.com atau WA +6285284200530 🙏' : 'Please contact us directly: pt.globaloperasiminers@gmail.com or WhatsApp +6285284200530 🙏');
+  });
+  // Select options
+  document.querySelectorAll('select option[data-en]').forEach(opt => {
+    const t = opt.getAttribute('data-' + lang);
+    if (t) opt.textContent = t;
+  });
+  // Placeholders
+  document.querySelectorAll('[data-' + lang + '-ph]').forEach(el => {
+    el.placeholder = el.getAttribute('data-' + lang + '-ph');
+  });
+  // Amount info text
+  const ai = document.getElementById('amount-info');
+  if (ai) ai.textContent = lang === 'en' ? 'Range: IDR 5,000,000 – IDR 50,000,000' : 'Rentang: IDR 5.000.000 – IDR 50.000.000';
+  // Chat input placeholder
+  const ci = document.getElementById('chatInp');
+  if (ci) ci.placeholder = lang === 'en' ? 'Type your message...' : 'Ketik pesan Anda...';
+}
+
+// ════════ AGENT TABS ════════
+function switchAgent(i) {
+  document.querySelectorAll('.agent-tab').forEach((t,j) => t.classList.toggle('active', i===j));
+  document.querySelectorAll('.agent-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+}
+
+// ════════ PAYMENT ════════
+function formatIDR(v) { return 'Rp ' + parseInt(v).toLocaleString('id-ID'); }
+
+function scrollToPayment(amt) {
+  document.getElementById('pay-amount').value = amt;
+  updateSummary();
+  setTimeout(() => document.getElementById('payment-section').scrollIntoView({behavior:'smooth',block:'center'}), 80);
+}
+
+function updateSummary() {
+  const amt = parseInt(document.getElementById('pay-amount').value);
+  const svc = document.getElementById('pay-service').value;
+  const info = document.getElementById('amount-info');
+  const sum = document.getElementById('pay-summary');
+  if (!isNaN(amt) && amt >= 5000000 && amt <= 50000000) {
+    info.textContent = '✅ ' + formatIDR(amt);
+    info.style.color = 'var(--accent)';
+    sum.style.display = 'block';
+    document.getElementById('sum-svc').textContent = svc || (siteLang==='en'?'(select service)':'(pilih layanan)');
+    document.getElementById('sum-total').textContent = formatIDR(amt);
+  } else if (amt > 50000000) {
+    info.textContent = siteLang==='en' ? '⚠️ Max IDR 50,000,000 — contact us for custom packages.' : '⚠️ Maks IDR 50.000.000 — hubungi kami untuk paket khusus.';
+    info.style.color = 'var(--gold)';
+    sum.style.display = 'none';
+  } else {
+    info.textContent = siteLang==='en' ? 'Range: IDR 5,000,000 – IDR 50,000,000' : 'Rentang: IDR 5.000.000 – IDR 50.000.000';
+    info.style.color = 'var(--muted)';
+    sum.style.display = 'none';
   }
 }
 
-function generateReport() {
-  const reportMsg = lang === 'id'
-      ? `📊 *Laporan percakapan ini telah dikirim ke tim GoMiners.*\n\nTim kami akan menghubungi Anda segera. Untuk respons lebih cepat:\n📧 pt.globaloperasiminers@gmail.com\n💬 WA: +6285284200530`
-      : `📊 *A conversation report has been sent to the GoMiners team.*\n\nOur team will reach out shortly. For faster response:\n📧 pt.globaloperasiminers@gmail.com\n💬 WA: +6285284200530`;
-  addBotMsg(reportMsg);
+function selectGW(gw) {
+  selectedGW = gw;
+  document.getElementById('gw-mid').className = 'gw-btn' + (gw==='mid' ? ' selected-mid' : '');
+  document.getElementById('gw-xen').className = 'gw-btn' + (gw==='xen' ? ' selected-xen' : '');
+}
+
+function doPay() {
+  const name = document.getElementById('pay-name').value.trim();
+  const email = document.getElementById('pay-email').value.trim();
+  const phone = document.getElementById('pay-phone').value.trim();
+  const svc = document.getElementById('pay-service').value;
+  const amt = parseInt(document.getElementById('pay-amount').value);
+  const ref = document.getElementById('pay-ref').value.trim();
+  const isID = siteLang === 'id';
+  if (!name||!email||!phone||!svc) { alert(isID?'⚠️ Mohon lengkapi semua field wajib (*)':'⚠️ Please fill all required fields (*)'); return; }
+  if (isNaN(amt)||amt<5000000||amt>50000000) { alert(isID?'⚠️ Nominal harus antara IDR 5.000.000 – IDR 50.000.000':'⚠️ Amount must be between IDR 5,000,000 – IDR 50,000,000'); return; }
+  if (!selectedGW) { alert(isID?'⚠️ Pilih payment gateway: Midtrans atau Xendit':'⚠️ Please select a payment gateway: Midtrans or Xendit'); return; }
+  const orderId = 'GM-' + Date.now() + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
+  const gwLabel = selectedGW==='mid' ? 'Midtrans' : 'Xendit';
+  const waMsg = encodeURIComponent((isID?'Halo GoMiners 👋\n\nKonfirmasi pembayaran:\n':'Hello GoMiners 👋\n\nPayment confirmation:\n') + `📋 Order: ${orderId}\n💼 ${isID?'Layanan':'Service'}: ${svc}\n💰 ${isID?'Nominal':'Amount'}: ${formatIDR(amt)}\n🔗 Gateway: ${gwLabel}${ref?'\n📎 Ref: '+ref:''}`);
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+  modal.innerHTML = `<div style="background:#0D1824;border:1px solid rgba(0,200,255,0.2);border-radius:20px;padding:36px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+    <div style="font-size:40px;margin-bottom:12px">🔐</div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px;color:#E8F0FE">${isID?'Konfirmasi Pembayaran':'Payment Confirmation'}</h3>
+    <div style="background:#050A0F;border:1px solid rgba(0,200,255,0.1);border-radius:11px;padding:18px;margin:18px 0;text-align:left">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">Order ID</span><span style="color:#00C8FF;font-size:12.5px;font-weight:700">${orderId}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">${isID?'Nama':'Name'}</span><span style="color:#E8F0FE;font-size:12.5px">${name}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">${isID?'Layanan':'Service'}</span><span style="color:#E8F0FE;font-size:12.5px">${svc}</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">Gateway</span><span style="color:#E8F0FE;font-size:12.5px">${gwLabel}</span></div>
+      <div style="border-top:1px solid rgba(0,200,255,0.1);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:700;color:#E8F0FE;font-size:13px">Total</span><span style="font-weight:800;color:#00C8FF;font-size:20px;font-family:'Syne',sans-serif">${formatIDR(amt)}</span></div>
+    </div>
+    <div style="background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.18);border-radius:9px;padding:11px;margin-bottom:18px;font-size:11.5px;color:#FFB800">⚙️ ${isID?'Mode Demo — Backend Midtrans/Xendit belum terhubung. Konfirmasi via WhatsApp.':'Demo Mode — Midtrans/Xendit backend not connected yet. Please confirm via WhatsApp.'}</div>
+    <a href="https://wa.me/6285284200530?text=${waMsg}" target="_blank" style="display:block;padding:13px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:10px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;text-decoration:none;margin-bottom:9px">💬 ${isID?'Konfirmasi via WhatsApp':'Confirm via WhatsApp'}</a>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#6B7F9A;font-family:'DM Sans',sans-serif;cursor:pointer;font-size:12.5px">${isID?'Tutup':'Close'}</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+// ════════ CHATBOT ════════
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatWin').classList.toggle('open', chatOpen);
+}
+
+function startChatLang(lang) {
+  chatLang = lang;
+  document.getElementById('chatLangScreen').style.display = 'none';
+  document.getElementById('chatBody').classList.add('vis');
+  document.getElementById('chatInpArea').classList.add('vis');
+  document.getElementById('chatInp').placeholder = lang==='en' ? 'Type your message...' : 'Ketik pesan Anda...';
+  const greet = lang==='en'
+    ? `Welcome to GoMiners.id! 👋\n\nI'm your GoMiners AI Assistant. I'm here to genuinely understand your business needs.\n\nMay I know your name and what brings you here today? Are you interested in:\n• 🤖 AI Automation\n• ₿ Crypto Solutions\n• 📊 SaaS for your business?`
+    : `Selamat datang di GoMiners.id! 🙏\n\nSaya adalah Asisten AI GoMiners. Saya di sini untuk benar-benar memahami kebutuhan bisnis Anda.\n\nBoleh saya tahu nama Anda dan apa yang membawa Anda ke sini hari ini? Apakah Anda tertarik dengan:\n• 🤖 Otomasi AI\n• ₿ Solusi Kripto\n• 📊 SaaS untuk bisnis Anda?`;
+  addBot(greet);
+}
+
+function addBot(txt) {
+  const b = document.getElementById('chatBody');
+  const d = document.createElement('div');
+  d.className = 'chat-msg bot';
+  d.innerHTML = `<div class="bub">${txt.replace(/\n/g,'<br>')}</div>`;
+  b.appendChild(d); b.scrollTop = b.scrollHeight;
+  chatHistory.push({role:'assistant',content:txt});
+}
+
+function addUser(txt) {
+  const b = document.getElementById('chatBody');
+  const d = document.createElement('div');
+  d.className = 'chat-msg user';
+  d.innerHTML = `<div class="bub">${txt}</div>`;
+  b.appendChild(d); b.scrollTop = b.scrollHeight;
+  chatHistory.push({role:'user',content:txt});
+}
+
+function showTyping() {
+  const b = document.getElementById('chatBody');
+  const t = document.createElement('div');
+  t.className='chat-msg bot';t.id='typing';
+  t.innerHTML='<div class="bub"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>';
+  b.appendChild(t);b.scrollTop=b.scrollHeight;
+}
+function rmTyping() { const t=document.getElementById('typing');if(t)t.remove(); }
+
+async function sendMsg() {
+  const inp = document.getElementById('chatInp');
+  const txt = inp.value.trim(); if(!txt)return;
+  inp.value=''; addUser(txt); showTyping();
+  const isEN = chatLang === 'en';
+  const sys = isEN
+    ? `You are GoMiners.id's AI assistant — an Indonesian AI & SaaS company. Your role:
+1. Welcome customers warmly, professionally, with dignity and genuine care
+2. Uncover real business needs through smart, empathetic questions
+3. Recommend the most relevant GoMiners service (AI Automation, Crypto Solutions, SaaS agents, products: Fixmine, CekGejala.id, Cryptosignal.id)
+4. Always close by offering to send a proposal via email pt.globaloperasiminers@gmail.com or WhatsApp +6285284200530
+5. After 5+ customer messages, mention that a KYC report will be sent to the GoMiners team
+Respond in professional, warm, confident English. Max 3-4 sentences per response.`
+    : `Kamu adalah asisten AI GoMiners.id — perusahaan SaaS dan AI asal Indonesia. Tugasmu:
+1. Menyambut customer dengan hangat, sopan, tegas, bermartabat, dan penuh kepedulian
+2. Menggali kebutuhan nyata mereka melalui pertanyaan cerdas dan empatik
+3. Merekomendasikan layanan GoMiners paling sesuai (Otomasi AI, Kripto, SaaS, produk: Fixmine, CekGejala.id, Cryptosignal.id)
+4. Selalu tutup dengan menawarkan kirim proposal via email pt.globaloperasiminers@gmail.com atau WA +6285284200530
+5. Setelah 5+ pesan customer, sebutkan laporan KYC akan dikirim ke tim GoMiners
+Jawab dalam Bahasa Indonesia profesional, hangat, percaya diri. Maks 3-4 kalimat per respons.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:sys,messages:chatHistory.filter(m=>m.role!=='system').slice(-12)})});
+    const data = await res.json();
+    rmTyping();
+    const reply = data.content?.[0]?.text || (isEN?'Please contact us at pt.globaloperasiminers@gmail.com':'Hubungi kami di pt.globaloperasiminers@gmail.com');
+    addBot(reply);
+    if(chatHistory.filter(m=>m.role==='user').length>=5 && chatHistory.filter(m=>m.role==='user').length%5===0) {
+      const rep = isEN
+        ? `📊 *A conversation report has been sent to the GoMiners team.*\n\nFor faster response:\n📧 pt.globaloperasiminers@gmail.com\n💬 WA: +6285284200530`
+        : `📊 *Laporan percakapan telah dikirim ke tim GoMiners.*\n\nUntuk respons lebih cepat:\n📧 pt.globaloperasiminers@gmail.com\n💬 WA: +6285284200530`;
+      setTimeout(()=>addBot(rep),800);
+    }
+  } catch(e) {
+    rmTyping();
+    addBot(isEN?'Sorry, a connection error occurred. Please contact us at pt.globaloperasiminers@gmail.com or WhatsApp +6285284200530 🙏':'Maaf, terjadi gangguan koneksi. Hubungi kami di pt.globaloperasiminers@gmail.com atau WA +6285284200530 🙏');
+  }
 }
 </script>
-
 </body>
 </html>
