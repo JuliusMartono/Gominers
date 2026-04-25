@@ -268,6 +268,14 @@ footer a{color:var(--accent);text-decoration:none}
   .mkt-grid{grid-template-columns:1fr}
   .chat-win{width:310px}
 }
+
+/* ── DOKU PAYMENT STYLES ── */
+.doku-method{background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.2s}
+.doku-method:hover{border-color:var(--accent);background:rgba(0,200,255,0.07)}
+.doku-method.selected{border-color:#0054A6;background:rgba(0,84,166,0.12);box-shadow:0 0 0 2px rgba(0,84,166,0.25)}
+.doku-method-icon{font-size:20px;margin-bottom:5px}
+.doku-method-name{font-size:11.5px;font-weight:700;color:var(--text)}
+.doku-method-sub{font-size:9.5px;color:var(--muted);margin-top:2px}
 </style>
 </head>
 <body>
@@ -421,7 +429,7 @@ footer a{color:var(--accent);text-decoration:none}
       </div>
       <div class="team-card">
         <div class="team-photo" style="background:transparent"><img src="/mnt/user-data/uploads/WhatsApp_Image_20260412_at_06_49_02.jpeg" alt="Nona - Director" onerror="this.parentElement.innerHTML='<div class=\'team-placeholder\'>N</div>'"><div class="team-overlay"></div></div>
-        <div class="team-info"><h3>Natalia Kwartika Atimeta</h3><div class="role" data-en="Director — PT Global Operasi Miners" data-id="Direktur — PT Global Operasi Miners">Director — PT Global Operasi Miners</div><p data-en="Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion." data-id="Pemimpin operasional dan pengembangan bisnis. Mendorong kemitraan, kesuksesan klien, dan ekspansi ekosistem SaaS GoMiners.">Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion.</p></div>
+        <div class="team-info"><h3>Nona</h3><div class="role" data-en="Director — PT Global Operasi Miners" data-id="Direktur — PT Global Operasi Miners">Director — PT Global Operasi Miners</div><p data-en="Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion." data-id="Pemimpin operasional dan pengembangan bisnis. Mendorong kemitraan, kesuksesan klien, dan ekspansi ekosistem SaaS GoMiners.">Operations and business development leader. Driving partnerships, client success, and GoMiners' SaaS ecosystem expansion.</p></div>
       </div>
     </div>
   </div>
@@ -549,7 +557,7 @@ footer a{color:var(--accent);text-decoration:none}
           <div class="gw-btn" id="gw-xen" onclick="selectGW('xen')"><div style="font-size:18px">🔵</div><div class="gw-name">Xendit</div><div class="gw-methods">VA · OVO · Dana · Retail</div></div>
         </div>
       </div>
-      <button class="pay-btn-main" onclick="doPay()" data-en="Pay Now 🔒" data-id="Bayar Sekarang 🔒">Pay Now 🔒</button>
+      <button class="pay-btn-main" onclick="doPay()" id="pay-btn-main"><span id="pay-btn-text" data-en="Pay with DOKU 🔒" data-id="Bayar dengan DOKU 🔒">Pay with DOKU 🔒</span></button>
       <div class="pay-secure">🔐 <span data-en="Licensed by Bank Indonesia · PCI-DSS Certified · 256-bit Encryption" data-id="Berlisensi Bank Indonesia · Bersertifikat PCI-DSS · Enkripsi 256-bit">Licensed by Bank Indonesia · PCI-DSS Certified · 256-bit Encryption</span><br><span data-en="Need help?" data-id="Butuh bantuan?">Need help?</span> <a href="https://wa.me/6285284200530" data-en="WhatsApp us" data-id="WA kami">WhatsApp us</a></div>
     </div>
   </div>
@@ -648,7 +656,6 @@ let siteLang = 'en';
 let chatLang = 'en';
 let chatOpen = false;
 let chatHistory = [];
-let selectedGW = null;
 
 function chooseLang(lang) {
   siteLang = lang;
@@ -705,8 +712,32 @@ function switchAgent(i) {
   document.querySelectorAll('.agent-panel').forEach((p,j) => p.classList.toggle('active', i===j));
 }
 
-// ════════ PAYMENT ════════
+// ════════ PAYMENT — DOKU LIVE ════════
+// ⚙️  CHANGE THIS when you deploy to production hosting:
+//     Local dev  → 'http://localhost:3001'
+//     Production → 'https://api.gominers.id'  (your server's public URL)
+    const BACKEND_URL = 'https://gominers-doku-backend-production.up.railway.app';
+let selectedDokuMethod = 'CHECKOUT';
+
 function formatIDR(v) { return 'Rp ' + parseInt(v).toLocaleString('id-ID'); }
+
+function selectDokuMethod(el, method) {
+  document.querySelectorAll('.doku-method').forEach(m => m.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDokuMethod = method;
+  const btn = document.getElementById('pay-btn-text');
+  const isID = siteLang === 'id';
+  const labels = {
+    CHECKOUT:'Bayar dengan DOKU 🔒', VIRTUAL_ACCOUNT_BCA:'Bayar via VA BCA 🔒',
+    VIRTUAL_ACCOUNT_BANK_MANDIRI:'Bayar via VA Mandiri 🔒', VIRTUAL_ACCOUNT_BNI:'Bayar via VA BNI 🔒',
+    VIRTUAL_ACCOUNT_BRI:'Bayar via VA BRI 🔒', EMONEY_OVO:'Bayar via OVO 🔒',
+    EMONEY_DANA:'Bayar via DANA 🔒', EMONEY_SHOPEE_PAY:'Bayar via ShopeePay 🔒',
+    CREDIT_CARD: isID ? 'Bayar via Kartu Kredit 🔒' : 'Pay via Credit Card 🔒',
+    ONLINE_TO_OFFLINE_ALFA:'Bayar via Alfamart 🔒', ONLINE_TO_OFFLINE_INDOMARET:'Bayar via Indomaret 🔒',
+    QRIS:'Bayar via QRIS 🔒'
+  };
+  if (btn) btn.textContent = labels[method] || (isID ? 'Bayar dengan DOKU 🔒' : 'Pay with DOKU 🔒');
+}
 
 function scrollToPayment(amt) {
   document.getElementById('pay-amount').value = amt;
@@ -718,62 +749,124 @@ function updateSummary() {
   const amt = parseInt(document.getElementById('pay-amount').value);
   const svc = document.getElementById('pay-service').value;
   const info = document.getElementById('amount-info');
-  const sum = document.getElementById('pay-summary');
+  const sum  = document.getElementById('pay-summary');
   if (!isNaN(amt) && amt >= 5000000 && amt <= 50000000) {
-    info.textContent = '✅ ' + formatIDR(amt);
-    info.style.color = 'var(--accent)';
+    info.textContent = '✅ ' + formatIDR(amt); info.style.color = 'var(--accent)';
     sum.style.display = 'block';
-    document.getElementById('sum-svc').textContent = svc || (siteLang==='en'?'(select service)':'(pilih layanan)');
+    document.getElementById('sum-svc').textContent   = svc || (siteLang==='en'?'(select service)':'(pilih layanan)');
     document.getElementById('sum-total').textContent = formatIDR(amt);
   } else if (amt > 50000000) {
-    info.textContent = siteLang==='en' ? '⚠️ Max IDR 50,000,000 — contact us for custom packages.' : '⚠️ Maks IDR 50.000.000 — hubungi kami untuk paket khusus.';
-    info.style.color = 'var(--gold)';
-    sum.style.display = 'none';
+    info.textContent = siteLang==='en' ? '⚠️ Max IDR 50,000,000 — contact us.' : '⚠️ Maks IDR 50.000.000 — hubungi kami.';
+    info.style.color = 'var(--gold)'; sum.style.display = 'none';
   } else {
     info.textContent = siteLang==='en' ? 'Range: IDR 5,000,000 – IDR 50,000,000' : 'Rentang: IDR 5.000.000 – IDR 50.000.000';
-    info.style.color = 'var(--muted)';
-    sum.style.display = 'none';
+    info.style.color = 'var(--muted)'; sum.style.display = 'none';
   }
 }
 
-function selectGW(gw) {
-  selectedGW = gw;
-  document.getElementById('gw-mid').className = 'gw-btn' + (gw==='mid' ? ' selected-mid' : '');
-  document.getElementById('gw-xen').className = 'gw-btn' + (gw==='xen' ? ' selected-xen' : '');
-}
-
-function doPay() {
-  const name = document.getElementById('pay-name').value.trim();
+async function doPay() {
+  const name  = document.getElementById('pay-name').value.trim();
   const email = document.getElementById('pay-email').value.trim();
   const phone = document.getElementById('pay-phone').value.trim();
-  const svc = document.getElementById('pay-service').value;
-  const amt = parseInt(document.getElementById('pay-amount').value);
-  const ref = document.getElementById('pay-ref').value.trim();
-  const isID = siteLang === 'id';
-  if (!name||!email||!phone||!svc) { alert(isID?'⚠️ Mohon lengkapi semua field wajib (*)':'⚠️ Please fill all required fields (*)'); return; }
-  if (isNaN(amt)||amt<5000000||amt>50000000) { alert(isID?'⚠️ Nominal harus antara IDR 5.000.000 – IDR 50.000.000':'⚠️ Amount must be between IDR 5,000,000 – IDR 50,000,000'); return; }
-  if (!selectedGW) { alert(isID?'⚠️ Pilih payment gateway: Midtrans atau Xendit':'⚠️ Please select a payment gateway: Midtrans or Xendit'); return; }
-  const orderId = 'GM-' + Date.now() + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
-  const gwLabel = selectedGW==='mid' ? 'Midtrans' : 'Xendit';
-  const waMsg = encodeURIComponent((isID?'Halo GoMiners 👋\n\nKonfirmasi pembayaran:\n':'Hello GoMiners 👋\n\nPayment confirmation:\n') + `📋 Order: ${orderId}\n💼 ${isID?'Layanan':'Service'}: ${svc}\n💰 ${isID?'Nominal':'Amount'}: ${formatIDR(amt)}\n🔗 Gateway: ${gwLabel}${ref?'\n📎 Ref: '+ref:''}`);
-  const modal = document.createElement('div');
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
-  modal.innerHTML = `<div style="background:#0D1824;border:1px solid rgba(0,200,255,0.2);border-radius:20px;padding:36px;max-width:480px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
-    <div style="font-size:40px;margin-bottom:12px">🔐</div>
-    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px;color:#E8F0FE">${isID?'Konfirmasi Pembayaran':'Payment Confirmation'}</h3>
-    <div style="background:#050A0F;border:1px solid rgba(0,200,255,0.1);border-radius:11px;padding:18px;margin:18px 0;text-align:left">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">Order ID</span><span style="color:#00C8FF;font-size:12.5px;font-weight:700">${orderId}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">${isID?'Nama':'Name'}</span><span style="color:#E8F0FE;font-size:12.5px">${name}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">${isID?'Layanan':'Service'}</span><span style="color:#E8F0FE;font-size:12.5px">${svc}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#6B7F9A;font-size:12.5px">Gateway</span><span style="color:#E8F0FE;font-size:12.5px">${gwLabel}</span></div>
-      <div style="border-top:1px solid rgba(0,200,255,0.1);margin:10px 0"></div>
-      <div style="display:flex;justify-content:space-between"><span style="font-weight:700;color:#E8F0FE;font-size:13px">Total</span><span style="font-weight:800;color:#00C8FF;font-size:20px;font-family:'Syne',sans-serif">${formatIDR(amt)}</span></div>
+  const svc   = document.getElementById('pay-service').value;
+  const amt   = parseInt(document.getElementById('pay-amount').value);
+  const ref   = document.getElementById('pay-ref').value.trim();
+  const isID  = siteLang === 'id';
+
+  if (!name||!email||!phone||!svc) {
+    alert(isID ? '⚠️ Mohon lengkapi semua field wajib (*)' : '⚠️ Please fill all required fields (*)'); return;
+  }
+  if (isNaN(amt)||amt<5000000||amt>50000000) {
+    alert(isID ? '⚠️ Nominal harus antara IDR 5.000.000 – IDR 50.000.000' : '⚠️ Amount must be between IDR 5,000,000 – IDR 50,000,000'); return;
+  }
+
+  const btn  = document.getElementById('pay-btn-main');
+  const btnT = document.getElementById('pay-btn-text');
+  btn.disabled = true;
+  btnT.textContent = isID ? '⏳ Menghubungi DOKU...' : '⏳ Connecting to DOKU...';
+
+  const invoiceNumber = 'GM-' + Date.now() + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
+
+  try {
+    const res = await fetch(BACKEND_URL + '/api/doku/checkout', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({
+        invoice_number : invoiceNumber,
+        amount         : amt,
+        customer_name  : name,
+        customer_email : email,
+        customer_phone : phone,
+        service        : svc,
+        ref_quote      : ref,
+        payment_method : selectedDokuMethod,
+        language       : siteLang === 'en' ? 'EN' : 'ID'
+      })
+    });
+
+    const data = await res.json();
+    btn.disabled = false;
+    btnT.textContent = isID ? 'Bayar dengan DOKU 🔒' : 'Pay with DOKU 🔒';
+
+    if (res.ok && data.success && data.payment_url) {
+      _showDokuRedirect(data.payment_url, invoiceNumber, svc, amt, isID);
+    } else {
+      _showDokuError(data.error || data.message || 'Error ' + res.status, invoiceNumber, svc, amt, ref, isID);
+    }
+
+  } catch (err) {
+    btn.disabled = false;
+    btnT.textContent = isID ? 'Bayar dengan DOKU 🔒' : 'Pay with DOKU 🔒';
+    _showDokuError(
+      isID ? 'Tidak dapat terhubung ke server. Pastikan backend aktif di: ' + BACKEND_URL
+           : 'Cannot reach server. Make sure backend is running at: ' + BACKEND_URL,
+      invoiceNumber, svc, amt, ref, isID
+    );
+  }
+}
+
+function _showDokuRedirect(payUrl, orderId, svc, amt, isID) {
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)';
+  m.innerHTML = `<div style="background:#0D1824;border:1px solid rgba(0,168,224,0.3);border-radius:20px;padding:40px;max-width:440px;width:100%;text-align:center">
+    <div style="width:60px;height:60px;background:linear-gradient(135deg,#0054A6,#00A8E0);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px">💎</div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#E8F0FE;margin-bottom:6px">${isID ? '✅ Pembayaran Siap!' : '✅ Payment Ready!'}</h3>
+    <p style="color:#6B7F9A;font-size:13px;margin-bottom:18px">${isID ? 'Halaman DOKU sedang dibuka di tab baru...' : 'DOKU payment page is opening in a new tab...'}</p>
+    <div style="background:#050A0F;border:1px solid rgba(0,168,224,0.14);border-radius:11px;padding:15px;margin-bottom:18px;text-align:left">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="color:#6B7F9A;font-size:12px">Order</span><strong style="color:#00A8E0;font-size:12px">${orderId}</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="color:#6B7F9A;font-size:12px">${isID?'Layanan':'Service'}</span><span style="color:#E8F0FE;font-size:12px">${svc}</span></div>
+      <div style="border-top:1px solid rgba(0,168,224,0.1);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between"><strong style="color:#E8F0FE">Total</strong><strong style="color:#00D4AA;font-size:20px;font-family:'Syne',sans-serif">${formatIDR(amt)}</strong></div>
     </div>
-    <div style="background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.18);border-radius:9px;padding:11px;margin-bottom:18px;font-size:11.5px;color:#FFB800">⚙️ ${isID?'Mode Demo — Backend Midtrans/Xendit belum terhubung. Konfirmasi via WhatsApp.':'Demo Mode — Midtrans/Xendit backend not connected yet. Please confirm via WhatsApp.'}</div>
-    <a href="https://wa.me/6285284200530?text=${waMsg}" target="_blank" style="display:block;padding:13px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:10px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px;text-decoration:none;margin-bottom:9px">💬 ${isID?'Konfirmasi via WhatsApp':'Confirm via WhatsApp'}</a>
+    <a href="${payUrl}" target="_blank" onclick="setTimeout(()=>this.closest('div[style*=fixed]').remove(),500)"
+       style="display:block;padding:14px;background:linear-gradient(135deg,#0054A6,#00A8E0);border-radius:11px;color:white;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;text-decoration:none;margin-bottom:9px">
+      ${isID ? '🔐 Buka Halaman Pembayaran DOKU' : '🔐 Open DOKU Payment Page'}
+    </a>
     <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#6B7F9A;font-family:'DM Sans',sans-serif;cursor:pointer;font-size:12.5px">${isID?'Tutup':'Close'}</button>
   </div>`;
-  document.body.appendChild(modal);
+  document.body.appendChild(m);
+  setTimeout(() => window.open(payUrl, '_blank'), 1500);
+}
+
+function _showDokuError(errMsg, orderId, svc, amt, ref, isID) {
+  const waMsg = encodeURIComponent(
+    (isID?'Halo GoMiners 👋\n\nIngin bayar tapi ada kendala:\n':'Hello GoMiners 👋\n\nWant to pay but encountered an issue:\n') +
+    `📋 Order: ${orderId}\n💼 ${isID?'Layanan':'Service'}: ${svc}\n💰 Total: ${formatIDR(amt)}${ref?'\n📎 Ref: '+ref:''}`
+  );
+  const m = document.createElement('div');
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+  m.innerHTML = `<div style="background:#0D1824;border:1px solid rgba(255,107,0,0.25);border-radius:20px;padding:36px;max-width:440px;width:100%;text-align:center">
+    <div style="font-size:44px;margin-bottom:14px">⚠️</div>
+    <h3 style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#E8F0FE;margin-bottom:10px">${isID?'Gagal Terhubung ke DOKU':'Failed to Connect to DOKU'}</h3>
+    <div style="background:#050A0F;border:1px solid rgba(255,107,0,0.2);border-radius:10px;padding:12px;margin-bottom:16px;text-align:left;font-size:12px;color:#FF6B00;font-family:monospace;word-break:break-word">${errMsg}</div>
+    <p style="color:#6B7F9A;font-size:13px;margin-bottom:16px">${isID?'Hubungi kami untuk bayar secara manual:':'Contact us to pay manually:'}</p>
+    <a href="https://wa.me/6285284200530?text=${waMsg}" target="_blank"
+       style="display:block;padding:13px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:10px;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:8px">
+      💬 ${isID?'Bayar via WhatsApp':'Pay via WhatsApp'}
+    </a>
+    <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#6B7F9A;font-family:'DM Sans',sans-serif;cursor:pointer;font-size:12.5px">${isID?'Tutup':'Close'}</button>
+  </div>`;
+  document.body.appendChild(m);
 }
 
 // ════════ CHATBOT ════════
