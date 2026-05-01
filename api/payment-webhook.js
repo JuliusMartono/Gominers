@@ -1,85 +1,246 @@
-// www.gominers.id/api/payment-webhook
-// Central payment webhook router for all GOMiners sister products
-// DOKU sends ALL notifications here → routes to correct product
+// api/payment-webhook.js
+// GoMiners.id — Universal DOKU Payment Webhook
+// Handles ALL GoMiners family products from one endpoint
+//
+// DOKU Dashboard → Settings → HTTP Notifications → URL:
+//   https://www.gominers.id/api/payment-webhook
+//
+// Invoice prefix routing:
+//   CGI-xxx → CekGejala.id (Supabase)
+//   CSI-xxx → CryptoSignal.id (add config when ready)
+//   GMI-xxx → GoMiners.id (add config when ready)
 
-module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(200).end();
+const crypto = require('crypto')
+const https  = require('https')
 
-  // GET — proxy status/verify calls to correct product
-  if (req.method === 'GET') {
-    const { product, ...rest } = req.query;
-    const target = getProductWebhook(product || 'cryptosignal');
-    const params = new URLSearchParams(rest).toString();
-    const upstream = await fetch(`${target}?${params}`);
-    const data = await upstream.json();
-    return res.status(upstream.status).json(data);
-  }
+const DOKU_SECRET_KEY = 'SK-QKbcPUHEiwGFsqws0Wts'
 
-  // POST — DOKU payment notification
-  if (req.method === 'POST') {
-    const body = req.body || {};
-    console.log('GOMiners central webhook received:', JSON.stringify(body));
+// ─── Product Handlers ─────────────────────────────────────────────────────────
+// Each product defines how to: find invoice, update invoice, upgrade user
+// Add new products here without touching the main webhook logic
 
-    // Auto-detect which product this payment belongs to
-    const product = detectProduct(req, body);
-    const targetUrl = getProductWebhook(product);
+const PRODUCT_HANDLERS = {
 
-    console.log(`Routing → ${product}: ${targetUrl}`);
-
-    try {
-      const upstream = await fetch(targetUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      const data = await upstream.json().catch(() => ({ ok: true }));
-      console.log(`${product} responded:`, upstream.status);
-
-      // Always return 200 to DOKU so it doesn't retry
-      return res.status(200).json({ ok: true, routed_to: product });
-    } catch (err) {
-      console.error('Routing error:', err.message);
-      // Still return 200 to DOKU — log error internally
-      return res.status(200).json({ ok: true, error: 'routing_failed' });
+  // ── CekGejala.id (Supabase) ────────────────────────────────────────────────
+  'CGI': {
+    name: 'CekGejala.id',
+    async findInvoice(invoiceNumber) {
+      const res = await supabaseGet(
+        process.env.CEKGEJALA_SUPABASE_URL,
+        process.env.CEKGEJALA_SUPABASE_KEY,
+        `invoices?invoice_number=eq.${invoiceNumber}&select=*`
+      )
+      return res?.[0] || null
+    },
+    async updateInvoice(invoiceNumber, data) {
+      return supabasePatch(
+        process.env.CEKGEJALA_SUPABASE_URL,
+        process.env.CEKGEJALA_SUPABASE_KEY,
+        `invoices?invoice_number=eq.${invoiceNumber}`,
+        data
+      )
+    },
+    async upgradeUser(userId, planDays) {
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + (planDays || 30))
+      return supabasePatch(
+        process.env.CEKGEJALA_SUPABASE_URL,
+        process.env.CEKGEJALA_SUPABASE_KEY,
+        `profiles?id=eq.${userId}`,
+        { plan: 'pro', plan_expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() }
+      )
     }
-  }
+  },
 
-  return res.status(405).json({ message: 'Method not allowed' });
-};
+  // ── CryptoSignal.id — add database config when you share what DB it uses ──
+  'CSI': {
+    name: 'CryptoSignal.id',
+    async findInvoice(invoiceNumber) {
+      // TODO: implement based on CryptoSignal database
+      // If Supabase: copy CGI handler above with CRYPTOSIGNAL_SUPABASE_URL
+      // If Firebase: use Firebase REST API
+      // If other: implement accordingly
+      console.log(`[CSI] findInvoice not implemented yet for: ${invoiceNumber}`)
+      return null
+    },
+    async updateInvoice(invoiceNumber, data) {
+      console.log(`[CSI] updateInvoice not implemented yet`)
+    },
+    async upgradeUser(userId, planDays) {
+      console.log(`[CSI] upgradeUser not implemented yet`)
+    }
+  },
 
-// ── Product detection logic ──────────────────────────────────────────────────
-function detectProduct(req, body = {}) {
-  // 1. Explicit query param ?product=cryptosignal
-  if (req.query?.product) return req.query.product;
-
-  // 2. additional_info.product in DOKU payload
-  if (body?.additional_info?.product) return body.additional_info.product;
-
-  // 3. Invoice number prefix
-  const invoice = body?.order?.invoice_number || '';
-  if (invoice.startsWith('CS-') || invoice.includes('-CS-')) return 'cryptosignal';
-  if (invoice.startsWith('GM-') || invoice.includes('-GM-')) return 'gominers';
-
-  // 4. Plan name hint
-  const plan = (body?.additional_info?.plan || '').toLowerCase();
-  if (plan.includes('crypto') || plan.includes('signal')) return 'cryptosignal';
-  if (plan.includes('miner') || plan.includes('saas')) return 'gominers';
-
-  // Default → cryptosignal (current active product)
-  return 'cryptosignal';
 }
 
-// ── Product webhook routing table ────────────────────────────────────────────
-function getProductWebhook(product) {
-  const routes = {
-    'cryptosignal': 'https://cryptosignal.id/api/payment-webhook',
-    'gominers':     'https://www.gominers.id/api/gominers-payment',
-    // Future sister products:
-    // 'product3': 'https://product3.com/api/payment-webhook',
-  };
-  return routes[product] || routes['cryptosignal'];
+// ─── Supabase Helpers ─────────────────────────────────────────────────────────
+
+function supabaseGet(url, key, path) {
+  return supabaseReq(url, key, 'GET', path, null)
+}
+
+function supabasePatch(url, key, path, body) {
+  return supabaseReq(url, key, 'PATCH', path, body)
+}
+
+function supabaseReq(baseUrl, key, method, path, body) {
+  return new Promise((resolve, reject) => {
+    if (!baseUrl || !key) {
+      console.error(`Supabase not configured: baseUrl=${!!baseUrl} key=${!!key}`)
+      return resolve(null)
+    }
+
+    const url = `${baseUrl}/rest/v1/${path}`
+    const bodyJson = body ? JSON.stringify(body) : undefined
+
+    const urlObj = new URL(url)
+    const options = {
+      hostname: urlObj.hostname,
+      port: 443,
+      path: urlObj.pathname + urlObj.search,
+      method,
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        key,
+        'Authorization': `Bearer ${key}`,
+        'Prefer':        method === 'PATCH' ? 'return=minimal' : 'return=representation',
+      },
+    }
+    if (bodyJson) options.headers['Content-Length'] = Buffer.byteLength(bodyJson)
+
+    const req = https.request(options, (res) => {
+      let data = ''
+      res.on('data', chunk => data += chunk)
+      res.on('end', () => {
+        try { resolve(data ? JSON.parse(data) : null) }
+        catch { resolve(null) }
+      })
+    })
+    req.on('error', (err) => {
+      console.error('Supabase request error:', err.message)
+      resolve(null)
+    })
+    if (bodyJson) req.write(bodyJson)
+    req.end()
+  })
+}
+
+// ─── Signature Verification ───────────────────────────────────────────────────
+
+function verifySignature(headers, bodyJson) {
+  const receivedSig = headers['signature'] || headers['Signature'] || ''
+  if (!receivedSig) return true // Allow unsigned (DOKU test mode)
+
+  const clientId         = headers['client-id']         || ''
+  const requestId        = headers['request-id']        || ''
+  const requestTimestamp = headers['request-timestamp'] || ''
+
+  const digestBase64 = crypto.createHash('sha256')
+    .update(bodyJson, 'utf8').digest('base64')
+
+  const component = [
+    `Client-Id:${clientId}`,
+    `Request-Id:${requestId}`,
+    `Request-Timestamp:${requestTimestamp}`,
+    `Request-Target:/api/payment-webhook`,
+    `Digest:${digestBase64}`,
+  ].join('\n')
+
+  const expected = 'HMACSHA256=' + crypto
+    .createHmac('sha256', DOKU_SECRET_KEY)
+    .update(component, 'utf8')
+    .digest('base64')
+
+  return expected === receivedSig
+}
+
+// ─── Main Handler ─────────────────────────────────────────────────────────────
+
+module.exports = async (req, res) => {
+  // Health check
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      status: 'GoMiners DOKU webhook active',
+      products: Object.keys(PRODUCT_HANDLERS),
+      timestamp: new Date().toISOString(),
+    })
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(200).json({ message: 'OK' })
+  }
+
+  // Read body
+  let bodyJson = ''
+  try {
+    bodyJson = await new Promise((resolve, reject) => {
+      let data = ''
+      req.on('data', chunk => data += chunk)
+      req.on('end', () => resolve(data))
+      req.on('error', reject)
+    })
+  } catch (err) {
+    console.error('[GoMiners Webhook] Failed to read body:', err.message)
+    return res.status(200).json({ message: 'OK' })
+  }
+
+  // ALWAYS return 200 immediately — DOKU retries if response is slow
+  res.status(200).json({ message: 'OK' })
+
+  // Process async after responding
+  try {
+    const payload = JSON.parse(bodyJson)
+    const invoiceNumber = payload?.order?.invoice_number
+    const status        = payload?.transaction?.status
+    const channel       = payload?.channel?.id || payload?.payment?.channel_type || ''
+
+    console.log(`[GoMiners Webhook] invoice=${invoiceNumber} status=${status} channel=${channel}`)
+
+    if (!invoiceNumber || !status) {
+      console.log('[GoMiners Webhook] Missing data — skip')
+      return
+    }
+
+    // Route to product handler by invoice prefix (CGI, CSI, GMI, etc.)
+    const prefix  = invoiceNumber.split('-')[0]
+    const handler = PRODUCT_HANDLERS[prefix]
+
+    if (!handler) {
+      console.log(`[GoMiners Webhook] Unknown prefix: ${prefix} — skip`)
+      return
+    }
+
+    console.log(`[GoMiners Webhook] Routing to: ${handler.name}`)
+
+    // Find invoice
+    const invoice = await handler.findInvoice(invoiceNumber)
+    if (!invoice) {
+      console.log(`[GoMiners Webhook] Invoice not found: ${invoiceNumber}`)
+      return
+    }
+
+    const mappedStatus =
+      status === 'SUCCESS' ? 'paid'    :
+      status === 'FAILED'  ? 'failed'  :
+      status === 'EXPIRED' ? 'expired' : 'pending'
+
+    // Update invoice status
+    await handler.updateInvoice(invoiceNumber, {
+      status:          mappedStatus,
+      payment_channel: channel,
+      paid_at:         mappedStatus === 'paid' ? new Date().toISOString() : null,
+      raw_response:    payload,
+      updated_at:      new Date().toISOString(),
+    })
+
+    // Upgrade user on successful payment
+    if (mappedStatus === 'paid' && invoice.user_id) {
+      await handler.upgradeUser(invoice.user_id, invoice.plan_days)
+      console.log(`[GoMiners Webhook] ✅ ${handler.name} — user ${invoice.user_id} upgraded to Pro`)
+    }
+
+  } catch (err) {
+    console.error('[GoMiners Webhook] Processing error:', err.message)
+    // Response already sent — just log
+  }
 }
