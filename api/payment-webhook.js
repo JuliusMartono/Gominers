@@ -70,6 +70,35 @@ const PRODUCT_HANDLERS = {
       console.log(`[CSI] upgradeUser not implemented yet`)
     }
   },
+  'FMI': {
+    name: 'FixMine.app',
+    async findInvoice(invoiceNumber) {
+      const res = await supabaseGet(
+        process.env.FIXMINE_SUPABASE_URL,
+        process.env.FIXMINE_SUPABASE_KEY,
+        `invoices?invoice_number=eq.${invoiceNumber}&select=*`
+      )
+      return res?.[0] || null
+    },
+    async updateInvoice(invoiceNumber, data) {
+      return supabasePatch(
+        process.env.FIXMINE_SUPABASE_URL,
+        process.env.FIXMINE_SUPABASE_KEY,
+        `invoices?invoice_number=eq.${invoiceNumber}`,
+        data
+      )
+    },
+    async upgradeUser(userId, planDays) {
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + (planDays || 30))
+      return supabasePatch(
+        process.env.FIXMINE_SUPABASE_URL,
+        process.env.FIXMINE_SUPABASE_KEY,
+        `profiles?id=eq.${userId}`,
+        { plan: 'pro', plan_expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() }
+      )
+    }
+  },
 
 }
 
