@@ -303,7 +303,7 @@ function enterDashboard(){
   renderDashboard();initPlatforms();
 }
 
-async function logout(){
+async function logout(){localStorage.removeItem("gm_audit_hist");localStorage.removeItem("gm_theme");
   await fetch(API+"/auth",{method:"DELETE"});
   document.getElementById("dashPage").classList.add("hidden");
   document.getElementById("authPage").classList.remove("hidden");
