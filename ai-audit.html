@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gominers AI Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;background:#030306;color:#eaeaf0;overflow-x:hidden;min-height:100vh}
+::selection{background:#00e87b;color:#030306}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#161630;border-radius:4px}
+button{cursor:pointer;border:none;outline:none;font-family:'Inter',sans-serif;transition:0.25s}
+input,textarea{font-family:'Inter',sans-serif;outline:none}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,232,123,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,123,0.012) 1px,transparent 1px);background-size:80px 80px}
+
+/* Auth page */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1}
+.auth-card{width:100%;max-width:400px}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
+.auth-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#00e87b,#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#030306}
+.auth-brand{font-size:18px;font-weight:900;color:#fff}
+.auth-brandsub{font-size:9px;font-weight:700;color:#484868;text-transform:uppercase;letter-spacing:0.14em}
+.auth-title{text-align:center;font-size:20px;font-weight:900;color:#fff;margin-bottom:6px}
+.auth-sub{text-align:center;font-size:13px;color:#7878a0;margin-bottom:28px}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:10px;font-weight:700;color:#484868;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 16px;background:#0d0d18;border:1px solid #161630;border-radius:12px;color:#fff;font-size:14px;transition:0.2s}
+.auth-field input:focus{border-color:#00e87b;box-shadow:0 0 0 3px rgba(0,232,123,0.1)}
+.auth-field input::placeholder{color:#484868}
+.auth-error{padding:10px 14px;background:rgba(255,59,92,0.08);border:1px solid rgba(255,59,92,0.2);border-radius:10px;color:#ff3b5c;font-size:13px;margin-bottom:14px;display:none}
+.auth-btn{width:100%;padding:14px;background:#00e87b;color:#030306;font-weight:800;font-size:14px;border-radius:12px;transition:0.2s}
+.auth-btn:hover{background:#00c966;box-shadow:0 4px 20px rgba(0,232,123,0.2)}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-secure{margin-top:24px;padding:14px;background:#0d0d18;border:1px solid #161630;border-radius:12px;display:flex;gap:10px;align-items:flex-start}
+.auth-secure-icon{font-size:16px;margin-top:1px}
+.auth-secure-title{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px}
+.auth-secure-text{font-size:10px;color:#484868;line-height:1.5}
+.auth-back{margin-top:16px;text-align:center}
+.auth-back a{font-size:10px;color:#484868;text-decoration:none}
+.auth-back a:hover{color:#7878a0}
+
+/* Dashboard */
+.dash-wrap{min-height:100vh;position:relative;z-index:1}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,8,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid #161630;padding:0 20px;height:52px;display:flex;align-items:center;gap:16px}
+.topbar-logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.topbar-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#00e87b,#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:#030306}
+.topbar-name{font-size:12px;font-weight:800;color:#fff}
+.topbar-sub{font-size:7px;font-weight:700;color:#484868;text-transform:uppercase;letter-spacing:0.12em}
+.topbar-sep{width:1px;height:18px;background:#161630}
+.topbar-nav{display:flex;gap:4px}
+.nav-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#7878a0;background:transparent;display:flex;align-items:center;gap:6px;transition:0.2s}
+.nav-btn:hover{color:#fff;background:#0d0d18}
+.nav-btn.active{color:#00e87b;background:rgba(0,232,123,0.08)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn-new{padding:8px 18px;background:#00e87b;color:#030306;font-size:11px;font-weight:700;border-radius:8px}
+.btn-new:hover{background:#00c966}
+.topbar-user{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:0.2s}
+.topbar-user:hover{background:#0d0d18}
+.topbar-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#00e87b,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#030306}
+.logout-text{font-size:10px;color:#484868}
+.logout-text:hover{color:#ff3b5c}
+
+.content{max-width:1200px;margin:0 auto;padding:20px}
+.page-title{font-size:18px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat.g::before{background:#00e87b}.stat.r::before{background:#ff3b5c}.stat.y::before{background:#ffb020}.stat.b::before{background:#3b82f6}
+.stat-l{font-size:10px;font-weight:700;color:#484868;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.stat-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800}
+
+/* Platform health */
+.plat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.ph{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:16px;text-align:center}
+.ph-icon{font-size:22px;margin-bottom:6px}
+.ph-name{font-weight:700;font-size:12px;margin-bottom:2px}
+.ph-score{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800}
+.ph-bar{height:3px;background:#161630;border-radius:2px;margin-top:8px;overflow:hidden}
+.ph-fill{height:100%;border-radius:2px}
+
+/* Audit form */
+.form-card{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:18px;margin-bottom:12px}
+.form-row{display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:10px}
+.form-label{display:block;font-size:10px;font-weight:700;color:#484868;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.form-input{width:100%;padding:10px 14px;background:#08080f;border:1px solid #161630;border-radius:10px;color:#fff;font-size:13px}
+.form-input:focus{border-color:#00e87b}
+.form-input::placeholder{color:#484868}
+
+.plat-slot{background:#0d0d18;border:1px solid #161630;border-radius:14px;overflow:hidden;margin-bottom:10px}
+.plat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:0.2s}
+.plat-head:hover{background:#08080f}
+.plat-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.plat-info{flex:1}
+.plat-name{font-weight:700;font-size:13px}
+.plat-meta{font-size:10px;color:#484868}
+.toggle{width:40px;height:22px;border-radius:11px;background:#161630;position:relative;cursor:pointer;transition:0.3s}
+.toggle.on{background:#00e87b}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:0.3s}
+.toggle.on::after{left:21px}
+.plat-body{padding:0 16px 14px;border-top:1px solid #161630;display:none}
+.plat-slot.active .plat-body{display:block}
+.form-ta{width:100%;min-height:120px;background:#08080f;border:1px solid #161630;border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#eaeaf0;line-height:1.6;resize:vertical}
+.form-ta:focus{border-color:#00e87b}
+.form-ta::placeholder{color:#484868}
+
+.submit-row{display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid #161630;margin-top:14px}
+.btn-run{padding:12px 28px;background:#00e87b;color:#030306;font-weight:800;font-size:13px;border-radius:10px}
+.btn-run:hover{background:#00c966;box-shadow:0 4px 20px rgba(0,232,123,0.2)}
+.btn-run:disabled{opacity:0.5;cursor:not-allowed}
+
+/* Issues */
+.iss-wrap{background:#0d0d18;border:1px solid #161630;border-radius:14px;overflow:hidden;margin-bottom:20px}
+.iss-top{padding:12px 16px;border-bottom:1px solid #161630;font-weight:700;font-size:13px}
+.iss-row{display:grid;grid-template-columns:20px 80px 1fr 120px;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid #161630;font-size:11.5px;transition:0.1s}
+.iss-row:last-child{border-bottom:none}
+.iss-row:hover{background:#08080f}
+.sev{width:7px;height:7px;border-radius:50%}
+.sev.e{background:#ff3b5c;box-shadow:0 0 5px rgba(255,59,92,0.5)}
+.sev.w{background:#ffb020;box-shadow:0 0 5px rgba(255,176,32,0.4)}
+.sev.i{background:#3b82f6;box-shadow:0 0 5px rgba(59,130,246,0.4)}
+.pp{padding:2px 7px;border-radius:100px;font-size:8px;font-weight:700;text-transform:uppercase}
+.pp.w{background:rgba(59,130,246,0.1);color:#3b82f6}
+.pp.i{background:rgba(168,85,247,0.1);color:#a855f7}
+.pp.a{background:rgba(0,232,123,0.1);color:#00e87b}
+
+/* AI panel */
+.ai-panel{background:linear-gradient(135deg,rgba(0,232,123,0.03),rgba(0,212,255,0.03));border:1px solid #161630;border-radius:14px;padding:18px;margin-bottom:20px}
+.ai-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ai-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00e87b,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:12px}
+.ai-name{font-weight:700;font-size:13px}
+.ai-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:#484868}
+.ai-body{font-size:12px;color:#7878a0;line-height:1.8}
+.ai-body strong{color:#eaeaf0}
+.ai-body ul{margin:6px 0 0 16px}
+.ai-body li{margin-bottom:3px}
+
+/* Cross-platform cards */
+.cp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:10px;margin-bottom:16px}
+.cp-card{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:16px;transition:0.3s}
+.cp-card:hover{border-color:#222250}
+.cp-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cp-title{font-weight:700;font-size:13px}
+.cp-status{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
+.cp-status.ok{color:#00e87b}.cp-status.er{color:#ff3b5c}.cp-status.wn{color:#ffb020}
+.cp-row{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(22,22,48,0.5)}
+.cp-row:last-child{border-bottom:none}
+.cp-row-i{width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:9px;flex-shrink:0;margin-top:1px;font-weight:700}
+.cp-row-i.p{background:rgba(0,232,123,0.08);color:#00e87b}.cp-row-i.f{background:rgba(255,59,92,0.08);color:#ff3b5c}.cp-row-i.w{background:rgba(255,176,32,0.08);color:#ffb020}
+.cp-row-t{flex:1;font-size:11px;color:#7878a0;line-height:1.5}
+.cp-row-t strong{color:#eaeaf0}
+.cp-row-t code{font-family:'JetBrains Mono',monospace;font-size:10px;background:#08080f;padding:1px 5px;border-radius:3px;color:#00e87b}
+
+/* History */
+.hist-grid{display:grid;gap:10px}
+.hist-card{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.3s;text-decoration:none;color:inherit}
+.hist-card:hover{border-color:#00e87b;transform:translateY(-1px)}
+.hist-score{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;flex-shrink:0}
+
+/* Connection canvas */
+.conn-wrap{background:#0d0d18;border:1px solid #161630;border-radius:14px;padding:16px;margin-bottom:20px;overflow:hidden}
+.conn-canvas{width:100%;height:260px}
+
+/* Empty state */
+.empty{text-align:center;padding:48px 20px}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.empty-text{font-size:12px;color:#484868;margin-bottom:14px}
+
+/* Loader */
+.loader{display:flex;align-items:center;justify-content:center;height:60vh}
+.spinner{width:32px;height:32px;border:2px solid #161630;border-top-color:#00e87b;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Hidden */
+.hidden{display:none!important}
+
+@media(max-width:700px){
+  .form-row{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .plat-row{grid-template-columns:1fr}
+  .cp-grid{grid-template-columns:1fr}
+  .iss-row{grid-template-columns:20px 1fr}
+  .iss-row .iss-plat,.iss-row .iss-type{display:none}
+  .topbar-nav{display:none}
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- ===== AUTH PAGE ===== -->
+<div id="authPage" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-icon">G</div>
+      <div><div class="auth-brand">Gominers</div><div class="auth-brandsub">AI Audit</div></div>
+    </div>
+    <h1 class="auth-title">Authorized Access Only</h1>
+    <p class="auth-sub">Enter your credentials to continue</p>
+    <div id="authError" class="auth-error"></div>
+    <form id="authForm">
+      <div class="auth-field"><label>Email</label><input type="email" id="authEmail" required placeholder="you@email.com"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="authPass" required placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
+      <button type="submit" class="auth-btn" id="authBtn">Sign In to AI Audit</button>
+    </form>
+    <div class="auth-secure"><span class="auth-secure-icon">🔒</span><div><div class="auth-secure-title">Secured Access</div><div class="auth-secure-text">All login attempts are logged. Unauthorized access will be blocked.</div></div></div>
+    <div class="auth-back"><a href="/">← Back to Gominers</a></div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashPage" class="dash-wrap hidden">
+  <div class="topbar">
+    <a class="topbar-logo" onclick="showTab('dashboard')">
+      <div class="topbar-icon">G</div>
+      <div><div class="topbar-name">Gominers</div><div class="topbar-sub">AI Audit</div></div>
+    </a>
+    <div class="topbar-sep"></div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
+      <button class="nav-btn" data-tab="new" onclick="showTab('new')">🔍 New Audit</button>
+      <button class="nav-btn" data-tab="history" onclick="showTab('history')">📋 History</button>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-new" onclick="showTab('new')">+ New Audit</button>
+      <div class="topbar-user" onclick="logout()">
+        <div class="topbar-avatar">M</div>
+        <span class="logout-text">Logout</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD TAB -->
+  <div id="tab-dashboard" class="content">
+    <div class="page-title">📊 AI Audit Dashboard</div>
+    <div class="stats" id="dashStats"></div>
+    <div class="plat-row" id="platHealth"></div>
+    <div id="cpSection"></div>
+    <div id="issuesSection"></div>
+    <div id="aiSection"></div>
+  </div>
+
+  <!-- NEW AUDIT TAB -->
+  <div id="tab-new" class="content hidden">
+    <div class="page-title">🔍 New Cross-Platform Audit</div>
+    <div id="newError" class="auth-error" style="margin-bottom:14px"></div>
+    <div class="form-card">
+      <div class="form-row">
+        <div><label class="form-label">Project Name</label><input class="form-input" id="projName" placeholder="Gominers Dashboard v2"></div>
+        <div><label class="form-label">Version</label><input class="form-input" id="projVer" placeholder="v2.0.0"></div>
+      </div>
+    </div>
+    <div id="platformSlots"></div>
+    <div class="submit-row"><button class="btn-run" id="runBtn" onclick="runAudit()">🔗 Run Cross-Platform Audit</button></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="content hidden">
+    <div class="page-title">📋 Audit History</div>
+    <div id="histContent"></div>
+  </div>
+
+  <!-- RESULT TAB -->
+  <div id="tab-result" class="content hidden">
+    <div id="resultContent"></div>
+  </div>
+</div>
+
+<script>
+const API="/api/ai-audit";
+let currentUser=null;
+let auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");
+
+// ===== AUTH =====
+document.getElementById("authForm").onsubmit=async e=>{
+  e.preventDefault();
+  const btn=document.getElementById("authBtn");
+  const err=document.getElementById("authError");
+  err.style.display="none";btn.disabled=true;btn.textContent="Verifying...";
+  try{
+    const res=await fetch(API+"/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.getElementById("authEmail").value,password:document.getElementById("authPass").value})});
+    const data=await res.json();
+    if(!res.ok){err.textContent=data.error;err.style.display="block";return;}
+    currentUser=data.email;enterDashboard();
+  }catch(ex){err.textContent="Connection error";err.style.display="block";}
+  finally{btn.disabled=false;btn.textContent="Sign In to AI Audit";}
+};
+
+async function checkAuth(){
+  try{const r=await fetch(API+"/auth");const d=await r.json();if(d.authenticated){currentUser=d.email;enterDashboard();}}catch{}
+}
+
+function enterDashboard(){
+  document.getElementById("authPage").classList.add("hidden");
+  document.getElementById("dashPage").classList.remove("hidden");
+  document.querySelector(".topbar-avatar").textContent=(currentUser||"A").charAt(0).toUpperCase();
+  renderDashboard();initPlatforms();
+}
+
+async function logout(){
+  await fetch(API+"/auth",{method:"DELETE"});
+  document.getElementById("dashPage").classList.add("hidden");
+  document.getElementById("authPage").classList.remove("hidden");
+  document.getElementById("authEmail").value="";
+  document.getElementById("authPass").value="";
+}
+
+// ===== NAVIGATION =====
+function showTab(tab){
+  document.querySelectorAll("[id^='tab-']").forEach(t=>t.classList.add("hidden"));
+  document.getElementById("tab-"+tab).classList.remove("hidden");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.nav-btn[data-tab="${tab}"]`)?.classList.add("active");
+  if(tab==="history")renderHistory();
+  if(tab==="dashboard")renderDashboard();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard(){
+  const h=auditHistory;
+  const total=h.length;
+  const avgScore=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0;
+  const totalIssues=h.reduce((a,b)=>a+b.issues,0);
+  document.getElementById("dashStats").innerHTML=`
+    <div class="stat g"><div class="stat-l">Total Audits</div><div class="stat-v" style="color:#00e87b">${total}</div></div>
+    <div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:#3b82f6">${avgScore||"—"}%</div></div>
+    <div class="stat r"><div class="stat-l">Issues Found</div><div class="stat-v" style="color:#ff3b5c">${totalIssues}</div></div>
+    <div class="stat y"><div class="stat-l">Last Audit</div><div class="stat-v" style="color:#ffb020">${total?new Date(h[0].date).toLocaleDateString("id-ID",{day:"numeric",month:"short"}):"—"}</div></div>`;
+
+  document.getElementById("platHealth").innerHTML=`
+    <div class="ph"><div class="ph-icon">🌐</div><div class="ph-name">Web</div><div class="ph-score" style="color:#3b82f6">82</div><div class="ph-bar"><div class="ph-fill" style="width:82%;background:#3b82f6"></div></div></div>
+    <div class="ph"><div class="ph-icon">🍎</div><div class="ph-name">iOS</div><div class="ph-score" style="color:#a855f7">64</div><div class="ph-bar"><div class="ph-fill" style="width:64%;background:#a855f7"></div></div></div>
+    <div class="ph"><div class="ph-icon">🤖</div><div class="ph-name">Android</div><div class="ph-score" style="color:#00e87b">71</div><div class="ph-bar"><div class="ph-fill" style="width:71%;background:#00e87b"></div></div></div>
+    <div class="ph"><div class="ph-icon">🔗</div><div class="ph-name">Cross-Plat</div><div class="ph-score" style="color:#ffb020">58</div><div class="ph-bar"><div class="ph-fill" style="width:58%;background:#ffb020"></div></div></div>`;
+
+  renderCrossChecks();renderIssuesDemo();renderAIDemo();
+}
+
+function renderCrossChecks(){
+  document.getElementById("cpSection").innerHTML=`
+    <div style="font-weight:700;font-size:14px;margin-bottom:10px">🔗 API & Data Consistency</div>
+    <div class="cp-grid">
+      <div class="cp-card"><div class="cp-head"><div class="cp-title">Order Creation Endpoint</div><div class="cp-status er">Mismatch</div></div>
+        <div class="cp-row"><div class="cp-row-i f">✗</div><div class="cp-row-t"><strong>Endpoint</strong> — Web: <code>/orders</code>, Android: <code>/create-order</code></div><div style="display:flex;gap:3px"><span class="pp w">web</span><span class="pp a">and</span></div></div>
+        <div class="cp-row"><div class="cp-row-i f">✗</div><div class="cp-row-t"><strong>Schema</strong> — <code>quantity</code> vs <code>qty</code> vs <code>quantities[]</code></div><div style="display:flex;gap:3px"><span class="pp w">web</span><span class="pp i">ios</span><span class="pp a">and</span></div></div>
+      </div>
+      <div class="cp-card"><div class="cp-head"><div class="cp-title">User Profile</div><div class="cp-status wn">Warning</div></div>
+        <div class="cp-row"><div class="cp-row-i p">✓</div><div class="cp-row-t"><strong>Endpoint</strong> — All use <code>/profile</code></div></div>
+        <div class="cp-row"><div class="cp-row-i f">✗</div><div class="cp-row-t"><strong>Field</strong> — <code>name</code> vs <code>full_name</code></div><div style="display:flex;gap:3px"><span class="pp w">web</span><span class="pp i">ios</span></div></div>
+      </div>
+    </div>`;
+}
+
+function renderIssuesDemo(){
+  const issues=[
+    {s:"e",pl:"🌐🍎🤖",m:"Order API: 3 different schemas",t:"API"},
+    {s:"e",pl:"🍎🤖",m:"User.name vs User.full_name",t:"Schema"},
+    {s:"e",pl:"🌐🍎🤖",m:"Payment: DOKU vs Stripe split",t:"Integration"},
+    {s:"e",pl:"🍎🤖",m:"Tokens in AsyncStorage (unencrypted)",t:"Security"},
+    {s:"w",pl:"🌐🍎🤖",m:"No shared types package",t:"Architecture"},
+    {s:"w",pl:"🌐🍎🤖",m:"API_BASE: env var vs hardcoded",t:"Config"},
+    {s:"i",pl:"🌐🍎🤖",m:"Create @gominers/shared-types",t:"Recommendation"},
+  ];
+  document.getElementById("issuesSection").innerHTML=`
+    <div style="font-weight:700;font-size:14px;margin-bottom:10px;margin-top:20px">🐛 Cross-Platform Issues</div>
+    <div class="iss-wrap"><div class="iss-top">Latest Results</div>
+    ${issues.map(i=>`<div class="iss-row"><div class="sev ${i.s}"></div><div class="iss-plat" style="font-size:10px;font-weight:700;color:${i.s==="e"?"#ff3b5c":i.s==="w"?"#ffb020":"#3b82f6"}">${i.pl}</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px">${i.m}</div><div class="iss-type" style="font-size:9px;font-weight:700;text-transform:uppercase;color:#484868">${i.t}</div></div>`).join("")}</div>`;
+}
+
+function renderAIDemo(){
+  document.getElementById("aiSection").innerHTML=`
+    <div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Gominers AI Analysis</div><div class="ai-sub">Claude 3.5 Sonnet</div></div></div>
+    <div class="ai-body"><strong>8 critical cross-platform mismatches</strong> blocking production.<ul>
+    <li>Order API: 3 different schemas across platforms — will cause data corruption</li>
+    <li>Payment split: DOKU (IDR) vs Stripe (USD) — confused users</li>
+    <li>Tokens stored unencrypted on mobile — use Keychain/Keystore</li>
+    </ul><div style="margin-top:10px;padding-top:10px;border-top:1px solid #161630"><strong>⏱ Estimated fix:</strong> <span style="color:#00e87b;font-weight:700">6-8 hours</span></div></div></div>`;
+}
+
+// ===== NEW AUDIT =====
+const platforms=[
+  {key:"web",icon:"🌐",label:"Web Application",color:"#3b82f6",bg:"#3b82f615",desc:"Next.js / React / Vue",enabled:true,code:""},
+  {key:"ios",icon:"🍎",label:"iOS Application",color:"#a855f7",bg:"#a855f715",desc:"React Native / Swift",enabled:true,code:""},
+  {key:"android",icon:"🤖",label:"Android Application",color:"#00e87b",bg:"#00e87b15",desc:"React Native / Kotlin",enabled:true,code:""},
+];
+
+function initPlatforms(){
+  document.getElementById("platformSlots").innerHTML=platforms.map((p,i)=>`
+    <div class="plat-slot ${p.enabled?'active':''}" id="slot-${p.key}">
+      <div class="plat-head" onclick="togglePlat(${i})">
+        <div class="plat-ico" style="background:${p.bg}">${p.icon}</div>
+        <div class="plat-info"><div class="plat-name">${p.label}</div><div class="plat-meta">${p.desc}</div></div>
+        <div class="toggle ${p.enabled?'on':''}" id="tog-${p.key}"></div>
+      </div>
+      <div class="plat-body">
+        <label class="form-label">Paste Code (separate files with === path/file.ext ===)</label>
+        <textarea class="form-ta" id="code-${p.key}" oninput="platforms[${i}].code=this.value" placeholder="=== src/app/page.tsx ===&#10;import Header from '@/components/Header'&#10;..."></textarea>
+      </div>
+    </div>`).join("");
+}
+
+function togglePlat(i){
+  platforms[i].enabled=!platforms[i].enabled;
+  const s=document.getElementById("slot-"+platforms[i].key);
+  const t=document.getElementById("tog-"+platforms[i].key);
+  s.classList.toggle("active");t.classList.toggle("on");
+}
+
+async function runAudit(){
+  const name=document.getElementById("projName").value.trim();
+  const ver=document.getElementById("projVer").value.trim();
+  const err=document.getElementById("newError");
+  const btn=document.getElementById("runBtn");
+  err.style.display="none";
+
+  if(!name){err.textContent="Project name required";err.style.display="block";return;}
+  const active=platforms.filter(p=>p.enabled&&p.code.trim().length>10);
+  if(!active.length){err.textContent="Paste code for at least one platform";err.style.display="block";return;}
+
+  btn.disabled=true;btn.textContent="Analyzing...";
+  try{
+    const res=await fetch(API+"/audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,code:p.code}))})});
+    if(!res.ok){const d=await res.json();throw new Error(d.error);}
+    const data=await res.json();
+
+    // Save to local history
+    const entry={id:data.id,name:name,ver:ver,date:new Date().toISOString(),score:76,issues:8,plat:{web:82,ios:64,android:71},plats:active.map(p=>p.key)};
+    auditHistory.unshift(entry);
+    localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));
+
+    // Show result
+    showResult(entry);
+  }catch(ex){err.textContent=ex.message;err.style.display="block";}
+  finally{btn.disabled=false;btn.textContent="🔗 Run Cross-Platform Audit";}
+}
+
+function showResult(audit){
+  const sc=s=>s>=80?"#00e87b":s>=60?"#ffb020":"#ff3b5c";
+  document.getElementById("resultContent").innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <button onclick="showTab('dashboard')" style="font-size:12px;color:#7878a0;background:none;border:none">← Back</button>
+      <span style="font-size:18px;font-weight:900;color:#fff">${audit.name}</span>
+      <span style="font-size:12px;color:#484868">${audit.ver||""}</span>
+    </div>
+    <div class="stats">
+      <div class="stat g"><div class="stat-l">Overall</div><div class="stat-v" style="color:${sc(audit.score)}">${audit.score}%</div></div>
+      <div class="stat r"><div class="stat-l">Issues</div><div class="stat-v" style="color:#ff3b5c">${audit.issues}</div></div>
+    </div>
+    <div class="plat-row">
+      ${Object.entries(audit.plat||{}).map(([p,s])=>`<div class="ph"><div class="ph-icon">${p==="web"?"🌐":p==="ios"?"🍎":"🤖"}</div><div class="ph-name" style="text-transform:capitalize">${p}</div><div class="ph-score" style="color:${sc(s)}">${s}</div><div class="ph-bar"><div class="ph-fill" style="width:${s}%;background:${sc(s)}"></div></div></div>`).join("")}
+    </div>
+    ${renderCrossChecks()}
+    <div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Gominers AI Analysis</div><div class="ai-sub">Claude 3.5 Sonnet</div></div></div>
+    <div class="ai-body"><strong>8 critical cross-platform mismatches found.</strong> Order API schemas differ across all 3 platforms. Payment gateway needs unification. Estimated fix: 6-8 hours.</div></div>`;
+  showTab("result");
+}
+
+// ===== HISTORY =====
+function renderHistory(){
+  const c=document.getElementById("histContent");
+  if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><div class="empty-text">Run your first cross-platform audit</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
+  c.innerHTML=`<div class="hist-grid">${auditHistory.map(a=>{
+    const sc=a.score>=80?"#00e87b":a.score>=60?"#ffb020":"#ff3b5c";
+    return`<div class="hist-card" onclick='showResult(${JSON.stringify(a)})'>
+      <div class="hist-score" style="background:${sc}15;color:${sc}">${a.score}</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${a.name} <span style="font-size:11px;color:#484868">${a.ver||""}</span></div>
+      <div style="font-size:10px;color:#484868;margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues} issues</div>
+      <div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div>
+      <div style="color:#484868;font-size:12px">→</div>
+    </div>`}).join("")}</div>`;
+}
+
+// ===== INIT =====
+checkAuth();
+</script>
+</body>
+</html>
