@@ -12,6 +12,10 @@ async function generateFixes(issues, sourceCode, projectName) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { error: "ANTHROPIC_API_KEY not configured" };
 
+  const contextBlock = sourceCode && sourceCode.length > 50
+    ? "## SOURCE CODE:\n" + sourceCode.substring(0, 100000)
+    : "## SOURCE CODE: Not available. Generate fixes based on issue descriptions only. Provide generic but practical code patterns.";
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -22,7 +26,10 @@ async function generateFixes(issues, sourceCode, projectName) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 8000,
-      system: `You are an expert senior engineer. Given audit issues and source code, generate ACTUAL CODE FIXES for each file.
+      system: `You are an expert senior engineer. Given audit issues, generate ACTUAL CODE FIXES.
+
+When source code is available, generate precise fixes for the specific files.
+When source code is NOT available, generate practical code patterns and templates that the developer can apply.
 
 Return ONLY valid JSON:
 {
@@ -32,39 +39,19 @@ Return ONLY valid JSON:
     {
       "issue_id": "SEC-01",
       "file": "src/config/auth.ts",
-      "original_snippet": "the exact code that needs to change (10-30 lines)",
-      "fixed_snippet": "the replacement code",
+      "original_snippet": "the code that needs to change (or empty string if source not available)",
+      "fixed_snippet": "the replacement code or new code to add",
       "explanation": "what was fixed and why",
-      "new_files": [
-        {
-          "path": "src/types/shared.ts",
-          "content": "full file content if a new file needs to be created"
-        }
-      ]
+      "new_files": []
     }
   ],
   "dependency_changes": {
-    "add": {"package": "version"},
-    "remove": ["package"]
+    "add": {},
+    "remove": []
   },
-  "config_changes": [
-    {
-      "file": "next.config.js",
-      "original_snippet": "old config",
-      "fixed_snippet": "new config"
-    }
-  ]
-}
-
-Rules:
-- Generate REAL working code, not pseudocode
-- Keep existing functionality intact
-- Follow the project's existing code style
-- For security fixes, be thorough but not breaking
-- For cross-platform fixes, ensure consistency
-- Include all necessary imports
-- For new dependency additions, specify exact version`,
-      messages: [{ role: "user", content: `Project: ${projectName}\n\n## AUDIT ISSUES:\n${JSON.stringify(issues, null, 2)}\n\n## SOURCE CODE:\n${sourceCode.substring(0, 120000)}` }]
+  "config_changes": []
+}`,
+      messages: [{ role: "user", content: `Project: ${projectName}\n\n## AUDIT ISSUES:\n${JSON.stringify(issues, null, 2)}\n\n${contextBlock}` }]
     })
   });
 
@@ -98,9 +85,8 @@ module.exports = async function handler(req, res) {
     const { project_name, issues, sourceCode } = body;
 
     if (!issues || !issues.length) return res.status(400).json({ error: "No issues to fix" });
-    if (!sourceCode) return res.status(400).json({ error: "Source code required for fixing" });
 
-    const fixes = await generateFixes(issues, sourceCode, project_name || "Project");
+    const fixes = await generateFixes(issues, sourceCode || "", project_name || "Project");
     if (fixes.error) return res.status(500).json({ error: fixes.error });
 
     return res.status(200).json({ ...fixes, generated_at: new Date().toISOString() });
