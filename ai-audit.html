@@ -460,7 +460,8 @@ async function generateFixes(audit){
     st.innerHTML='<div class="spinner-sm"></div><span>Fixing '+(idx+1)+'/'+total+': '+(issues[idx].id||"")+' '+(issues[idx].title||"").substring(0,40)+'...</span>';
 
     try{
-      const r=await fetch(API+"/fix",{
+      await new Promise(r=>setTimeout(r,3000));
+    const r=await fetch(API+"/fix",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
