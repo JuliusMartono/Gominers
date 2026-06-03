@@ -8,202 +8,184 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-font-smoothing:antialiased}
-:root{--bg:#030306;--surface:#0d0d18;--surface2:#08080f;--border:#161630;--text:#eaeaf0;--text2:#7878a0;--text3:#484868;--accent:#00e87b;--accent-dim:rgba(0,232,123,0.08);--accent-hover:#00c966;--red:#ff3b5c;--red-dim:rgba(255,59,92,0.08);--yellow:#ffb020;--yellow-dim:rgba(255,176,32,0.08);--blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);--purple:#a855f7;--purple-dim:rgba(168,85,247,0.1);--topbar-bg:rgba(8,8,15,0.95)}
-html.light{--bg:#f5f5f7;--surface:#ffffff;--surface2:#f0f0f4;--border:#e0e0e8;--text:#1a1a2e;--text2:#6b6b80;--text3:#9898ab;--accent:#00b862;--accent-dim:rgba(0,184,98,0.08);--accent-hover:#009e53;--red:#e02e4a;--red-dim:rgba(224,46,74,0.08);--yellow:#d4950a;--yellow-dim:rgba(212,149,10,0.08);--blue:#2563eb;--blue-dim:rgba(37,99,235,0.08);--purple:#8b35e0;--purple-dim:rgba(139,53,224,0.06);--topbar-bg:rgba(255,255,255,0.92)}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;transition:background 0.3s,color 0.3s}
+:root{--bg:#030306;--surface:#0d0d18;--surface2:#08080f;--border:#161630;--text:#eaeaf0;--text2:#7878a0;--text3:#484868;--accent:#00e87b;--accent-dim:rgba(0,232,123,0.08);--accent-hover:#00c966;--red:#ff3b5c;--red-dim:rgba(255,59,92,0.08);--yellow:#ffb020;--yellow-dim:rgba(255,176,32,0.08);--blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);--purple:#a855f7;--purple-dim:rgba(168,85,247,0.1);--topbar-bg:rgba(8,8,15,0.95);--card-hover:#222250}
+html.light{--bg:#f5f5f7;--surface:#fff;--surface2:#f0f0f4;--border:#e0e0e8;--text:#1a1a2e;--text2:#6b6b80;--text3:#9898ab;--accent:#00b862;--accent-dim:rgba(0,184,98,0.08);--accent-hover:#009e53;--red:#e02e4a;--red-dim:rgba(224,46,74,0.08);--yellow:#d4950a;--yellow-dim:rgba(212,149,10,0.08);--blue:#2563eb;--blue-dim:rgba(37,99,235,0.08);--purple:#8b35e0;--purple-dim:rgba(139,53,224,0.06);--topbar-bg:rgba(255,255,255,0.92);--card-hover:#e8e8f0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;transition:background .3s,color .3s}
 ::selection{background:var(--accent);color:var(--bg)}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-button{cursor:pointer;border:none;outline:none;font-family:'Inter',sans-serif;transition:0.25s}
+button{cursor:pointer;border:none;outline:none;font-family:'Inter',sans-serif;transition:.25s}
 input,textarea{font-family:'Inter',sans-serif;outline:none}
-.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,232,123,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,123,0.012) 1px,transparent 1px);background-size:80px 80px}
+.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(0,232,123,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,123,.012) 1px,transparent 1px);background-size:80px 80px}
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1}
 .auth-card{width:100%;max-width:400px}
 .auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;justify-content:center}
 .auth-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:var(--bg)}
 .auth-brand{font-size:18px;font-weight:900;color:var(--text)}
-.auth-brandsub{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.14em}
+.auth-brandsub{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.14em}
 .auth-title{text-align:center;font-size:20px;font-weight:900;color:var(--text);margin-bottom:6px}
 .auth-sub{text-align:center;font-size:13px;color:var(--text2);margin-bottom:28px}
 .auth-field{margin-bottom:14px}
-.auth-field label{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-.auth-field input{width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;transition:0.2s}
+.auth-field label{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;transition:.2s}
 .auth-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 .auth-field input::placeholder{color:var(--text3)}
-.auth-error{padding:10px 14px;background:var(--red-dim);border:1px solid rgba(255,59,92,0.2);border-radius:10px;color:var(--red);font-size:13px;margin-bottom:14px;display:none}
-.auth-btn{width:100%;padding:14px;background:var(--accent);color:var(--bg);font-weight:800;font-size:14px;border-radius:12px;transition:0.2s}
+.auth-error{padding:10px 14px;background:var(--red-dim);border:1px solid rgba(255,59,92,.2);border-radius:10px;color:var(--red);font-size:13px;margin-bottom:14px;display:none}
+.auth-btn{width:100%;padding:14px;background:var(--accent);color:var(--bg);font-weight:800;font-size:14px;border-radius:12px}
 .auth-btn:hover{background:var(--accent-hover);box-shadow:0 4px 20px var(--accent-dim)}
-.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-secure{margin-top:24px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;gap:10px;align-items:flex-start}
 .auth-secure-icon{font-size:16px;margin-top:1px}
 .auth-secure-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
 .auth-secure-text{font-size:10px;color:var(--text3);line-height:1.5}
 .auth-back{margin-top:16px;text-align:center}
-.auth-back a{font-size:10px;color:var(--text3);text-decoration:none}
-.auth-back a:hover{color:var(--text2)}
+.auth-back a{font-size:10px;color:var(--text3);text-decoration:none}.auth-back a:hover{color:var(--text2)}
 .dash-wrap{min-height:100vh;position:relative;z-index:1}
-.topbar{position:sticky;top:0;z-index:50;background:var(--topbar-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;transition:0.3s}
+.topbar{position:sticky;top:0;z-index:50;background:var(--topbar-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;transition:.3s}
 .topbar-logo{display:flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
 .topbar-icon{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#00d4ff);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px;color:var(--bg)}
-.topbar-name{font-size:12px;font-weight:800;color:var(--text)}
-.topbar-sub{font-size:7px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em}
+.topbar-name{font-size:12px;font-weight:800;color:var(--text)}.topbar-sub{font-size:7px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.12em}
 .topbar-sep{width:1px;height:18px;background:var(--border)}
 .topbar-nav{display:flex;gap:4px}
-.nav-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;color:var(--text2);background:transparent;display:flex;align-items:center;gap:6px;transition:0.2s}
-.nav-btn:hover{color:var(--text);background:var(--surface)}
-.nav-btn.active{color:var(--accent);background:var(--accent-dim)}
+.nav-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;color:var(--text2);background:transparent;display:flex;align-items:center;gap:6px}
+.nav-btn:hover{color:var(--text);background:var(--surface)}.nav-btn.active{color:var(--accent);background:var(--accent-dim)}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .btn-new{padding:8px 18px;background:var(--accent);color:var(--bg);font-size:11px;font-weight:700;border-radius:8px}
 .btn-new:hover{background:var(--accent-hover)}
-.theme-toggle{width:44px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:0.3s;flex-shrink:0}
-.theme-toggle.light{background:var(--accent)}
-.theme-toggle::after{content:'🌙';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--surface);top:3px;left:3px;transition:0.3s;display:flex;align-items:center;justify-content:center;font-size:10px}
+.theme-toggle{width:44px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;transition:.3s;flex-shrink:0}
+.theme-toggle.light{background:var(--accent)}.theme-toggle::after{content:'🌙';position:absolute;width:18px;height:18px;border-radius:50%;background:var(--surface);top:3px;left:3px;transition:.3s;display:flex;align-items:center;justify-content:center;font-size:10px}
 .theme-toggle.light::after{content:'☀️';left:23px}
-.topbar-user{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:0.2s}
-.topbar-user:hover{background:var(--surface)}
-.topbar-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00d4ff);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--bg)}
-.logout-text{font-size:10px;color:var(--text3)}
-.logout-text:hover{color:var(--red)}
+.topbar-user{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:.2s}
+.topbar-user:hover{background:var(--surface)}.topbar-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00d4ff);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--bg)}
+.logout-text{font-size:10px;color:var(--text3)}.logout-text:hover{color:var(--red)}
 .content{max-width:1200px;margin:0 auto;padding:20px}
 .page-title{font-size:18px;font-weight:900;margin-bottom:18px;display:flex;align-items:center;gap:8px;color:var(--text)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:0.3s}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:.3s}
 .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
 .stat.g::before{background:var(--accent)}.stat.r::before{background:var(--red)}.stat.y::before{background:var(--yellow)}.stat.b::before{background:var(--blue)}
-.stat-l{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.stat-l{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .stat-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800}
-.plat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px}
-.ph{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:0.3s}
-.ph-icon{font-size:22px;margin-bottom:6px}
-.ph-name{font-weight:700;font-size:12px;margin-bottom:2px}
-.ph-score{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800}
-.ph-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
-.ph-fill{height:100%;border-radius:2px}
-.form-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;transition:0.3s}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-bottom:20px}
+.cat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;transition:.3s;cursor:pointer}
+.cat-card:hover{border-color:var(--card-hover);transform:translateY(-1px)}
+.cat-name{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.cat-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800}
+.cat-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.cat-fill{height:100%;border-radius:2px}
+.cat-detail{font-size:9px;color:var(--text3);margin-top:4px}
+.launch-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;transition:.3s}
+.launch-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.launch-icon{font-size:20px}.launch-title{font-weight:800;font-size:15px}
+.launch-badge{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+.launch-badge.ready{background:var(--accent-dim);color:var(--accent)}.launch-badge.not{background:var(--red-dim);color:var(--red)}
+.launch-list{list-style:none}.launch-list li{font-size:12px;color:var(--text2);padding:4px 0;display:flex;gap:6px;align-items:flex-start}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;transition:.3s}
 .form-row{display:grid;grid-template-columns:1fr 160px;gap:10px;margin-bottom:10px}
-.form-label{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-.form-input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;transition:0.2s}
-.form-input:focus{border-color:var(--accent)}
-.form-input::placeholder{color:var(--text3)}
-.plat-slot{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;transition:0.3s}
-.plat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:0.2s}
+.form-label{display:block;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.form-input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px}
+.form-input:focus{border-color:var(--accent)}.form-input::placeholder{color:var(--text3)}
+.plat-slot{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;transition:.3s}
+.plat-head{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:.2s}
 .plat-head:hover{background:var(--surface2)}
 .plat-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
-.plat-info{flex:1}
-.plat-name{font-weight:700;font-size:13px;color:var(--text)}
-.plat-meta{font-size:10px;color:var(--text3)}
-.toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:0.3s}
-.toggle.on{background:var(--accent)}
-.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--surface);top:3px;left:3px;transition:0.3s}
+.plat-info{flex:1}.plat-name{font-weight:700;font-size:13px;color:var(--text)}.plat-meta{font-size:10px;color:var(--text3)}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--border);position:relative;cursor:pointer;transition:.3s}
+.toggle.on{background:var(--accent)}.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--surface);top:3px;left:3px;transition:.3s}
 .toggle.on::after{left:21px}
-.plat-body{padding:0 16px 14px;border-top:1px solid var(--border);display:none}
-.plat-slot.active .plat-body{display:block}
-.form-ta{width:100%;min-height:80px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);line-height:1.6;resize:vertical;transition:0.2s}
-.form-ta:focus{border-color:var(--accent)}
-.form-ta::placeholder{color:var(--text3)}
+.plat-body{padding:0 16px 14px;border-top:1px solid var(--border);display:none}.plat-slot.active .plat-body{display:block}
+.input-tabs{display:flex;gap:4px;margin-bottom:10px}
+.input-tab{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;color:var(--text3);background:transparent;cursor:pointer}
+.input-tab:hover{color:var(--text)}.input-tab.active{color:var(--accent);background:var(--accent-dim)}
+.input-panel{display:none}.input-panel.active{display:block}
 .github-input-row{display:flex;gap:8px;margin-bottom:10px}
 .github-input-row input{flex:1}
 .btn-fetch{padding:10px 18px;background:var(--blue);color:#fff;font-size:11px;font-weight:700;border-radius:10px;white-space:nowrap}
-.btn-fetch:hover{opacity:0.85}
-.btn-fetch:disabled{opacity:0.5;cursor:not-allowed}
+.btn-fetch:hover{opacity:.85}.btn-fetch:disabled{opacity:.5;cursor:not-allowed}
+.btn-browse{padding:10px 18px;background:var(--purple);color:#fff;font-size:11px;font-weight:700;border-radius:10px;white-space:nowrap}
+.btn-browse:hover{opacity:.85}
+.btn-scan{padding:10px 18px;background:var(--yellow);color:#000;font-size:11px;font-weight:700;border-radius:10px;white-space:nowrap}
+.btn-scan:hover{opacity:.85}.btn-scan:disabled{opacity:.5;cursor:not-allowed}
+.form-ta{width:100%;min-height:80px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);line-height:1.6;resize:vertical}
+.form-ta:focus{border-color:var(--accent)}.form-ta::placeholder{color:var(--text3)}
 .fetch-status{font-size:11px;color:var(--text2);padding:6px 0;display:none}
-.fetch-status.ok{color:var(--accent)}
-.fetch-status.err{color:var(--red)}
+.fetch-status.ok{color:var(--accent)}.fetch-status.err{color:var(--red)}
+.web-input-row{display:flex;gap:8px;margin-bottom:10px}
+.web-input-row input{flex:1}
+.web-status{font-size:11px;padding:6px 0;display:none}.web-status.ok{color:var(--accent)}.web-status.err{color:var(--red)}
+.web-result{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;display:none}
+.web-result-title{font-weight:700;font-size:12px;margin-bottom:6px;color:var(--text)}
+.web-result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px}
+.web-stat{font-size:10px;color:var(--text3)}
+.web-stat span{font-weight:700;color:var(--text)}
+.drop-zone{border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:.3s;margin-bottom:10px}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:var(--accent-dim)}
+.drop-icon{font-size:28px;margin-bottom:6px}
+.drop-text{font-size:12px;color:var(--text2)}
+.drop-text strong{color:var(--text)}
+.drop-hint{font-size:10px;color:var(--text3);margin-top:4px}
+.uploaded-files{margin-top:8px;display:none}
+.uploaded-file{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px;font-size:11px}
+.uploaded-file .uf-name{flex:1;color:var(--text)}.uploaded-file .uf-size{color:var(--text3);font-size:10px}
 .submit-row{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding-top:14px;border-top:1px solid var(--border);margin-top:14px}
 .btn-run{padding:12px 28px;background:var(--accent);color:var(--bg);font-weight:800;font-size:13px;border-radius:10px}
 .btn-run:hover{background:var(--accent-hover);box-shadow:0 4px 20px var(--accent-dim)}
-.btn-run:disabled{opacity:0.5;cursor:not-allowed}
-.analyzing-text{font-size:12px;color:var(--yellow);display:none;align-items:center;gap:8px}
-.analyzing-text.show{display:flex}
-.spinner-sm{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+.btn-run:disabled{opacity:.5;cursor:not-allowed}
+.analyzing{font-size:12px;color:var(--yellow);display:none;align-items:center;gap:8px}.analyzing.show{display:flex}
+.spinner-sm{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ai-panel{background:linear-gradient(135deg,var(--accent-dim),rgba(0,212,255,0.03));border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;transition:0.3s}
+.ai-panel{background:linear-gradient(135deg,var(--accent-dim),rgba(0,212,255,.03));border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px;transition:.3s}
 .ai-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .ai-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00d4ff);display:flex;align-items:center;justify-content:center;font-size:12px}
-.ai-name{font-weight:700;font-size:13px;color:var(--text)}
-.ai-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3)}
-.ai-body{font-size:12px;color:var(--text2);line-height:1.8}
-.ai-body strong{color:var(--text)}
-.ai-body ul{margin:6px 0 0 16px}
-.ai-body li{margin-bottom:3px}
-.cp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:10px;margin-bottom:16px}
-.cp-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;transition:0.3s}
-.cp-card:hover{border-color:var(--border)}
-.cp-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.cp-title{font-weight:700;font-size:13px;color:var(--text)}
-.cp-status{margin-left:auto;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
-.cp-status.ok{color:var(--accent)}.cp-status.er{color:var(--red)}.cp-status.wn{color:var(--yellow)}
-.cp-row{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(22,22,48,0.15)}
-.cp-row:last-child{border-bottom:none}
-.cp-row-i{width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:9px;flex-shrink:0;margin-top:1px;font-weight:700}
-.cp-row-i.p{background:var(--accent-dim);color:var(--accent)}.cp-row-i.f{background:var(--red-dim);color:var(--red)}.cp-row-i.w{background:var(--yellow-dim);color:var(--yellow)}
-.cp-row-t{flex:1;font-size:11px;color:var(--text2);line-height:1.5}
-.cp-row-t strong{color:var(--text)}
-.cp-row-t code{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--surface2);padding:1px 5px;border-radius:3px;color:var(--accent)}
-.iss-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;transition:0.3s}
+.ai-name{font-weight:700;font-size:13px;color:var(--text)}.ai-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3)}
+.ai-body{font-size:12px;color:var(--text2);line-height:1.8}.ai-body strong{color:var(--text)}
+.ai-body ul{margin:6px 0 0 16px}.ai-body li{margin-bottom:3px}
+.iss-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;transition:.3s}
 .iss-top{padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;color:var(--text)}
-.iss-row{display:grid;grid-template-columns:20px 80px 1fr 100px 60px;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:11.5px;transition:0.1s}
-.iss-row:last-child{border-bottom:none}
-.iss-row:hover{background:var(--surface2)}
-.sev{width:7px;height:7px;border-radius:50%}
-.sev.e{background:var(--red);box-shadow:0 0 5px rgba(255,59,92,0.5)}
-.sev.w{background:var(--yellow);box-shadow:0 0 5px rgba(255,176,32,0.4)}
-.sev.i{background:var(--blue);box-shadow:0 0 5px rgba(59,130,246,0.4)}
+.iss-row{display:grid;grid-template-columns:10px 70px 1fr 100px;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--border);font-size:11px;transition:.1s}
+.iss-row:last-child{border-bottom:none}.iss-row:hover{background:var(--surface2)}
+.sev{width:7px;height:7px;border-radius:50%}.sev.e{background:var(--red);box-shadow:0 0 5px rgba(255,59,92,.5)}.sev.w{background:var(--yellow);box-shadow:0 0 5px rgba(255,176,32,.4)}.sev.i{background:var(--blue);box-shadow:0 0 5px rgba(59,130,246,.4)}
 .pp{padding:2px 7px;border-radius:100px;font-size:8px;font-weight:700;text-transform:uppercase}
 .pp.w{background:var(--blue-dim);color:var(--blue)}.pp.i{background:var(--purple-dim);color:var(--purple)}.pp.a{background:var(--accent-dim);color:var(--accent)}
+.recs{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px}
+.recs h3{font-size:14px;margin-bottom:10px;color:var(--text)}.recs li{font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.6}
 .hist-grid{display:grid;gap:10px}
-.hist-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.3s;text-decoration:none;color:inherit}
+.hist-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.3s;text-decoration:none;color:inherit}
 .hist-card:hover{border-color:var(--accent);transform:translateY(-1px)}
 .hist-score{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;flex-shrink:0}
-.empty{text-align:center;padding:48px 20px}
-.empty-icon{font-size:36px;margin-bottom:10px}
+.empty{text-align:center;padding:48px 20px}.empty-icon{font-size:36px;margin-bottom:10px}
 .empty-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
 .empty-text{font-size:12px;color:var(--text3);margin-bottom:14px}
 .hidden{display:none!important}
-.recs{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px}
-.recs h3{font-size:14px;margin-bottom:10px;color:var(--text)}
-.recs li{font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.6}
-@media(max-width:700px){
-  .form-row{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .plat-row{grid-template-columns:1fr}
-  .cp-grid{grid-template-columns:1fr}
-  .iss-row{grid-template-columns:20px 1fr}
-  .iss-row .iss-plat,.iss-row .iss-type,.iss-row .iss-file{display:none}
-  .topbar-nav{display:none}
-  .github-input-row{flex-direction:column}
-}
+.issue-detail{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 16px 9px;display:none}
+.issue-detail.open{display:block}
+.issue-title{font-weight:700;font-size:12px;color:var(--text);margin-bottom:4px}
+.issue-msg{font-size:11px;color:var(--text2);line-height:1.6}
+.issue-file{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);margin-top:4px}
+.issue-fix{font-size:11px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.issue-fix strong{color:var(--accent)}
+@media(max-width:700px){.form-row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}.topbar-nav{display:none}.github-input-row,.web-input-row{flex-direction:column}.iss-row{grid-template-columns:10px 1fr}.iss-row .iss-cat,.iss-row .iss-type{display:none}}
 </style>
 </head>
 <body>
 <div class="grid-bg"></div>
-
-<div id="authPage" class="auth-wrap">
-  <div class="auth-card">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><div class="theme-toggle" id="authThemeToggle" onclick="toggleTheme()"></div></div>
-    <div class="auth-logo">
-      <div class="auth-icon">G</div>
-      <div><div class="auth-brand">Gominers</div><div class="auth-brandsub">AI Audit</div></div>
-    </div>
-    <h1 class="auth-title">Authorized Access Only</h1>
-    <p class="auth-sub">Enter your credentials to continue</p>
-    <div id="authError" class="auth-error"></div>
-    <form id="authForm">
-      <div class="auth-field"><label>Email</label><input type="email" id="authEmail" required placeholder="you@email.com"></div>
-      <div class="auth-field"><label>Password</label><input type="password" id="authPass" required placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
-      <button type="submit" class="auth-btn" id="authBtn">Sign In to AI Audit</button>
-    </form>
-    <div class="auth-secure"><span class="auth-secure-icon">🔒</span><div><div class="auth-secure-title">Secured Access</div><div class="auth-secure-text">All login attempts are logged. Unauthorized access will be blocked.</div></div></div>
-    <div class="auth-back"><a href="/">← Back to Gominers</a></div>
-  </div>
-</div>
+<div id="authPage" class="auth-wrap"><div class="auth-card">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><div class="theme-toggle" id="authTT" onclick="toggleTheme()"></div></div>
+  <div class="auth-logo"><div class="auth-icon">G</div><div><div class="auth-brand">Gominers</div><div class="auth-brandsub">AI Audit</div></div></div>
+  <h1 class="auth-title">Authorized Access Only</h1>
+  <p class="auth-sub">Enter your credentials to continue</p>
+  <div id="authError" class="auth-error"></div>
+  <form id="authForm">
+    <div class="auth-field"><label>Email</label><input type="email" id="authEmail" required placeholder="you@email.com"></div>
+    <div class="auth-field"><label>Password</label><input type="password" id="authPass" required placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
+    <button type="submit" class="auth-btn" id="authBtn">Sign In to AI Audit</button>
+  </form>
+  <div class="auth-secure"><span class="auth-secure-icon">🔒</span><div><div class="auth-secure-title">Secured Access</div><div class="auth-secure-text">All login attempts are logged. Unauthorized access will be blocked.</div></div></div>
+  <div class="auth-back"><a href="/">← Back to Gominers</a></div>
+</div></div>
 
 <div id="dashPage" class="dash-wrap hidden">
   <div class="topbar">
-    <a class="topbar-logo" onclick="showTab('dashboard')">
-      <div class="topbar-icon">G</div>
-      <div><div class="topbar-name">Gominers</div><div class="topbar-sub">AI Audit</div></div>
-    </a>
+    <a class="topbar-logo" onclick="showTab('dashboard')"><div class="topbar-icon">G</div><div><div class="topbar-name">Gominers</div><div class="topbar-sub">AI Audit</div></div></a>
     <div class="topbar-sep"></div>
     <div class="topbar-nav">
       <button class="nav-btn active" data-tab="dashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
@@ -212,284 +194,169 @@ input,textarea{font-family:'Inter',sans-serif;outline:none}
     </div>
     <div class="topbar-right">
       <button class="btn-new" onclick="showTab('new')">+ New Audit</button>
-      <div class="theme-toggle" id="dashThemeToggle" onclick="toggleTheme()"></div>
-      <div class="topbar-user" onclick="logout()">
-        <div class="topbar-avatar">M</div>
-        <span class="logout-text">Logout</span>
-      </div>
+      <div class="theme-toggle" id="dashTT" onclick="toggleTheme()"></div>
+      <div class="topbar-user" onclick="logout()"><div class="topbar-avatar">M</div><span class="logout-text">Logout</span></div>
     </div>
   </div>
 
-  <div id="tab-dashboard" class="content">
-    <div class="page-title">📊 AI Audit Dashboard</div>
-    <div class="stats" id="dashStats"></div>
-    <div id="dashAI"></div>
-  </div>
+  <div id="tab-dashboard" class="content"><div class="page-title">📊 AI Audit Dashboard</div><div class="stats" id="dashStats"></div><div id="dashAI"></div></div>
 
   <div id="tab-new" class="content hidden">
-    <div class="page-title">🔍 New Cross-Platform Audit</div>
+    <div class="page-title">🔍 New Product Audit — 100+ Point Analysis</div>
     <div id="newError" class="auth-error" style="margin-bottom:14px"></div>
     <div class="form-card">
       <div class="form-row">
         <div><label class="form-label">Project Name</label><input class="form-input" id="projName" placeholder="cekgejala.id"></div>
         <div><label class="form-label">Version</label><input class="form-input" id="projVer" placeholder="v2.0.0"></div>
       </div>
+      <div style="margin-top:8px"><label class="form-label">Live Website URL (optional — scan production)</label>
+        <div class="web-input-row"><input class="form-input" id="webUrl" placeholder="https://cekgejala.id"><button class="btn-scan" id="scanBtn" onclick="scanWebsite()">🔍 Scan</button></div>
+        <div class="web-status" id="webStatus"></div>
+        <div class="web-result" id="webResult"></div>
+      </div>
     </div>
     <div id="platformSlots"></div>
     <div class="submit-row">
-      <div id="analyzingStatus" class="analyzing-text"><div class="spinner-sm"></div><span>AI is analyzing code... This may take 30-60 seconds</span></div>
-      <button class="btn-run" id="runBtn" onclick="runAudit()">🧠 Run AI Audit</button>
+      <div id="analyzingEl" class="analyzing"><div class="spinner-sm"></div><span>AI analyzing 100+ checkpoints... (30-90s)</span></div>
+      <button class="btn-run" id="runBtn" onclick="runAudit()">🧠 Run Full AI Audit</button>
     </div>
   </div>
 
-  <div id="tab-history" class="content hidden">
-    <div class="page-title">📋 Audit History</div>
-    <div id="histContent"></div>
-  </div>
-
-  <div id="tab-result" class="content hidden">
-    <div id="resultContent"></div>
-  </div>
+  <div id="tab-history" class="content hidden"><div class="page-title">📋 Audit History</div><div id="histContent"></div></div>
+  <div id="tab-result" class="content hidden"><div id="resultContent"></div></div>
 </div>
 
 <script>
-const API="/api/ai-audit";
-let currentUser=null;
-let auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");
+const API="/api/ai-audit";let currentUser=null;let auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");let webScanData=null;let uploadedFiles={};
 
-function toggleTheme(){
-  const html=document.documentElement;
-  const isLight=html.classList.toggle("light");
-  localStorage.setItem("gm_theme",isLight?"light":"dark");
-  updateToggles(isLight);
-}
-function updateToggles(isLight){
-  document.querySelectorAll(".theme-toggle").forEach(t=>{
-    if(isLight)t.classList.add("light");else t.classList.remove("light");
-  });
-}
-(function(){
-  const s=localStorage.getItem("gm_theme");
-  if(s==="light"){document.documentElement.classList.add("light");updateToggles(true);}
-})();
+function toggleTheme(){const h=document.documentElement,l=h.classList.toggle("light");localStorage.setItem("gm_theme",l?"light":"dark");document.querySelectorAll(".theme-toggle").forEach(t=>l?t.classList.add("light"):t.classList.remove("light"));}
+(function(){const s=localStorage.getItem("gm_theme");if(s==="light"){document.documentElement.classList.add("light");document.querySelectorAll(".theme-toggle").forEach(t=>t.classList.add("light"));}})();
 
-document.getElementById("authForm").onsubmit=async e=>{
-  e.preventDefault();
-  const btn=document.getElementById("authBtn"),err=document.getElementById("authError");
-  err.style.display="none";btn.disabled=true;btn.textContent="Verifying...";
-  try{
-    const res=await fetch(API+"/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.getElementById("authEmail").value,password:document.getElementById("authPass").value})});
-    const data=await res.json();
-    if(!res.ok){err.textContent=data.error;err.style.display="block";return;}
-    currentUser=data.email;enterDashboard();
-  }catch(ex){err.textContent="Connection error";err.style.display="block";}
-  finally{btn.disabled=false;btn.textContent="Sign In to AI Audit";}
-};
+document.getElementById("authForm").onsubmit=async e=>{e.preventDefault();const b=document.getElementById("authBtn"),er=document.getElementById("authError");er.style.display="none";b.disabled=true;b.textContent="Verifying...";try{const r=await fetch(API+"/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.getElementById("authEmail").value,password:document.getElementById("authPass").value})});const d=await r.json();if(!r.ok){er.textContent=d.error;er.style.display="block";return;}currentUser=d.email;enterDashboard();}catch(x){er.textContent="Connection error";er.style.display="block";}finally{b.disabled=false;b.textContent="Sign In to AI Audit";}};
+async function checkAuth(){try{const r=await fetch(API+"/auth");const d=await r.json();if(d.authenticated){currentUser=d.email;enterDashboard();}}catch{}}
+function enterDashboard(){document.getElementById("authPage").classList.add("hidden");document.getElementById("dashPage").classList.remove("hidden");document.querySelector(".topbar-avatar").textContent=(currentUser||"A").charAt(0).toUpperCase();const il=document.documentElement.classList.contains("light");document.querySelectorAll(".theme-toggle").forEach(t=>il?t.classList.add("light"):t.classList.remove("light"));renderDashboard();initPlatforms();}
+async function logout(){await fetch(API+"/auth",{method:"DELETE"});document.getElementById("dashPage").classList.add("hidden");document.getElementById("authPage").classList.remove("hidden");}
 
-async function checkAuth(){
-  try{const r=await fetch(API+"/auth");const d=await r.json();if(d.authenticated){currentUser=d.email;enterDashboard();}}catch{}
-}
+function showTab(t){document.querySelectorAll("[id^='tab-']").forEach(x=>x.classList.add("hidden"));document.getElementById("tab-"+t).classList.remove("hidden");document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));document.querySelector(`.nav-btn[data-tab="${t}"]`)?.classList.add("active");if(t==="history")renderHistory();if(t==="dashboard")renderDashboard();}
 
-function enterDashboard(){
-  document.getElementById("authPage").classList.add("hidden");
-  document.getElementById("dashPage").classList.remove("hidden");
-  document.querySelector(".topbar-avatar").textContent=(currentUser||"A").charAt(0).toUpperCase();
-  updateToggles(document.documentElement.classList.contains("light"));
-  renderDashboard();initPlatforms();
-}
+function renderDashboard(){const h=auditHistory,total=h.length,avg=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0,issues=h.reduce((a,b)=>a+b.issues,0);
+document.getElementById("dashStats").innerHTML=`<div class="stat g"><div class="stat-l">Total Audits</div><div class="stat-v" style="color:var(--accent)">${total}</div></div><div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:var(--blue)">${avg||"—"}%</div></div><div class="stat r"><div class="stat-l">Issues Found</div><div class="stat-v" style="color:var(--red)">${issues}</div></div><div class="stat y"><div class="stat-l">Last Audit</div><div class="stat-v" style="color:var(--yellow)">${total?new Date(h[0].date).toLocaleDateString("id-ID",{day:"numeric",month:"short"}):"—"}</div></div>`;
+if(!total){document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Ready — 100+ Point Audit</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">Go to <strong>New Audit</strong> to analyze your product. Provide <strong>GitHub repo URLs</strong>, <strong>local folders</strong>, <strong>live website URL</strong>, or <strong>upload source files</strong>. The AI will audit 100+ checkpoints across Security, Performance, SEO, Accessibility, Cross-Platform, Dependencies, API Design, Auth, Database, Testing, Build, Mobile, PWA, i18n, Monitoring, Documentation, and more.</div></div>`;}
+else{const l=h[0];document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Latest: ${l.name} — ${l.score}%</div><div class="ai-sub">${l.launch_ready?"✅ Launch Ready":"🚫 Launch Blockers Found"}</div></div></div><div class="ai-body">${(l.analysis||"").substring(0,300)}...</div></div>`;}}
 
-async function logout(){
-  await fetch(API+"/auth",{method:"DELETE"});
-  document.getElementById("dashPage").classList.add("hidden");
-  document.getElementById("authPage").classList.remove("hidden");
-  document.getElementById("authEmail").value="";
-  document.getElementById("authPass").value="";
-}
+// ===== WEBSITE SCANNER =====
+async function scanWebsite(){const url=document.getElementById("webUrl").value.trim();if(!url)return;const btn=document.getElementById("scanBtn"),st=document.getElementById("webStatus"),res=document.getElementById("webResult");btn.disabled=true;btn.textContent="Scanning...";st.textContent="Scanning website...";st.className="web-status";st.style.display="block";res.style.display="none";
+try{const r=await fetch(API+"/webscan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw new Error(d.error);webScanData=d;const a=d.analysis;
+res.innerHTML=`<div class="web-result-title">✅ ${d.url} (${d.status})</div><div class="web-result-grid"><div class="web-stat">Title: <span>${a.title||"—"}</span></div><div class="web-stat">HTTPS: <span>${a.hasHttps?"✅":"❌"}</span></div><div class="web-stat">CSP: <span>${a.hasCsp?"✅":"❌"}</span></div><div class="web-stat">HSTS: <span>${a.hasHsts?"✅":"❌"}</span></div><div class="web-stat">Viewport: <span>${a.viewport?"✅":"❌"}</span></div><div class="web-stat">OG Tags: <span>${a.hasOg?"✅":"❌"}</span></div><div class="web-stat">Canonical: <span>${a.hasCanonical?"✅":"❌"}</span></div><div class="web-stat">Schema: <span>${a.hasStructuredData?"✅":"❌"}</span></div><div class="web-stat">ARIA: <span>${a.hasAriaLabels?"✅":"❌"}</span></div><div class="web-stat">Lang: <span>${a.hasLang||"—"}</span></div><div class="web-stat">Scripts: <span>${a.scripts}</span></div><div class="web-stat">Images: <span>${a.images}</span></div></div>`;
+res.style.display="block";st.textContent="✓ Website scanned successfully";st.className="web-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="web-status err";}finally{btn.disabled=false;btn.textContent="🔍 Scan";}}
 
-function showTab(tab){
-  document.querySelectorAll("[id^='tab-']").forEach(t=>t.classList.add("hidden"));
-  document.getElementById("tab-"+tab).classList.remove("hidden");
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  document.querySelector(`.nav-btn[data-tab="${tab}"]`)?.classList.add("active");
-  if(tab==="history")renderHistory();
-  if(tab==="dashboard")renderDashboard();
-}
-
-function renderDashboard(){
-  const h=auditHistory;
-  const total=h.length;
-  const avgScore=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0;
-  const totalIssues=h.reduce((a,b)=>a+b.issues,0);
-  document.getElementById("dashStats").innerHTML=`
-    <div class="stat g"><div class="stat-l">Total Audits</div><div class="stat-v" style="color:var(--accent)">${total}</div></div>
-    <div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:var(--blue)">${avgScore||"—"}%</div></div>
-    <div class="stat r"><div class="stat-l">Issues Found</div><div class="stat-v" style="color:var(--red)">${totalIssues}</div></div>
-    <div class="stat y"><div class="stat-l">Last Audit</div><div class="stat-v" style="color:var(--yellow)">${total?new Date(h[0].date).toLocaleDateString("id-ID",{day:"numeric",month:"short"}):"—"}</div></div>`;
-
-  if(total===0){
-    document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Ready for Analysis</div><div class="ai-sub">Claude Sonnet 4</div></div></div>
-    <div class="ai-body">No audits yet. Go to <strong>New Audit</strong> and provide GitHub repo URLs for each platform. The AI will automatically fetch code, analyze cross-platform consistency, and generate a detailed report.</div></div>`;
-  } else {
-    const last=h[0];
-    document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Latest: ${last.name}</div><div class="ai-sub">Score: ${last.score}%</div></div></div>
-    <div class="ai-body">${last.analysis||"Analysis complete."}</div></div>`;
-  }
-}
-
-// ===== PLATFORMS WITH GITHUB URL FETCH =====
+// ===== PLATFORMS WITH 4 INPUT METHODS =====
 const platforms=[
-  {key:"web",icon:"🌐",label:"Web Application",bg:"var(--blue-dim)",desc:"Next.js / React / Vue",enabled:true,repoUrl:"",code:"",loading:false},
-  {key:"ios",icon:"🍎",label:"iOS Application",bg:"var(--purple-dim)",desc:"React Native / Swift",enabled:true,repoUrl:"",code:"",loading:false},
-  {key:"android",icon:"🤖",label:"Android Application",bg:"var(--accent-dim)",desc:"React Native / Kotlin",enabled:true,repoUrl:"",code:"",loading:false},
+  {key:"web",icon:"🌐",label:"Web Application",bg:"var(--blue-dim)",desc:"Next.js / React / Vue",enabled:true,inputMode:"github",repoUrl:"",code:"",files:[],loading:false},
+  {key:"ios",icon:"🍎",label:"iOS Application",bg:"var(--purple-dim)",desc:"React Native / Swift",enabled:true,inputMode:"github",repoUrl:"",code:"",files:[],loading:false},
+  {key:"android",icon:"🤖",label:"Android Application",bg:"var(--accent-dim)",desc:"React Native / Kotlin",enabled:true,inputMode:"github",repoUrl:"",code:"",files:[],loading:false},
 ];
 
-function initPlatforms(){
-  document.getElementById("platformSlots").innerHTML=platforms.map((p,i)=>`
-    <div class="plat-slot ${p.enabled?'active':''}" id="slot-${p.key}">
-      <div class="plat-head" onclick="togglePlat(${i})">
-        <div class="plat-ico" style="background:${p.bg}">${p.icon}</div>
-        <div class="plat-info"><div class="plat-name">${p.label}</div><div class="plat-meta">${p.desc}</div></div>
-        <div class="toggle ${p.enabled?'on':''}" id="tog-${p.key}"></div>
+function initPlatforms(){document.getElementById("platformSlots").innerHTML=platforms.map((p,i)=>`
+<div class="plat-slot ${p.enabled?'active':''}" id="slot-${p.key}">
+  <div class="plat-head" onclick="togglePlat(${i})"><div class="plat-ico" style="background:${p.bg}">${p.icon}</div><div class="plat-info"><div class="plat-name">${p.label}</div><div class="plat-meta">${p.desc}</div></div><div class="toggle ${p.enabled?'on':''}" id="tog-${p.key}"></div></div>
+  <div class="plat-body">
+    <div class="input-tabs">
+      <button class="input-tab active" onclick="setInputMode(${i},'github')">🔗 GitHub</button>
+      <button class="input-tab" onclick="setInputMode(${i},'folder')">📁 Local Folder</button>
+      <button class="input-tab" onclick="setInputMode(${i},'upload')">📤 Upload Files</button>
+      <button class="input-tab" onclick="setInputMode(${i},'paste')">📋 Paste Code</button>
+    </div>
+    <div class="input-panel active" id="panel-${p.key}-github">
+      <label class="form-label">GitHub Repository URL</label>
+      <div class="github-input-row"><input class="form-input" id="repo-${p.key}" placeholder="https://github.com/username/repo" oninput="platforms[${i}].repoUrl=this.value"><button class="btn-fetch" id="fetch-${p.key}" onclick="fetchRepo(${i})">Fetch Code</button></div>
+      <div class="fetch-status" id="status-${p.key}"></div>
+    </div>
+    <div class="input-panel" id="panel-${p.key}-folder">
+      <label class="form-label">Select Local Project Folder</label>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn-browse" onclick="browseFolder(${i})">📁 Browse Folder</button><span id="folder-name-${p.key}" style="font-size:12px;color:var(--text3)">No folder selected</span></div>
+      <div class="fetch-status" id="folder-status-${p.key}"></div>
+    </div>
+    <div class="input-panel" id="panel-${p.key}-upload">
+      <label class="form-label">Upload Source Files / ZIP / AAB / APK</label>
+      <div class="drop-zone" id="drop-${p.key}" onclick="document.getElementById('file-${p.key}').click()" ondrop="handleDrop(event,${i})" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')">
+        <div class="drop-icon">📂</div>
+        <div class="drop-text"><strong>Click to browse</strong> or drag files here</div>
+        <div class="drop-hint">Supports: .js .ts .tsx .jsx .vue .kt .java .swift .json .xml .zip .aab .apk</div>
       </div>
-      <div class="plat-body">
-        <label class="form-label">GitHub Repository URL</label>
-        <div class="github-input-row">
-          <input class="form-input" id="repo-${p.key}" placeholder="https://github.com/username/repo" oninput="platforms[${i}].repoUrl=this.value">
-          <button class="btn-fetch" id="fetch-${p.key}" onclick="fetchRepo(${i})">Fetch Code</button>
-        </div>
-        <div class="fetch-status" id="status-${p.key}"></div>
-        <label class="form-label" style="margin-top:10px">Or paste code manually (=== path/file.ext ===)</label>
-        <textarea class="form-ta" id="code-${p.key}" oninput="platforms[${i}].code=this.value" placeholder="=== src/app/page.tsx ===&#10;import Header from '@/components/Header'&#10;..."></textarea>
-      </div>
-    </div>`).join("");
-}
-
-function togglePlat(i){
-  platforms[i].enabled=!platforms[i].enabled;
-  document.getElementById("slot-"+platforms[i].key).classList.toggle("active");
-  document.getElementById("tog-"+platforms[i].key).classList.toggle("on");
-}
-
-async function fetchRepo(i){
-  const p=platforms[i];
-  const btn=document.getElementById("fetch-"+p.key);
-  const status=document.getElementById("status-"+p.key);
-  const url=p.repoUrl.trim();
-
-  if(!url||!url.includes("github.com")){
-    status.textContent="Enter a valid GitHub URL";status.className="fetch-status err";status.style.display="block";return;
-  }
-
-  btn.disabled=true;btn.textContent="Fetching...";
-  status.textContent="Connecting to GitHub API...";status.className="fetch-status";status.style.display="block";
-
-  try{
-    const res=await fetch(API+"/github",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url})});
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error);
-
-    p.code=data.code;
-    document.getElementById("code-"+p.key).value=data.code;
-    status.innerHTML="✓ Fetched <strong>"+data.filesCount+"</strong> files from <strong>"+data.repo+"</strong> ("+data.totalFiles+" total code files)";
-    status.className="fetch-status ok";status.style.display="block";
-  }catch(ex){
-    status.textContent="✗ "+ex.message;status.className="fetch-status err";status.style.display="block";
-  }finally{
-    btn.disabled=false;btn.textContent="Fetch Code";
-  }
-}
-
-async function runAudit(){
-  const name=document.getElementById("projName").value.trim();
-  const ver=document.getElementById("projVer").value.trim();
-  const err=document.getElementById("newError");
-  const btn=document.getElementById("runBtn");
-  const statusEl=document.getElementById("analyzingStatus");
-  err.style.display="none";
-
-  if(!name){err.textContent="Project name required";err.style.display="block";return;}
-  const active=platforms.filter(p=>p.enabled&&p.code.trim().length>20);
-  if(!active.length){err.textContent="Fetch code from GitHub or paste code for at least one platform";err.style.display="block";return;}
-
-  btn.disabled=true;btn.textContent="Analyzing...";
-  statusEl.classList.add("show");
-
-  try{
-    const res=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,filesCount:0,totalFiles:0}))})});
-    if(!res.ok){const d=await res.json();throw new Error(d.error||"Analysis failed");}
-    const data=await res.json();
-
-    const entry={
-      id:data.id,name:name,ver:ver,date:new Date().toISOString(),
-      score:data.overall_score||0,issues:data.failed_checks||0,
-      plat:data.platform_scores||{},
-      plats:active.map(p=>p.key),
-      analysis:data.ai_analysis||"",
-      issues_list:data.issues||[],
-      recommendations:data.recommendations||[],
-      total_checks:data.total_checks||0,
-      passed:data.passed_checks||0,
-      failed:data.failed_checks||0,
-      warnings:data.warning_checks||0,
-      cross_score:data.cross_platform_score||0,
-      estimated_fix:data.estimated_fix_hours||""
-    };
-    auditHistory.unshift(entry);
-    localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));
-    showResult(entry);
-  }catch(ex){err.textContent=ex.message;err.style.display="block";}
-  finally{btn.disabled=false;btn.textContent="🧠 Run AI Audit";statusEl.classList.remove("show");}
-}
-
-function showResult(audit){
-  const sc=s=>s>=80?"var(--accent)":s>=60?"var(--yellow)":"var(--red)";
-  const issuesHtml=(audit.issues_list||[]).map(i=>{
-    const sev=i.severity==="error"?"e":i.severity==="warning"?"w":"i";
-    const plats=(i.platforms||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("");
-    return`<div class="iss-row"><div class="sev ${sev}"></div><div class="iss-plat" style="display:flex;gap:3px">${plats}</div><div style="font-size:11px;color:var(--text)">${i.message}</div><div class="iss-type" style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3)">${i.type||""}</div><div class="iss-file" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.file||""}</div></div>`;
-  }).join("");
-
-  const recsHtml=(audit.recommendations||[]).length?
-    `<div class="recs"><h3>💡 Recommendations</h3><ul>${audit.recommendations.map(r=>`<li>${r}</li>`).join("")}</ul></div>`:"";
-
-  document.getElementById("resultContent").innerHTML=`
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-      <button onclick="showTab('dashboard')" style="font-size:12px;color:var(--text2);background:none;border:none">← Back</button>
-      <span style="font-size:18px;font-weight:900;color:var(--text)">${audit.name}</span>
-      <span style="font-size:12px;color:var(--text3)">${audit.ver||""}</span>
+      <input type="file" id="file-${p.key}" multiple accept=".js,.ts,.tsx,.jsx,.vue,.kt,.java,.swift,.json,.xml,.css,.scss,.html,.yaml,.yml,.zip,.aab,.apk,.gradle,.dart" style="display:none" onchange="handleFiles(event,${i})">
+      <div class="uploaded-files" id="uploaded-${p.key}"></div>
     </div>
-    <div class="stats">
-      <div class="stat g"><div class="stat-l">Overall Score</div><div class="stat-v" style="color:${sc(audit.score)}">${audit.score}%</div></div>
-      <div class="stat b"><div class="stat-l">Cross-Platform</div><div class="stat-v" style="color:${sc(audit.cross_score)}">${audit.cross_score}%</div></div>
-      <div class="stat"><div class="stat-l">Checks</div><div class="stat-v" style="color:var(--text)">${audit.passed}/${audit.total_checks}</div></div>
-      <div class="stat r"><div class="stat-l">Issues</div><div class="stat-v" style="color:var(--red)">${audit.failed}</div></div>
-      <div class="stat y"><div class="stat-l">Warnings</div><div class="stat-v" style="color:var(--yellow)">${audit.warnings}</div></div>
+    <div class="input-panel" id="panel-${p.key}-paste">
+      <label class="form-label">Paste Code (=== path/file.ext ===)</label>
+      <textarea class="form-ta" id="code-${p.key}" oninput="platforms[${i}].code=this.value" placeholder="=== src/app/page.tsx ===&#10;import Header from '@/components/Header'&#10;..."></textarea>
     </div>
-    <div class="plat-row">
-      ${Object.entries(audit.plat||{}).map(([p,s])=>`<div class="ph"><div class="ph-icon">${p==="web"?"🌐":p==="ios"?"🍎":"🤖"}</div><div class="ph-name" style="text-transform:capitalize">${p}</div><div class="ph-score" style="color:${sc(s)}">${s}</div><div class="ph-bar"><div class="ph-fill" style="width:${s}%;background:${sc(s)}"></div></div></div>`).join("")}
-    </div>
-    ${issuesHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">🐛 Issues (${audit.failed} errors, ${audit.warnings} warnings)</div>
-    <div class="iss-wrap"><div class="iss-top">All Issues</div>${issuesHtml}</div>`:""}
-    <div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">AI Analysis</div><div class="ai-sub">Claude Sonnet 4</div></div></div>
-    <div class="ai-body">${(audit.analysis||"").replace(/\n/g,"<br>")}</div></div>
-    ${recsHtml}
-    ${audit.estimated_fix?`<div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">⏱ Estimated fix: <strong style="color:var(--accent)">${audit.estimated_fix}</strong></div>`:""}`;
-  showTab("result");
-}
+  </div>
+</div>`).join("");}
 
-function renderHistory(){
-  const c=document.getElementById("histContent");
-  if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><div class="empty-text">Run your first cross-platform audit</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
-  c.innerHTML=`<div class="hist-grid">${auditHistory.map(a=>{
-    const sc=a.score>=80?"var(--accent)":a.score>=60?"var(--yellow)":"var(--red)";
-    return`<div class="hist-card" onclick='showResult(${JSON.stringify(a)})'>
-      <div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div>
-      <div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div>
-      <div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues</div>
-      <div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div>
-      <div style="color:var(--text3);font-size:12px">→</div>
-    </div>`}).join("")}</div>`;
-}
+function togglePlat(i){platforms[i].enabled=!platforms[i].enabled;document.getElementById("slot-"+platforms[i].key).classList.toggle("active");document.getElementById("tog-"+platforms[i].key).classList.toggle("on");}
+
+function setInputMode(i,mode){const p=platforms[i];p.inputMode=mode;const slot=document.getElementById("slot-"+p.key);
+slot.querySelectorAll(".input-tab").forEach(t=>t.classList.remove("active"));slot.querySelectorAll(".input-panel").forEach(t=>t.classList.remove("active"));
+const tabs=slot.querySelectorAll(".input-tab");const modes=["github","folder","upload","paste"];tabs[modes.indexOf(mode)]?.classList.add("active");
+document.getElementById("panel-"+p.key+"-"+mode)?.classList.add("active");}
+
+async function fetchRepo(i){const p=platforms[i],btn=document.getElementById("fetch-"+p.key),st=document.getElementById("status-"+p.key),url=p.repoUrl.trim();if(!url||!url.includes("github.com")){st.textContent="Enter a valid GitHub URL";st.className="fetch-status err";st.style.display="block";return;}
+btn.disabled=true;btn.textContent="Fetching...";st.textContent="Connecting to GitHub API...";st.className="fetch-status";st.style.display="block";
+try{const r=await fetch(API+"/github",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url})});const d=await r.json();if(!r.ok)throw new Error(d.error);p.code=d.code;p.repo=d.repo;st.innerHTML="✓ <strong>"+d.filesCount+"</strong> files from <strong>"+d.repo+"</strong>";st.className="fetch-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="fetch-status err";}finally{btn.disabled=false;btn.textContent="Fetch Code";}}
+
+async function browseFolder(i){if(!window.showDirectoryPicker){alert("Folder picker requires Chrome or Edge browser. Use GitHub URL or Upload instead.");return;}
+const p=platforms[i];try{const dir=await window.showDirectoryPicker({mode:"read"});document.getElementById("folder-name-"+p.key).textContent="📁 "+dir.name;const st=document.getElementById("folder-status-"+p.key);st.textContent="Reading files...";st.className="fetch-status";st.style.display="block";
+let code="",count=0;const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];
+async function readDir(handle,path=""){for await(const entry of handle.values()){if(entry.kind==="file"){const name=entry.name;if(exts.some(e=>name.endsWith(e))&&!name.includes("node_modules")){try{const file=await entry.getFile();const text=await file.text();if(text.length<40000){code+="=== "+(path?path+"/":"")+name+" ===\n"+text+"\n\n";count++;}}catch{}}}
+else if(entry.kind==="directory"&&!["node_modules",".git","build","dist",".next",".vercel","__pycache__",".gradle","Pods","vendor",".output",".expo"].includes(entry.name)){await readDir(entry,(path?path+"/":"")+entry.name);}}}
+await readDir(dir);p.code=code;p.inputMode="github";st.innerHTML="✓ <strong>"+count+"</strong> files from <strong>"+dir.name+"</strong>";st.className="fetch-status ok";}catch(e){if(e.name!=="AbortError")alert("Error reading folder: "+e.message);}}
+
+function handleFiles(e,i){processFiles(e.target.files,i);}
+function handleDrop(e,i){e.preventDefault();e.target.closest(".drop-zone").classList.remove("drag");processFiles(e.dataTransfer.files,i);}
+
+async function processFiles(files,i){const p=platforms[i];const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];let code="",count=0,fileNames=[];
+for(const file of files){if(file.name.endsWith(".zip")||file.name.endsWith(".aab")||file.name.endsWith(".apk")){fileNames.push(file.name+" (binary — will be noted)");continue;}
+if(exts.some(e=>file.name.endsWith(e))){try{const text=await file.text();if(text.length<40000){code+="=== "+file.name+" ===\n"+text+"\n\n";count++;fileNames.push(file.name);}}catch{}}}
+if(code)p.code+=(p.code?"\n":"")+code;const el=document.getElementById("uploaded-"+p.key);el.style.display="block";el.innerHTML=fileNames.map(f=>`<div class="uploaded-file"><span class="uf-name">📄 ${f}</span></div>`).join("")+`<div style="font-size:11px;color:var(--accent);margin-top:6px">✓ ${count} files loaded</div>`;}
+
+async function runAudit(){const name=document.getElementById("projName").value.trim(),ver=document.getElementById("projVer").value.trim(),err=document.getElementById("newError"),btn=document.getElementById("runBtn"),st=document.getElementById("analyzingEl");err.style.display="none";
+if(!name){err.textContent="Project name required";err.style.display="block";return;}
+const active=platforms.filter(p=>p.enabled&&(p.code.trim().length>20||p.repoUrl.includes("github.com")));
+if(!active.length&&!webScanData){err.textContent="Provide code via GitHub, folder, upload, or paste — or scan a live URL";err.style.display="block";return;}
+btn.disabled=true;btn.textContent="Analyzing...";st.classList.add("show");
+try{const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,repoUrl:p.repoUrl,filesCount:0,totalFiles:0,repo:p.repo||""})),webScan:webScanData?{url:webScanData.url,status:webScanData.status,analysis:webScanData.analysis,html:(webScanData.html||"").substring(0,80000)}:null})});
+if(!r.ok){const d=await r.json();throw new Error(d.error||"Analysis failed");}
+const d=await r.json();
+const entry={id:d.id,name:name,ver:ver,date:new Date().toISOString(),score:d.overall_score||0,issues:d.failed_checks||0,plat:d.platform_scores||{},plats:active.map(p=>p.key),analysis:d.ai_analysis||"",issues_list:d.issues||[],recommendations:d.recommendations||[],total_checks:d.total_checks||0,passed:d.passed_checks||0,failed:d.failed_checks||0,warnings:d.warning_checks||0,cross_score:d.cross_platform_score||0,estimated_fix:d.estimated_fix_hours||"",category_scores:d.category_scores||{},launch_ready:d.launch_readiness?.ready||false,launch_blockers:d.launch_readiness?.blockers||[],launch_warnings:d.launch_readiness?.warnings||[]};
+auditHistory.unshift(entry);localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));showResult(entry);
+}catch(e){err.textContent=e.message;err.style.display="block";}finally{btn.disabled=false;btn.textContent="🧠 Run Full AI Audit";st.classList.remove("show");}}
+
+function showResult(a){const sc=s=>s>=80?"var(--accent)":s>=60?"var(--yellow)":"var(--red)";
+const catHtml=Object.entries(a.category_scores||{}).map(([k,v])=>{const labels={security:"🔒 Security",cross_platform:"🔗 Cross-Platform",performance:"⚡ Performance",seo:"🔍 SEO",accessibility:"♿ Accessibility",code_quality:"📝 Code Quality",dependencies:"📦 Dependencies",api_design:"🔌 API Design",auth:"🔐 Auth",database:"🗄️ Database",testing:"🧪 Testing",build_deploy:"🚀 Build & Deploy",mobile:"📱 Mobile",pwa:"📲 PWA",i18n:"🌍 i18n",monitoring:"📊 Monitoring",documentation:"📚 Documentation",state_management:"🗃️ State Mgmt"};
+return`<div class="cat-card"><div class="cat-name">${labels[k]||k}</div><div class="cat-score" style="color:${sc(v.score)}">${v.score}%</div><div class="cat-bar"><div class="cat-fill" style="width:${v.score}%;background:${sc(v.score)}"></div></div><div class="cat-detail">${v.passed}✓ ${v.failed}✗ ${v.warning}⚠</div></div>`;}).join("");
+
+const issHtml=(a.issues_list||[]).map(i=>{const sev=i.severity==="error"?"e":i.severity==="warning"?"w":"i";
+return`<div class="iss-row" onclick="this.nextElementSibling.classList.toggle('open')" style="cursor:pointer"><div class="sev ${sev}"></div><div class="iss-cat" style="font-size:9px;font-weight:700;color:var(--text3)">${i.id||""}</div><div style="font-size:11px;color:var(--text)">${i.title||i.message||""}</div><div class="iss-type" style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3)">${i.category||i.type||""}</div></div>
+<div class="issue-detail"><div class="issue-msg">${i.message||""}</div>${i.file?`<div class="issue-file">📄 ${i.file}</div>`:""}${i.fix?`<div class="issue-fix"><strong>Fix:</strong> ${i.fix}</div>`:""}</div>`;}).join("");
+
+const launchHtml=a.launch_ready!==undefined?`<div class="launch-box"><div class="launch-head"><div class="launch-icon">${a.launch_ready?"🚀":"🚫"}</div><div class="launch-title">${a.launch_ready?"Ready for Launch":"Launch Blockers Found"}</div><div class="launch-badge ${a.launch_ready?"ready":"not"}">${a.launch_ready?"PASS":"BLOCKED"}</div></div>${(a.launch_blockers||[]).length?`<ul class="launch-list">${a.launch_blockers.map(b=>`<li>🚫 ${b}</li>`).join("")}</ul>`:""}${(a.launch_warnings||[]).length?`<ul class="launch-list">${a.launch_warnings.map(w=>`<li>⚠️ ${w}</li>`).join("")}</ul>`:""}</div>`:"";
+
+document.getElementById("resultContent").innerHTML=`
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button onclick="showTab('dashboard')" style="font-size:12px;color:var(--text2);background:none;border:none">← Back</button><span style="font-size:18px;font-weight:900;color:var(--text)">${a.name}</span><span style="font-size:12px;color:var(--text3)">${a.ver||""}</span></div>
+${launchHtml}
+<div class="stats"><div class="stat g"><div class="stat-l">Overall</div><div class="stat-v" style="color:${sc(a.score)}">${a.score}%</div></div><div class="stat b"><div class="stat-l">Cross-Platform</div><div class="stat-v" style="color:${sc(a.cross_score)}">${a.cross_score}%</div></div><div class="stat"><div class="stat-l">Checks</div><div class="stat-v">${a.passed||0}/${a.total_checks||0}</div></div><div class="stat r"><div class="stat-l">Errors</div><div class="stat-v" style="color:var(--red)">${a.failed||0}</div></div><div class="stat y"><div class="stat-l">Warnings</div><div class="stat-v" style="color:var(--yellow)">${a.warnings||0}</div></div></div>
+<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">📊 Category Scores (100+ checkpoints)</div><div class="cat-grid">${catHtml}</div>
+${Object.keys(a.plat||{}).length?`<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">🔗 Platform Scores</div><div class="plat-row">${Object.entries(a.plat).map(([p,s])=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center"><div style="font-size:22px;margin-bottom:6px">${p==="web"?"🌐":p==="ios"?"🍎":"🤖"}</div><div style="font-weight:700;font-size:12px;text-transform:capitalize;margin-bottom:2px">${p}</div><div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:${sc(s)}">${s}</div><div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:${s}%;height:100%;background:${sc(s)};border-radius:2px"></div></div></div>`).join("")}</div>`:""}
+${issHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">🐛 All Issues (${a.issues_list.length}) — click to expand</div><div class="iss-wrap"><div class="iss-top">Detailed Issues</div>${issHtml}</div>`:""}
+<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">AI Executive Summary</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">${(a.analysis||"").replace(/\n/g,"<br>")}</div></div>
+${(a.recommendations||[]).length?`<div class="recs"><h3>💡 Prioritized Recommendations</h3><ol>${a.recommendations.map(r=>`<li>${r}</li>`).join("")}</ol></div>`:""}
+${a.estimated_fix?`<div style="text-align:center;margin-top:16px;font-size:13px;color:var(--text2)">⏱ Estimated fix: <strong style="color:var(--accent)">${a.estimated_fix}</strong></div>`:""}`;
+showTab("result");}
+
+function renderHistory(){const c=document.getElementById("histContent");if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><div class="empty-text">Run your first 100+ point audit</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
+c.innerHTML=`<div class="hist-grid">${auditHistory.map(a=>{const sc=a.score>=80?"var(--accent)":a.score>=60?"var(--yellow)":"var(--red)";
+return`<div class="hist-card" onclick='showResult(${JSON.stringify(a)})'><div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div><div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues ${a.launch_ready!==undefined?" · "+(a.launch_ready?"🚀 Ready":"🚫 Blocked"):""}</div><div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div><div style="color:var(--text3)">→</div></div>`}).join("")}</div>`;}
 
 checkAuth();
 </script>
