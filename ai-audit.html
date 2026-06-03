@@ -155,6 +155,8 @@ input,textarea{font-family:'Inter',sans-serif;outline:none}
 .fix-status{font-size:11px;padding:4px 8px;border-radius:6px;display:inline-block;font-weight:600;margin-left:auto}
 .fix-status.pending{background:var(--yellow-dim);color:var(--yellow)}
 .fix-status.applied{background:var(--accent-dim);color:var(--accent)}
+.fix-status.error{background:var(--red-dim);color:var(--red)}
+.fix-status.running{background:var(--blue-dim);color:var(--blue)}
 .fix-desc{font-size:12px;color:var(--text2);margin-bottom:10px}
 .diff-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.7;overflow-x:auto;margin-bottom:10px;max-height:200px;overflow-y:auto}
 .diff-del{color:var(--red);background:rgba(255,59,92,.06);display:block;padding:1px 4px;border-radius:2px}
@@ -162,6 +164,19 @@ input,textarea{font-family:'Inter',sans-serif;outline:none}
 .pat-status{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:10px;font-weight:700;margin-top:4px}
 .pat-status.valid{background:var(--accent-dim);color:var(--accent)}
 .pat-status.invalid{background:var(--red-dim);color:var(--red)}
+.issue-fix-row{display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px;transition:.2s}
+.issue-fix-row:last-child{border-bottom:none}
+.issue-fix-icon{width:20px;text-align:center;font-size:12px}
+.issue-fix-title{flex:1;color:var(--text)}
+.issue-fix-badge{padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase}
+.badge-done{background:var(--accent-dim);color:var(--accent)}
+.badge-running{background:var(--blue-dim);color:var(--blue)}
+.badge-error{background:var(--red-dim);color:var(--red)}
+.badge-pending{background:var(--yellow-dim);color:var(--yellow)}
+.badge-skip{background:var(--border);color:var(--text3)}
+.progress-bar-wrap{background:var(--surface2);border-radius:8px;height:8px;overflow:hidden;margin:8px 0}
+.progress-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),#00d4ff);transition:width .3s ease}
+.progress-log{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);line-height:1.8;max-height:150px;overflow-y:auto;padding:8px;background:var(--surface2);border-radius:8px;margin-top:8px}
 @media(max-width:700px){.form-row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}.topbar-nav{display:none}.github-url-row,.github-pat-row,.web-input-row{flex-direction:column}.iss-row{grid-template-columns:10px 1fr}.iss-row .iss-cat,.iss-row .iss-type{display:none}}
 </style>
 </head>
@@ -228,14 +243,13 @@ let auditHistory=[];
 let webScanData=null;
 let currentFixes=null;
 let currentAudit=null;
+let fixRunning=false;
 
-// Safe load from localStorage
 try{auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");}catch(e){auditHistory=[];}
 
 function toggleTheme(){const h=document.documentElement,l=h.classList.toggle("light");localStorage.setItem("gm_theme",l?"light":"dark");document.querySelectorAll(".theme-toggle").forEach(t=>l?t.classList.add("light"):t.classList.remove("light"));}
 (function(){const s=localStorage.getItem("gm_theme");if(s==="light"){document.documentElement.classList.add("light");document.querySelectorAll(".theme-toggle").forEach(t=>t.classList.add("light"));}})();
 
-// ===== SANITIZE for safe localStorage/JSON =====
 function sanitizeAudit(a){
   return {
     id:a.id||Date.now().toString(36),
@@ -259,10 +273,9 @@ function sanitizeAudit(a){
     launch_ready:!!a.launch_ready,
     launch_blockers:Array.isArray(a.launch_blockers)?a.launch_blockers:[],
     launch_warnings:Array.isArray(a.launch_warnings)?a.launch_warnings:[],
-    fixes_applied:Number(a.fixes_applied)||0,
     fix_data:a.fix_data||null,
+    fix_progress:Array.isArray(a.fix_progress)?a.fix_progress:[],
     platInfo:Array.isArray(a.platInfo)?a.platInfo:[],
-    sourceCode:"", // Don't store sourceCode in localStorage (too big)
     apply_results:a.apply_results||null
   };
 }
@@ -270,15 +283,13 @@ function sanitizeAudit(a){
 function saveHistory(){
   try{
     const clean=auditHistory.map(sanitizeAudit);
-    // Keep max 50 entries, max 4MB total
     const trimmed=clean.slice(0,50);
     const json=JSON.stringify(trimmed);
     if(json.length>4000000){trimmed.pop();localStorage.setItem("gm_audit_hist",JSON.stringify(trimmed));}
     else{localStorage.setItem("gm_audit_hist",json);}
-  }catch(e){console.warn("Failed to save history:",e);}
+  }catch(e){console.warn("Save history failed:",e);}
 }
 
-// ===== AUTH =====
 document.getElementById("authForm").onsubmit=async e=>{
   e.preventDefault();
   const b=document.getElementById("authBtn"),er=document.getElementById("authError");
@@ -303,7 +314,8 @@ function enterDashboard(){
   renderDashboard();initPlatforms();
 }
 
-async function logout(){localStorage.removeItem("gm_audit_hist");localStorage.removeItem("gm_theme");
+async function logout(){
+  localStorage.removeItem("gm_audit_hist");localStorage.removeItem("gm_theme");
   await fetch(API+"/auth",{method:"DELETE"});
   document.getElementById("dashPage").classList.add("hidden");
   document.getElementById("authPage").classList.remove("hidden");
@@ -319,13 +331,13 @@ function showTab(t){
 }
 
 function renderDashboard(){
-  const h=auditHistory,total=h.length,avg=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0,issues=h.reduce((a,b)=>a+b.issues,0),fixed=h.reduce((a,b)=>a+(b.fixes_applied||0),0);
+  const h=auditHistory,total=h.length,avg=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0,issues=h.reduce((a,b)=>a+b.issues,0),fixed=h.reduce((a,b)=>a+(b.fix_data?.total_fixes||0),0);
   document.getElementById("dashStats").innerHTML=`<div class="stat g"><div class="stat-l">Audits</div><div class="stat-v" style="color:var(--accent)">${total}</div></div><div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:var(--blue)">${avg||"—"}%</div></div><div class="stat r"><div class="stat-l">Issues</div><div class="stat-v" style="color:var(--red)">${issues}</div></div><div class="stat y"><div class="stat-l">Fixed</div><div class="stat-v" style="color:var(--yellow)">${fixed}</div></div>`;
-  if(!total){document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Audit & Auto-Fix Ready</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">Go to <strong>New Audit</strong> to analyze your product with 100+ checkpoints.</div></div>`;}
+  if(!total){document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Audit & Auto-Fix Ready</div><div class="ai-sub">MiMo v2.5-pro</div></div></div><div class="ai-body">Go to <strong>New Audit</strong> to analyze your product with 100+ checkpoints.</div></div>`;}
   else{const l=h[0];document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Latest: ${l.name} — ${l.score}%</div><div class="ai-sub">${l.launch_ready?"✅ Ready":"🚫 Blockers"}</div></div></div><div class="ai-body">${(l.analysis||"").substring(0,300)}...</div></div>`;}
 }
 
-async function scanWebsite(){const url=document.getElementById("webUrl").value.trim();if(!url)return;const btn=document.getElementById("scanBtn"),st=document.getElementById("webStatus"),res=document.getElementById("webResult");btn.disabled=true;btn.textContent="Scanning...";st.textContent="Scanning...";st.className="web-status";st.style.display="block";res.style.display="none";
+async function scanWebsite(){const url=document.getElementById("webUrl").value.trim();if(!url)return;const btn=document.getElementById("scanBtn"),st=document.getElementById("webStatus"),res=document.getElementById("webResult");btn.disabled=true;btn.textContent="Scanning...";st.textContent="Scanning...";st.className="web-status";st.style.display="block";res.style.display="none;
 try{const r=await fetch(API+"/webscan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw new Error(d.error);webScanData=d;const a=d.analysis;
 res.innerHTML=`<div class="web-result-title">✅ ${d.url} (${d.status})</div><div class="web-result-grid"><div class="web-stat">HTTPS: <span>${a.hasHttps?"✅":"❌"}</span></div><div class="web-stat">CSP: <span>${a.hasCsp?"✅":"❌"}</span></div><div class="web-stat">HSTS: <span>${a.hasHsts?"✅":"❌"}</span></div><div class="web-stat">OG: <span>${a.hasOg?"✅":"❌"}</span></div><div class="web-stat">Schema: <span>${a.hasStructuredData?"✅":"❌"}</span></div><div class="web-stat">Scripts: <span>${a.scripts}</span></div></div>`;
 res.style.display="block";st.textContent="✓ Scanned";st.className="web-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="web-status err";}finally{btn.disabled=false;btn.textContent="🔍 Scan";}}
@@ -385,25 +397,243 @@ async function validatePAT(i){const p=platforms[i],btn=document.getElementById("
 
 async function fetchRepo(i){const p=platforms[i],btn=document.getElementById("fetch-"+p.key),st=document.getElementById("status-"+p.key),url=p.repoUrl.trim();if(!url||!url.includes("github.com")){st.textContent="Enter a valid GitHub URL";st.className="fetch-status err";st.style.display="block";return;}btn.disabled=true;btn.textContent="Fetching...";st.textContent="Connecting...";st.className="fetch-status";st.style.display="block";try{const r=await fetch(API+"/github",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url,github_token:p.githubPat||undefined})});const d=await r.json();if(!r.ok)throw new Error(d.error);p.code=d.code;p.repo=d.repo;st.innerHTML="✓ <strong>"+d.filesCount+"</strong> files from <strong>"+d.repo+"</strong>";st.className="fetch-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="fetch-status err";}finally{btn.disabled=false;btn.textContent="📥 Fetch Code";}}
 
-async function browseFolder(i){if(!window.showDirectoryPicker){alert("Folder picker requires Chrome or Edge. Use GitHub URL or Upload instead.");return;}const p=platforms[i];try{const dir=await window.showDirectoryPicker({mode:"readwrite"});document.getElementById("folder-name-"+p.key).textContent="📁 "+dir.name;const st=document.getElementById("folder-status-"+p.key);st.textContent="Reading...";st.className="fetch-status";st.style.display="block";let code="",count=0;const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];async function rd(handle,path){path=path||"";for await(const entry of handle.values()){if(entry.kind==="file"){if(exts.some(e=>entry.name.endsWith(e))&&!entry.name.includes("node_modules")){try{const file=await entry.getFile();const text=await file.text();if(text.length<40000){code+="=== "+(path?path+"/":"")+entry.name+" ===\n"+text+"\n\n";count++;}}catch{}}}else if(entry.kind==="directory"&&!["node_modules",".git","build","dist",".next",".vercel","__pycache__",".gradle","Pods","vendor",".output",".expo"].includes(entry.name)){await rd(entry,(path?path+"/":"")+entry.name);}}}await rd(dir);p.code=code;p.dirHandle=dir;p.inputMode="folder";st.innerHTML="✓ <strong>"+count+"</strong> files";st.className="fetch-status ok";}catch(e){if(e.name!=="AbortError")alert("Error: "+e.message);}}
+async function browseFolder(i){if(!window.showDirectoryPicker){alert("Folder picker requires Chrome or Edge.");return;}const p=platforms[i];try{const dir=await window.showDirectoryPicker({mode:"readwrite"});document.getElementById("folder-name-"+p.key).textContent="📁 "+dir.name;const st=document.getElementById("folder-status-"+p.key);st.textContent="Reading...";st.className="fetch-status";st.style.display="block";let code="",count=0;const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];async function rd(handle,path){path=path||"";for await(const entry of handle.values()){if(entry.kind==="file"){if(exts.some(e=>entry.name.endsWith(e))&&!entry.name.includes("node_modules")){try{const file=await entry.getFile();const text=await file.text();if(text.length<40000){code+="=== "+(path?path+"/":"")+entry.name+" ===\n"+text+"\n\n";count++;}}catch{}}}else if(entry.kind==="directory"&&!["node_modules",".git","build","dist",".next",".vercel","__pycache__",".gradle","Pods","vendor",".output",".expo"].includes(entry.name)){await rd(entry,(path?path+"/":"")+entry.name);}}}await rd(dir);p.code=code;p.dirHandle=dir;p.inputMode="folder";st.innerHTML="✓ <strong>"+count+"</strong> files";st.className="fetch-status ok";}catch(e){if(e.name!=="AbortError")alert("Error: "+e.message);}}
 
 function handleFiles(e,i){processFiles(e.target.files,i);}
 function handleDrop(e,i){e.preventDefault();e.target.closest(".drop-zone").classList.remove("drag");processFiles(e.dataTransfer.files,i);}
 async function processFiles(files,i){const p=platforms[i];const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];let code="",count=0,fileNames=[];for(const file of files){if(file.name.endsWith(".zip")||file.name.endsWith(".aab")||file.name.endsWith(".apk")){fileNames.push(file.name+" (binary noted)");continue;}if(exts.some(e=>file.name.endsWith(e))){try{const text=await file.text();if(text.length<40000){code+="=== "+file.name+" ===\n"+text+"\n\n";count++;fileNames.push(file.name);}}catch{}}}if(code)p.code+=(p.code?"\n":"")+code;const el=document.getElementById("uploaded-"+p.key);el.style.display="block";el.innerHTML=fileNames.map(f=>`<div class="uploaded-file"><span class="uf-name">📄 ${f}</span></div>`).join("")+`<div style="font-size:11px;color:var(--accent);margin-top:6px">✓ ${count} files loaded</div>`;}
 
-async function runAudit(){const name=document.getElementById("projName").value.trim(),ver=document.getElementById("projVer").value.trim(),err=document.getElementById("newError"),btn=document.getElementById("runBtn"),st=document.getElementById("analyzingEl");err.style.display="none";if(!name){err.textContent="Project name required";err.style.display="block";return;}const active=platforms.filter(p=>p.enabled&&(p.code.trim().length>20||p.repoUrl.includes("github.com")));if(!active.length&&!webScanData){err.textContent="Provide source code or scan a URL";err.style.display="block";return;}btn.disabled=true;btn.textContent="Auditing...";st.classList.add("show");try{const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,filesCount:0,totalFiles:0,repo:p.repo||""})),webScan:webScanData?{url:webScanData.url,status:webScanData.status,analysis:webScanData.analysis,html:(webScanData.html||"").substring(0,80000)}:null})});if(!r.ok){const d=await r.json();throw new Error(d.error||"Failed");}const d=await r.json();const platInfo=active.map(p=>({key:p.key,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,repo:p.repo||""}));const entry={id:d.id,name:name,ver:ver,date:new Date().toISOString(),score:d.overall_score||0,issues:d.failed_checks||0,plat:d.platform_scores||{},plats:active.map(p=>p.key),analysis:d.ai_analysis||"",issues_list:d.issues||[],recommendations:d.recommendations||[],total_checks:d.total_checks||0,passed:d.passed_checks||0,failed:d.failed_checks||0,warnings:d.warning_checks||0,cross_score:d.cross_platform_score||0,estimated_fix:d.estimated_fix_hours||"",category_scores:d.category_scores||{},launch_ready:d.launch_readiness?.ready||false,launch_blockers:d.launch_readiness?.blockers||[],launch_warnings:d.launch_readiness?.warnings||[],sourceCode:"",platInfo:platInfo,fixes_applied:0,fix_data:null};auditHistory.unshift(sanitizeAudit(entry));saveHistory();currentFixes=null;showResult(entry);}catch(e){err.textContent=e.message;err.style.display="block";}finally{btn.disabled=false;btn.textContent="🧠 Run Full Audit & Fix";st.classList.remove("show");}}
+async function runAudit(){const name=document.getElementById("projName").value.trim(),ver=document.getElementById("projVer").value.trim(),err=document.getElementById("newError"),btn=document.getElementById("runBtn"),st=document.getElementById("analyzingEl");err.style.display="none";if(!name){err.textContent="Project name required";err.style.display="block";return;}const active=platforms.filter(p=>p.enabled&&(p.code.trim().length>20||p.repoUrl.includes("github.com")));if(!active.length&&!webScanData){err.textContent="Provide source code or scan a URL";err.style.display="block";return;}btn.disabled=true;btn.textContent="Auditing...";st.classList.add("show");try{const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,filesCount:0,totalFiles:0,repo:p.repo||""})),webScan:webScanData?{url:webScanData.url,status:webScanData.status,analysis:webScanData.analysis,html:(webScanData.html||"").substring(0,80000)}:null})});if(!r.ok){const d=await r.json();throw new Error(d.error||"Failed");}const d=await r.json();const platInfo=active.map(p=>({key:p.key,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,repo:p.repo||""}));const entry={id:d.id,name:name,ver:ver,date:new Date().toISOString(),score:d.overall_score||0,issues:d.failed_checks||0,plat:d.platform_scores||{},plats:active.map(p=>p.key),analysis:d.ai_analysis||"",issues_list:d.issues||[],recommendations:d.recommendations||[],total_checks:d.total_checks||0,passed:d.passed_checks||0,failed:d.failed_checks||0,warnings:d.warning_checks||0,cross_score:d.cross_platform_score||0,estimated_fix:d.estimated_fix_hours||"",category_scores:d.category_scores||{},launch_ready:d.launch_readiness?.ready||false,launch_blockers:d.launch_readiness?.blockers||[],launch_warnings:d.launch_readiness?.warnings||[],platInfo:platInfo,fix_data:null,fix_progress:[],apply_results:null};auditHistory.unshift(sanitizeAudit(entry));saveHistory();currentFixes=null;showResult(entry);}catch(e){err.textContent=e.message;err.style.display="block";}finally{btn.disabled=false;btn.textContent="🧠 Run Full Audit & Fix";st.classList.remove("show");}}
 
-async function generateFixes(audit){const btn=document.getElementById("fixBtn"),st=document.getElementById("fixStatus");btn.disabled=true;st.style.display="flex";const allFixes=[];const totalIssues=audit.issues_list.length;for(let idx=0;idx<totalIssues;idx++){const iss=audit.issues_list[idx];st.innerHTML="<div class="spinner-sm"></div><span>Fixing "+(idx+1)+"/"+totalIssues+": "+(iss.id||iss.title||"issue")+"...</span>";try{const r=await fetch(API+"/fix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:audit.name,issues:audit.issues_list,issue_index:idx,sourceCode:audit.sourceCode||""})});if(r.ok){const d=await r.json();if(d.fixes&&d.fixes.length){allFixes.push(...d.fixes);updateFixProgress(idx+1,totalIssues,allFixes.length,iss.id||"OK");}else{updateFixProgress(idx+1,totalIssues,allFixes.length,iss.id||"empty");}}else{const d=await r.json();updateFixProgress(idx+1,totalIssues,allFixes.length,"ERR: "+(d.error||"unknown").substring(0,40));}}catch(e){updateFixProgress(idx+1,totalIssues,allFixes.length,"ERR: "+e.message.substring(0,40));}}const fixData={summary:"Generated "+allFixes.length+" fixes from "+totalIssues+" issues",total_fixes:allFixes.length,fixes:allFixes};currentFixes=fixData;audit.fix_data=fixData;audit.fixes_applied=allFixes.length;const idx=auditHistory.findIndex(a=>a.id===audit.id);if(idx>=0){auditHistory[idx]=sanitizeAudit(audit);saveHistory();}btn.disabled=false;btn.textContent="🔧 Generate Fixes";st.innerHTML="<span style="color:var(--accent)">✅ Done! "+allFixes.length+"/"+totalIssues+" fixes generated</span>";showResult(audit);}
-function updateFixProgress(done,total,fixes,label){const st=document.getElementById("fixStatus");if(st){st.innerHTML="<div class="spinner-sm"></div><span>"+done+"/"+total+" processed | "+fixes+" fixes | Last: "+label+"</span>";}}
+// ===== FIX: one-by-one with progress tracking =====
+async function generateFixes(audit){
+  if(fixRunning)return;
+  fixRunning=true;
+  const btn=document.getElementById("fixBtn");
+  const st=document.getElementById("fixStatus");
+  const logEl=document.getElementById("fixLog");
+  const progressEl=document.getElementById("fixProgressBar");
+  const counterEl=document.getElementById("fixCounter");
 
-// ===== HISTORY - FIXED: uses index lookup instead of JSON.stringify =====
+  btn.disabled=true;
+  btn.textContent="⏳ Fixing...";
+  st.style.display="flex";
+
+  const issues=audit.issues_list||[];
+  const total=issues.length;
+
+  // Initialize fix progress if empty
+  if(!audit.fix_progress||!audit.fix_progress.length){
+    audit.fix_progress=issues.map(()=>({status:"pending",fix:null}));
+  }
+
+  const allFixes=[];
+  let done=0;
+  let errors=0;
+
+  // Collect already-done fixes
+  audit.fix_progress.forEach(fp=>{
+    if(fp.status==="done"&&fp.fix){allFixes.push(fp.fix);done++;}
+    if(fp.status==="error")errors++;
+  });
+
+  renderFixProgress(audit);
+
+  for(let idx=0;idx<total;idx++){
+    const fp=audit.fix_progress[idx];
+
+    // SKIP already done
+    if(fp.status==="done"){
+      addFixLog(logEl,idx,"✅ Already fixed — skipping",issues[idx]);
+      continue;
+    }
+
+    // SKIP already errored (user can retry separately)
+    if(fp.status==="error"){
+      addFixLog(logEl,idx,"⏭️ Previously errored — skipping",issues[idx]);
+      continue;
+    }
+
+    // Mark as running
+    fp.status="running";
+    renderFixProgress(audit);
+    st.innerHTML='<div class="spinner-sm"></div><span>Fixing '+(idx+1)+'/'+total+': '+(issues[idx].id||"")+' '+(issues[idx].title||"").substring(0,40)+'...</span>';
+
+    try{
+      const r=await fetch(API+"/fix",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          project_name:audit.name,
+          issues:issues,
+          issue_index:idx,
+          sourceCode:""
+        })
+      });
+
+      if(r.ok){
+        const d=await r.json();
+        if(d.fixes&&d.fixes.length){
+          fp.status="done";
+          fp.fix=d.fixes[0];
+          fp.error=null;
+          allFixes.push(d.fixes[0]);
+          done++;
+          addFixLog(logEl,idx,"✅ Fixed: "+(d.fixes[0].explanation||"OK").substring(0,80),issues[idx]);
+        }else{
+          fp.status="error";
+          fp.error="No fix returned";
+          errors++;
+          addFixLog(logEl,idx,"⚠️ No fix generated",issues[idx]);
+        }
+      }else{
+        const d=await r.json().catch(()=>({error:"Unknown"}));
+        fp.status="error";
+        fp.error=(d.error||"Server error").substring(0,100);
+        errors++;
+        addFixLog(logEl,idx,"❌ "+fp.error,issues[idx]);
+      }
+    }catch(e){
+      fp.status="error";
+      fp.error=e.message.substring(0,100);
+      errors++;
+      addFixLog(logEl,idx,"❌ "+fp.error,issues[idx]);
+    }
+
+    renderFixProgress(audit);
+    counterEl.textContent=done+"/"+total+" fixed, "+errors+" errors";
+
+    // Save progress after each issue
+    const fixData={summary:"Generated "+done+" fixes",total_fixes:done,fixes:allFixes};
+    audit.fix_data=fixData;
+    audit.fix_progress=audit.fix_progress;
+    const aIdx=auditHistory.findIndex(a=>a.id===audit.id);
+    if(aIdx>=0){auditHistory[aIdx]=sanitizeAudit(audit);saveHistory();}
+  }
+
+  // Final update
+  currentFixes=audit.fix_data;
+  fixRunning=false;
+  btn.disabled=false;
+  btn.textContent="🔧 Generate Fixes";
+  st.innerHTML='<span style="color:var(--accent)">✅ Done! '+done+'/'+total+' fixes generated'+(errors?' ('+errors+' errors)':'')+'</span>';
+
+  // Re-render result to show fix cards
+  showResult(audit);
+}
+
+function renderFixProgress(audit){
+  const issues=audit.issues_list||[];
+  const fp=audit.fix_progress||[];
+  const wrap=document.getElementById("fixIssueList");
+  const bar=document.getElementById("fixProgressBar");
+  if(!wrap||!bar)return;
+
+  const doneCount=fp.filter(f=>f.status==="done").length;
+  const total=issues.length;
+  bar.style.width=(total?Math.round(doneCount/total*100):0)+"%";
+
+  let html="";
+  issues.forEach((iss,idx)=>{
+    const s=fp[idx]?.status||"pending";
+    const icons={done:"✅",running:"🔄",error:"❌",pending:"⏳",skip:"⏭️"};
+    const badges={done:"badge-done",running:"badge-running",error:"badge-error",pending:"badge-pending",skip:"badge-skip"};
+    html+=`<div class="issue-fix-row"><div class="issue-fix-icon">${icons[s]||"⏳"}</div><div class="issue-fix-title">${iss.id||""} — ${(iss.title||iss.message||"").substring(0,60)}</div><span class="issue-fix-badge ${badges[s]||"badge-pending"}">${s}</span></div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+function addFixLog(el,idx,msg,iss){
+  if(!el)return;
+  const line=document.createElement("div");
+  line.textContent="["+(idx+1)+"] "+(iss.id||"")+" "+msg;
+  el.appendChild(line);
+  el.scrollTop=el.scrollHeight;
+}
+
+async function applyFixes(audit){
+  const platformsToApply=(audit.platInfo||[]).filter(p=>p.repoUrl&&p.githubPat&&p.patValid);
+  if(!platformsToApply.length){alert("No validated GitHub repos. Validate a token first.");return;}
+  if(!currentFixes?.fixes?.length){alert("Generate fixes first.");return;}
+  const applyBtn=document.getElementById("applyBtn");applyBtn.disabled=true;applyBtn.textContent="Applying...";
+  const allResults=[];
+  for(const plat of platformsToApply){
+    try{const r=await fetch(API+"/apply",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes,branch:plat.patInfo?.default_branch||"main"})});const d=await r.json();if(r.ok){allResults.push({platform:plat.key,repo:plat.repo,status:"success",summary:d.summary,results:d.results||[],commit_url:d.commit_url});}else{allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:d.error});}}catch(e){allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:e.message});}
+  }
+  const el=document.getElementById("applyResults");el.style.display="block";el.innerHTML=allResults.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:13px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:12px;color:${r.status==="success"?"var(--accent)":"var(--red)"}">${r.summary||r.error||""}</div>${r.commit_url?`<div style="font-size:11px;margin-top:4px"><a href="${r.commit_url}" target="_blank" style="color:var(--blue)">${r.commit_url}</a></div>`:""}</div>`).join("");
+  audit.apply_results=allResults;
+  const idx=auditHistory.findIndex(a=>a.id===audit.id);
+  if(idx>=0){auditHistory[idx]=sanitizeAudit(audit);saveHistory();}
+  applyBtn.disabled=false;applyBtn.textContent="🚀 Apply All Fixes";
+}
+
+function showResult(a){
+  currentAudit=a;const sc=s=>s>=80?"var(--accent)":s>=60?"var(--yellow)":"var(--red)";
+  const catHtml=Object.entries(a.category_scores||{}).map(([k,v])=>{const labels={security:"🔒 Security",cross_platform:"🔗 Cross-Platform",performance:"⚡ Performance",seo:"🔍 SEO",accessibility:"♿ Accessibility",code_quality:"📝 Code Quality",dependencies:"📦 Dependencies",api_design:"🔌 API Design",auth:"🔐 Auth",database:"🗄️ Database",testing:"🧪 Testing",build_deploy:"🚀 Build & Deploy",mobile:"📱 Mobile",pwa:"📲 PWA",i18n:"🌍 i18n",monitoring:"📊 Monitoring",documentation:"📚 Documentation",state_management:"🗃️ State Mgmt"};return`<div class="cat-card"><div class="cat-name">${labels[k]||k}</div><div class="cat-score" style="color:${sc(v.score)}">${v.score}%</div><div class="cat-bar"><div class="cat-fill" style="width:${v.score}%;background:${sc(v.score)}"></div></div><div class="cat-detail">${v.passed||0}✓ ${v.failed||0}✗ ${v.warning||0}⚠</div></div>`;}).join("");
+
+  const issHtml=(a.issues_list||[]).map(i=>{const sev=i.severity==="error"?"e":i.severity==="warning"?"w":"i";return`<div class="iss-row" onclick="this.nextElementSibling.classList.toggle('open')"><div class="sev ${sev}"></div><div style="font-size:9px;font-weight:700;color:var(--text3)">${i.id||""}</div><div style="font-size:11px;color:var(--text)">${i.title||i.message||""}</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3)">${i.category||i.type||""}</div></div><div class="issue-detail"><div class="issue-msg">${i.message||""}</div>${i.file?`<div class="issue-file">📄 ${i.file}</div>`:""}${i.fix?`<div class="issue-fix"><strong>Fix:</strong> ${i.fix}</div>`:""}</div>`;}).join("");
+
+  const platStatusHtml=(a.platInfo||[]).map(p=>{if(!p.repoUrl)return"";const icon=p.patValid===true?"✅":p.patValid===false?"❌":"⚠️";const status=p.patValid===true?"Validated — "+(p.patInfo?.can_write?"Read/Write":"Read-Only"):p.patValid===false?"Token invalid":"No token";return`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px;font-size:11px"><span>${p.key==="web"?"🌐":p.key==="ios"?"🍎":"🤖"}</span><span style="flex:1;font-family:'JetBrains Mono',monospace;color:var(--text)">${p.repo||p.repoUrl}</span><span style="color:${p.patValid===true?"var(--accent)":p.patValid===false?"var(--red)":"var(--yellow)"}">${icon} ${status}</span></div>`;}).join("");
+
+  const fpCount=(a.fix_progress||[]).filter(f=>f.status==="done").length;
+  const fpTotal=(a.issues_list||[]).length;
+
+  let fixHtml=`<div class="fix-section"><div class="fix-head"><div class="fix-icon">🔧</div><div class="fix-title">Auto-Fix Engine</div><div style="font-size:11px;color:var(--text3);margin-right:8px">${fpCount}/${fpTotal} fixed</div><button class="btn-fix btn-generate" id="fixBtn" onclick="generateFixes(currentAudit)">${fpCount>0?"🔧 Continue Fixing":"🔧 Generate Fixes"}</button>${a.platInfo?.some(p=>p.patValid)?`<button class="btn-fix btn-apply" id="applyBtn" onclick="applyFixes(currentAudit)">🚀 Apply All Fixes</button>`:""}</div><div id="fixStatus" class="analyzing" style="display:none"><div class="spinner-sm"></div><span>Working...</span></div>
+  <div class="progress-bar-wrap"><div class="fix-progress-bar-fill" id="fixProgressBar" style="height:100%;border-radius:8px;background:linear-gradient(90deg,var(--accent),#00d4ff);transition:width .3s ease;width:${fpTotal?Math.round(fpCount/fpTotal*100):0}%"></div></div>
+  <div id="fixCounter" style="font-size:11px;color:var(--text3);margin-bottom:8px">${fpCount}/${fpTotal} fixed</div>
+  <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Repository Access</div>${platStatusHtml||"<div style='font-size:11px;color:var(--text3)'>No repos configured</div>"}</div>
+  <div id="fixIssueList" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px"></div>
+  <div class="progress-log" id="fixLog" style="display:none"></div>`;
+
+  if(a.fix_data?.fixes?.length){
+    fixHtml+=`<div style="font-size:12px;color:var(--accent);margin-bottom:10px;margin-top:10px">✅ ${a.fix_data.total_fixes} fixes ready to apply</div>`;
+    a.fix_data.fixes.forEach(f=>{
+      fixHtml+=`<div class="fix-card"><div class="fix-card-head"><span class="fix-issue-id">${f.issue_id||""}</span><span class="fix-file">${f.file||""}</span><span class="fix-status applied">Ready</span></div><div class="fix-desc">${f.explanation||""}</div>${f.fixed_snippet?`<div class="diff-block">${(f.fixed_snippet||"").split("\n").map(l=>`<span class="diff-add">+ ${l}</span>`).join("")}</div>`:""}</div>`;
+    });
+  }
+  fixHtml+=`</div>`;
+
+  let applyHtml="";
+  if(a.apply_results?.length){applyHtml=`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🚀 Applied Fixes</div>`+a.apply_results.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:12px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:11px;color:var(--text2)">${r.summary||r.error||""}</div></div>`).join("");}
+
+  const launchHtml=a.launch_ready!==undefined?`<div class="launch-box"><div class="launch-head"><div class="launch-icon">${a.launch_ready?"🚀":"🚫"}</div><div class="launch-title">${a.launch_ready?"Ready for Launch":"Launch Blockers Found"}</div><div class="launch-badge ${a.launch_ready?"ready":"not"}">${a.launch_ready?"PASS":"BLOCKED"}</div></div>${(a.launch_blockers||[]).length?`<ul class="launch-list">${a.launch_blockers.map(b=>`<li>🚫 ${b}</li>`).join("")}</ul>`:""}${(a.launch_warnings||[]).length?`<ul class="launch-list">${a.launch_warnings.map(w=>`<li>⚠️ ${w}</li>`).join("")}</ul>`:""}</div>`:"";
+
+  document.getElementById("resultContent").innerHTML=`
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button onclick="showTab('dashboard')" style="font-size:12px;color:var(--text2);background:none;border:none">← Back</button><span style="font-size:18px;font-weight:900;color:var(--text)">${a.name}</span><span style="font-size:12px;color:var(--text3)">${a.ver||""}</span>${fpCount?`<span style="font-size:11px;color:var(--accent);font-weight:700">🔧 ${fpCount} fixed</span>`:""}</div>
+  ${launchHtml}
+  <div class="stats"><div class="stat g"><div class="stat-l">Overall</div><div class="stat-v" style="color:${sc(a.score)}">${a.score}%</div></div><div class="stat b"><div class="stat-l">Cross-Platform</div><div class="stat-v" style="color:${sc(a.cross_score)}">${a.cross_score}%</div></div><div class="stat"><div class="stat-l">Checks</div><div class="stat-v">${a.passed||0}/${a.total_checks||0}</div></div><div class="stat r"><div class="stat-l">Errors</div><div class="stat-v" style="color:var(--red)">${a.failed||0}</div></div><div class="stat y"><div class="stat-l">Warnings</div><div class="stat-v" style="color:var(--yellow)">${a.warnings||0}</div></div></div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">📊 Category Scores</div><div class="cat-grid">${catHtml}</div>
+  ${fixHtml}${applyHtml}
+  ${issHtml?`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🐛 Issues (${a.issues_list.length})</div><div class="iss-wrap"><div class="iss-top">Click to expand</div>${issHtml}</div>`:""}
+  <div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">AI Summary</div><div class="ai-sub">MiMo v2.5-pro</div></div></div><div class="ai-body">${(a.analysis||"").replace(/\n/g,"<br>")}</div></div>
+  ${(a.recommendations||[]).length?`<div class="recs"><h3>💡 Recommendations</h3><ol>${a.recommendations.map(r=>`<li>${r}</li>`).join("")}</ol></div>`:""}`;
+
+  // Init fix progress view
+  renderFixProgress(a);
+
+  // Show log if fixes exist
+  const logEl=document.getElementById("fixLog");
+  if(logEl&&(a.fix_progress||[]).length){
+    logEl.style.display="block";
+    a.fix_progress.forEach((fp,idx)=>{
+      if(fp.status==="done")addFixLog(logEl,idx,"✅ Fixed: "+(fp.fix?.explanation||"OK").substring(0,80),a.issues_list[idx]);
+      else if(fp.status==="error")addFixLog(logEl,idx,"❌ Error: "+(fp.error||"unknown"),a.issues_list[idx]);
+      else addFixLog(logEl,idx,"⏳ Pending",a.issues_list[idx]);
+    });
+  }
+
+  showTab("result");
+}
+
 function renderHistory(){
   const c=document.getElementById("histContent");
   if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
   let html='<div class="hist-grid">';
   auditHistory.forEach((a,idx)=>{
     const sc=a.score>=80?"var(--accent)":a.score>=60?"var(--yellow)":"var(--red)";
-    html+=`<div class="hist-card" onclick="showResult(auditHistory[${idx}])"><div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div><div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues${a.fixes_applied?" · 🔧 "+a.fixes_applied+" fixed":""}</div><div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div><div style="color:var(--text3)">→</div></div>`;
+    const fpDone=(a.fix_progress||[]).filter(f=>f.status==="done").length;
+    const fpTotal=(a.issues_list||[]).length;
+    html+=`<div class="hist-card" onclick="showResult(auditHistory[${idx}])"><div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div><div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues${fpDone?" · 🔧 "+fpDone+"/"+fpTotal+" fixed":""}</div><div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div><div style="color:var(--text3)">→</div></div>`;
   });
   html+='</div>';
   c.innerHTML=html;
