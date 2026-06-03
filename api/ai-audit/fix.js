@@ -1,4 +1,30 @@
-const bcrypt = require("bcryptjs");
+const MIMO_KEY = process.env.MIMO_API_KEY;
+const MIMO_BASE = "https://api.xiaomimimo.com/v1";
+const MIMO_MODEL = "mimo-v2.5-pro";
+
+async function callMiMo(systemPrompt, userPrompt) {
+  const r = await fetch(MIMO_BASE + "/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + MIMO_KEY
+    },
+    body: JSON.stringify({
+      model: MIMO_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      max_tokens: 8000
+    })
+  });
+  if (!r.ok) {
+    const err = await r.text();
+    return { error: "MiMo API " + r.status + ": " + err.substring(0, 300) };
+  }
+  const data = await r.json();
+  return data.choices[0].message.content;
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -7,7 +33,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Simple auth check
+  // Auth
   const cookies = {};
   (req.headers.cookie || "").split(";").forEach(c => {
     const [k, ...v] = c.trim().split("=");
@@ -16,7 +42,6 @@ module.exports = async function handler(req, res) {
   const token = cookies["gmn_session"];
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-  // Verify JWT
   try {
     const jose = await import("jose");
     const secret = new TextEncoder().encode(process.env.AUTH_SECRET || "fallback");
@@ -25,51 +50,39 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  if (!MIMO_KEY) return res.status(500).json({ error: "MIMO_API_KEY not configured" });
+
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { project_name, issues, sourceCode } = body;
 
     if (!issues || !issues.length) return res.status(400).json({ error: "No issues to fix" });
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured" });
-
     const contextBlock = sourceCode && sourceCode.length > 50
       ? "## SOURCE CODE:\n" + sourceCode.substring(0, 100000)
-      : "## SOURCE CODE: Not available. Generate fixes based on issue descriptions. Provide practical code patterns.";
+      : "## SOURCE CODE: Not available. Generate fixes based on issue descriptions only.";
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 8000,
-        system: "You are an expert senior engineer. Given audit issues, generate ACTUAL CODE FIXES. When source code is available, generate precise fixes. When not available, generate practical code patterns. Return ONLY valid JSON: {\"summary\":\"...\",\"total_fixes\":0,\"fixes\":[{\"issue_id\":\"\",\"file\":\"\",\"original_snippet\":\"\",\"fixed_snippet\":\"\",\"explanation\":\"\",\"new_files\":[]}],\"dependency_changes\":{\"add\":{},\"remove\":[]}}",
-        messages: [{ role: "user", content: "Project: " + (project_name||"Project") + "\n\n## AUDIT ISSUES:\n" + JSON.stringify(issues, null, 2) + "\n\n" + contextBlock }]
-      })
-    });
+    const issuesSummary = issues.map((iss, i) =>
+      (i+1) + ". [" + (iss.severity||"info") + "] " + (iss.id||"") + " - " + (iss.title||iss.message||"") + (iss.file?" (File: "+iss.file+")":"") + (iss.fix?" Fix hint: "+iss.fix:"")
+    ).join("\n");
 
-    if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).json({ error: "Claude API error: " + err.substring(0, 200) });
-    }
+    const sys = "You are a senior engineer. Given audit issues, generate code fixes. Return ONLY raw JSON, no markdown, no code fences. JSON format: {\"summary\":\"overview\",\"total_fixes\":number,\"fixes\":[{\"issue_id\":\"id\",\"file\":\"path\",\"original_snippet\":\"code\",\"fixed_snippet\":\"code\",\"explanation\":\"why\",\"new_files\":[]}]}";
+    const user = "Project: " + (project_name||"Project") + "\n\nIssues:\n" + issuesSummary + "\n\n" + contextBlock;
 
-    const data = await response.json();
-    const text = data.content[0].text;
+    const text = await callMiMo(sys, user);
+
+    if (typeof text === "object" && text.error) return res.status(500).json(text);
 
     let result;
+    text.replace(/^```(?:json)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "").trim();
+
     try { result = JSON.parse(text); }
     catch {
       const m = text.match(/\{[\s\S]*\}/);
-      if (m) { try { result = JSON.parse(m[0]); } catch { result = { error: "Parse error", raw: text.substring(0, 500) }; } }
-      else { result = { error: "Parse error", raw: text.substring(0, 500) }; }
+      if (m) try { result = JSON.parse(m[0]); } catch {}
+      if (!result) return res.status(500).json({ error: "Parse error", raw: text.substring(0, 500) });
     }
 
-    if (result.error) return res.status(500).json(result);
     return res.status(200).json({ ...result, generated_at: new Date().toISOString() });
 
   } catch (e) {
