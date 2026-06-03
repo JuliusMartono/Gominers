@@ -248,7 +248,7 @@ let fixRunning=false;
 try{auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");}catch(e){auditHistory=[];}
 
 function toggleTheme(){const h=document.documentElement,l=h.classList.toggle("light");localStorage.setItem("gm_theme",l?"light":"dark");document.querySelectorAll(".theme-toggle").forEach(t=>l?t.classList.add("light"):t.classList.remove("light"));}
-(function(){const s=localStorage.getItem("gm_theme");if(s==="light"){document.documentElement.classList.add("light");document.querySelectorAll(".theme-toggle").forEach(t=>t.classList.add("light"));}})();
+;(function(){const s=localStorage.getItem("gm_theme");if(s==="light"){document.documentElement.classList.add("light");document.querySelectorAll(".theme-toggle").forEach(t=>t.classList.add("light"));}})();
 
 function sanitizeAudit(a){
   return {
