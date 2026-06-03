@@ -23,7 +23,14 @@ async function callMiMo(systemPrompt, userPrompt) {
     return { error: "MiMo API " + r.status + ": " + err.substring(0, 300) };
   }
   const data = await r.json();
-  return data.choices[0].message.content;
+  const choice = data.choices && data.choices[0];
+  if (!choice) return { error: "No response from MiMo", raw: JSON.stringify(data).substring(0, 500) };
+  const msg = choice.message;
+  if (!msg) return { error: "No message in response", raw: JSON.stringify(choice).substring(0, 500) };
+  const content = msg.content;
+  if (typeof content === "string") return content;
+  if (typeof content === "object") return JSON.stringify(content);
+  return String(content);
 }
 
 module.exports = async function handler(req, res) {
@@ -33,7 +40,6 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // Auth
   const cookies = {};
   (req.headers.cookie || "").split(";").forEach(c => {
     const [k, ...v] = c.trim().split("=");
@@ -66,7 +72,7 @@ module.exports = async function handler(req, res) {
       (i+1) + ". [" + (iss.severity||"info") + "] " + (iss.id||"") + " - " + (iss.title||iss.message||"") + (iss.file?" (File: "+iss.file+")":"") + (iss.fix?" Fix hint: "+iss.fix:"")
     ).join("\n");
 
-    const sys = "You are a senior engineer. Given audit issues, generate code fixes. Return ONLY raw JSON, no markdown, no code fences. JSON format: {\"summary\":\"overview\",\"total_fixes\":number,\"fixes\":[{\"issue_id\":\"id\",\"file\":\"path\",\"original_snippet\":\"code\",\"fixed_snippet\":\"code\",\"explanation\":\"why\",\"new_files\":[]}]}";
+    const sys = "You are a senior engineer. Generate code fixes for the audit issues below. Respond with ONLY a raw JSON object, no markdown fences, no code blocks, no explanation. JSON:\n{\"summary\":\"overview\",\"total_fixes\":0,\"fixes\":[{\"issue_id\":\"\",\"file\":\"\",\"original_snippet\":\"\",\"fixed_snippet\":\"\",\"explanation\":\"\",\"new_files\":[]}]}";
     const user = "Project: " + (project_name||"Project") + "\n\nIssues:\n" + issuesSummary + "\n\n" + contextBlock;
 
     const text = await callMiMo(sys, user);
@@ -74,13 +80,12 @@ module.exports = async function handler(req, res) {
     if (typeof text === "object" && text.error) return res.status(500).json(text);
 
     let result;
-    text.replace(/^```(?:json)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "").trim();
-
-    try { result = JSON.parse(text); }
+    const clean = text.replace(/^```(?:json)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "").trim();
+    try { result = JSON.parse(clean); }
     catch {
-      const m = text.match(/\{[\s\S]*\}/);
+      const m = clean.match(/\{[\s\S]*\}/);
       if (m) try { result = JSON.parse(m[0]); } catch {}
-      if (!result) return res.status(500).json({ error: "Parse error", raw: text.substring(0, 500) });
+      if (!result) return res.status(500).json({ error: "Parse error", raw: clean.substring(0, 500) });
     }
 
     return res.status(200).json({ ...result, generated_at: new Date().toISOString() });

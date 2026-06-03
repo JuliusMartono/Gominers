@@ -33,7 +33,14 @@ async function callMiMo(systemPrompt, userPrompt) {
     return { error: "MiMo API " + r.status + ": " + err.substring(0, 300) };
   }
   const data = await r.json();
-  return data.choices[0].message.content;
+  const choice = data.choices && data.choices[0];
+  if (!choice) return { error: "No response from MiMo", raw: JSON.stringify(data).substring(0, 500) };
+  const msg = choice.message;
+  if (!msg) return { error: "No message in response", raw: JSON.stringify(choice).substring(0, 500) };
+  const content = msg.content;
+  if (typeof content === "string") return content;
+  if (typeof content === "object") return JSON.stringify(content);
+  return String(content);
 }
 
 function buildAuditPrompt(projectName, projectVersion, platforms, webScan) {
@@ -48,41 +55,9 @@ function buildAuditPrompt(projectName, projectVersion, platforms, webScan) {
     webBlock = "\n\n### WEBSITE SCAN: " + webScan.url + "\nStatus: " + webScan.status + "\nAnalysis: " + JSON.stringify(webScan.analysis) + "\nHTML preview: " + (webScan.html || "").substring(0, 5000);
   }
 
-  const sys = `You are a senior software engineer performing a comprehensive audit. Analyze the code and return a JSON object with this EXACT structure (no markdown, no code fences, just raw JSON):
+  const sys = "You are a senior software engineer. Analyze the code and respond with ONLY a JSON object, no markdown fences, no explanation. Raw JSON format:\n{\"overall_score\":0-100,\"cross_platform_score\":0-100,\"total_checks\":0,\"passed_checks\":0,\"failed_checks\":0,\"warning_checks\":0,\"category_scores\":{\"security\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"performance\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"code_quality\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"seo\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"accessibility\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"dependencies\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"auth\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"api_design\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"database\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"testing\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"build_deploy\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"mobile\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"documentation\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0}},\"platform_scores\":{\"web\":0-100,\"ios\":0-100,\"android\":0-100},\"issues\":[{\"id\":\"\",\"severity\":\"error|warning|info\",\"title\":\"\",\"message\":\"\",\"file\":\"\",\"category\":\"\",\"fix\":\"\"}],\"recommendations\":[\"\"],\"launch_readiness\":{\"ready\":true|false,\"blockers\":[\"\"],\"warnings\":[\"\"]},\"ai_analysis\":\"summary\",\"estimated_fix_hours\":\"X hours\"}\n\nPerform 100+ checkpoints across all categories. Be thorough and strict.";
 
-{
-  "overall_score": <0-100>,
-  "cross_platform_score": <0-100>,
-  "total_checks": <number>,
-  "passed_checks": <number>,
-  "failed_checks": <number>,
-  "warning_checks": <number>,
-  "category_scores": {
-    "security": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "performance": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "code_quality": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "seo": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "accessibility": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "dependencies": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "auth": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "api_design": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "database": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "testing": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "build_deploy": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "mobile": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>},
-    "documentation": {"score": <0-100>, "passed": <n>, "failed": <n>, "warning": <n>}
-  },
-  "platform_scores": {"web": <0-100>, "ios": <0-100>, "android": <0-100>},
-  "issues": [{"id": "SEC-01", "severity": "error"|"warning"|"info", "title": "", "message": "", "file": "", "category": "", "fix": ""}],
-  "recommendations": ["string"],
-  "launch_readiness": {"ready": bool, "blockers": ["string"], "warnings": ["string"]},
-  "ai_analysis": "summary text",
-  "estimated_fix_hours": "X hours"
-}
-
-Perform 100+ checkpoints across ALL categories. Be thorough.`;
-
-  const user = "Project: " + projectName + " v" + (projectVersion || "1.0.0") + "\n\n" + codeBlock + webBlock + "\n\nPerform full 100+ checkpoint audit and return JSON only.";
+  const user = "Project: " + projectName + " v" + (projectVersion || "1.0.0") + "\n\n" + codeBlock + webBlock;
 
   return { sys, user };
 }
@@ -112,11 +87,12 @@ module.exports = async function handler(req, res) {
     if (typeof text === "object" && text.error) return res.status(500).json(text);
 
     let result;
-    try { result = JSON.parse(text); }
+    const clean = text.replace(/^```(?:json)?\s*\n?/gm, "").replace(/\n?```\s*$/gm, "").trim();
+    try { result = JSON.parse(clean); }
     catch {
-      const m = text.match(/\{[\s\S]*\}/);
+      const m = clean.match(/\{[\s\S]*\}/);
       if (m) try { result = JSON.parse(m[0]); } catch {}
-      if (!result) return res.status(500).json({ error: "Parse error", raw: text.substring(0, 500) });
+      if (!result) return res.status(500).json({ error: "Parse error", raw: clean.substring(0, 500) });
     }
 
     result.id = Date.now().toString(36);
