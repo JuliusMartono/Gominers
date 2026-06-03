@@ -155,18 +155,13 @@ input,textarea{font-family:'Inter',sans-serif;outline:none}
 .fix-status{font-size:11px;padding:4px 8px;border-radius:6px;display:inline-block;font-weight:600;margin-left:auto}
 .fix-status.pending{background:var(--yellow-dim);color:var(--yellow)}
 .fix-status.applied{background:var(--accent-dim);color:var(--accent)}
-.fix-status.error{background:var(--red-dim);color:var(--red)}
 .fix-desc{font-size:12px;color:var(--text2);margin-bottom:10px}
 .diff-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;line-height:1.7;overflow-x:auto;margin-bottom:10px;max-height:200px;overflow-y:auto}
 .diff-del{color:var(--red);background:rgba(255,59,92,.06);display:block;padding:1px 4px;border-radius:2px}
 .diff-add{color:var(--accent);background:rgba(0,232,123,.06);display:block;padding:1px 4px;border-radius:2px}
-.apply-results{margin-top:12px}
-.apply-result-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;border-bottom:1px solid var(--border)}
-.apply-result-item:last-child{border-bottom:none}
 .pat-status{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:10px;font-weight:700;margin-top:4px}
 .pat-status.valid{background:var(--accent-dim);color:var(--accent)}
 .pat-status.invalid{background:var(--red-dim);color:var(--red)}
-.pat-status.nowrite{background:var(--yellow-dim);color:var(--yellow)}
 @media(max-width:700px){.form-row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(2,1fr)}.topbar-nav{display:none}.github-url-row,.github-pat-row,.web-input-row{flex-direction:column}.iss-row{grid-template-columns:10px 1fr}.iss-row .iss-cat,.iss-row .iss-type{display:none}}
 </style>
 </head>
@@ -227,22 +222,110 @@ input,textarea{font-family:'Inter',sans-serif;outline:none}
 </div>
 
 <script>
-const API="/api/ai-audit";let currentUser=null;let auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");let webScanData=null;let currentFixes=null;let currentAudit=null;
+const API="/api/ai-audit";
+let currentUser=null;
+let auditHistory=[];
+let webScanData=null;
+let currentFixes=null;
+let currentAudit=null;
+
+// Safe load from localStorage
+try{auditHistory=JSON.parse(localStorage.getItem("gm_audit_hist")||"[]");}catch(e){auditHistory=[];}
 
 function toggleTheme(){const h=document.documentElement,l=h.classList.toggle("light");localStorage.setItem("gm_theme",l?"light":"dark");document.querySelectorAll(".theme-toggle").forEach(t=>l?t.classList.add("light"):t.classList.remove("light"));}
 (function(){const s=localStorage.getItem("gm_theme");if(s==="light"){document.documentElement.classList.add("light");document.querySelectorAll(".theme-toggle").forEach(t=>t.classList.add("light"));}})();
 
-document.getElementById("authForm").onsubmit=async e=>{e.preventDefault();const b=document.getElementById("authBtn"),er=document.getElementById("authError");er.style.display="none";b.disabled=true;b.textContent="Verifying...";try{const r=await fetch(API+"/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.getElementById("authEmail").value,password:document.getElementById("authPass").value})});const d=await r.json();if(!r.ok){er.textContent=d.error;er.style.display="block";return;}currentUser=d.email;enterDashboard();}catch(x){er.textContent="Connection error";er.style.display="block";}finally{b.disabled=false;b.textContent="Sign In";}};
+// ===== SANITIZE for safe localStorage/JSON =====
+function sanitizeAudit(a){
+  return {
+    id:a.id||Date.now().toString(36),
+    name:String(a.name||"Unknown"),
+    ver:String(a.ver||""),
+    date:a.date||new Date().toISOString(),
+    score:Number(a.score)||0,
+    issues:Number(a.issues)||0,
+    plat:a.plat||{},
+    plats:a.plats||[],
+    analysis:String(a.analysis||"").substring(0,5000),
+    issues_list:Array.isArray(a.issues_list)?a.issues_list:[],
+    recommendations:Array.isArray(a.recommendations)?a.recommendations:[],
+    total_checks:Number(a.total_checks)||0,
+    passed:Number(a.passed)||0,
+    failed:Number(a.failed)||0,
+    warnings:Number(a.warnings)||0,
+    cross_score:Number(a.cross_score)||0,
+    estimated_fix:String(a.estimated_fix||""),
+    category_scores:a.category_scores||{},
+    launch_ready:!!a.launch_ready,
+    launch_blockers:Array.isArray(a.launch_blockers)?a.launch_blockers:[],
+    launch_warnings:Array.isArray(a.launch_warnings)?a.launch_warnings:[],
+    fixes_applied:Number(a.fixes_applied)||0,
+    fix_data:a.fix_data||null,
+    platInfo:Array.isArray(a.platInfo)?a.platInfo:[],
+    sourceCode:"", // Don't store sourceCode in localStorage (too big)
+    apply_results:a.apply_results||null
+  };
+}
+
+function saveHistory(){
+  try{
+    const clean=auditHistory.map(sanitizeAudit);
+    // Keep max 50 entries, max 4MB total
+    const trimmed=clean.slice(0,50);
+    const json=JSON.stringify(trimmed);
+    if(json.length>4000000){trimmed.pop();localStorage.setItem("gm_audit_hist",JSON.stringify(trimmed));}
+    else{localStorage.setItem("gm_audit_hist",json);}
+  }catch(e){console.warn("Failed to save history:",e);}
+}
+
+// ===== AUTH =====
+document.getElementById("authForm").onsubmit=async e=>{
+  e.preventDefault();
+  const b=document.getElementById("authBtn"),er=document.getElementById("authError");
+  er.style.display="none";b.disabled=true;b.textContent="Verifying...";
+  try{
+    const r=await fetch(API+"/auth",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:document.getElementById("authEmail").value,password:document.getElementById("authPass").value})});
+    const d=await r.json();
+    if(!r.ok){er.textContent=d.error;er.style.display="block";return;}
+    currentUser=d.email;enterDashboard();
+  }catch(x){er.textContent="Connection error";er.style.display="block";}
+  finally{b.disabled=false;b.textContent="Sign In";}
+};
+
 async function checkAuth(){try{const r=await fetch(API+"/auth");const d=await r.json();if(d.authenticated){currentUser=d.email;enterDashboard();}}catch{}}
-function enterDashboard(){document.getElementById("authPage").classList.add("hidden");document.getElementById("dashPage").classList.remove("hidden");document.querySelector(".topbar-avatar").textContent=(currentUser||"A").charAt(0).toUpperCase();const il=document.documentElement.classList.contains("light");document.querySelectorAll(".theme-toggle").forEach(t=>il?t.classList.add("light"):t.classList.remove("light"));renderDashboard();initPlatforms();}
-async function logout(){await fetch(API+"/auth",{method:"DELETE"});document.getElementById("dashPage").classList.add("hidden");document.getElementById("authPage").classList.remove("hidden");}
-function showTab(t){document.querySelectorAll("[id^='tab-']").forEach(x=>x.classList.add("hidden"));document.getElementById("tab-"+t).classList.remove("hidden");document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));document.querySelector(`.nav-btn[data-tab="${t}"]`)?.classList.add("active");if(t==="history")renderHistory();if(t==="dashboard")renderDashboard();}
 
-function renderDashboard(){const h=auditHistory,total=h.length,avg=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0,issues=h.reduce((a,b)=>a+b.issues,0),fixed=h.reduce((a,b)=>a+(b.fixes_applied||0),0);
-document.getElementById("dashStats").innerHTML=`<div class="stat g"><div class="stat-l">Audits</div><div class="stat-v" style="color:var(--accent)">${total}</div></div><div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:var(--blue)">${avg||"—"}%</div></div><div class="stat r"><div class="stat-l">Issues</div><div class="stat-v" style="color:var(--red)">${issues}</div></div><div class="stat y"><div class="stat-l">Fixed</div><div class="stat-v" style="color:var(--yellow)">${fixed}</div></div>`;
-if(!total){document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Audit & Auto-Fix Ready</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">Go to <strong>New Audit</strong>. For each platform, provide <strong>GitHub URL + Personal Access Token</strong>. The AI will audit 100+ checkpoints, generate code fixes, and apply them directly to your repos with your permission.</div></div>`;}}
+function enterDashboard(){
+  document.getElementById("authPage").classList.add("hidden");
+  document.getElementById("dashPage").classList.remove("hidden");
+  document.querySelector(".topbar-avatar").textContent=(currentUser||"A").charAt(0).toUpperCase();
+  const il=document.documentElement.classList.contains("light");
+  document.querySelectorAll(".theme-toggle").forEach(t=>il?t.classList.add("light"):t.classList.remove("light"));
+  renderDashboard();initPlatforms();
+}
 
-async function scanWebsite(){const url=document.getElementById("webUrl").value.trim();if(!url)return;const btn=document.getElementById("scanBtn"),st=document.getElementById("webStatus"),res=document.getElementById("webResult");btn.disabled=true;btn.textContent="Scanning...";st.textContent="Scanning...";st.className="web-status";st.style.display="block";res.style.display="none";
+async function logout(){
+  await fetch(API+"/auth",{method:"DELETE"});
+  document.getElementById("dashPage").classList.add("hidden");
+  document.getElementById("authPage").classList.remove("hidden");
+}
+
+function showTab(t){
+  document.querySelectorAll("[id^='tab-']").forEach(x=>x.classList.add("hidden"));
+  document.getElementById("tab-"+t).classList.remove("hidden");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.nav-btn[data-tab="${t}"]`)?.classList.add("active");
+  if(t==="history")renderHistory();
+  if(t==="dashboard")renderDashboard();
+}
+
+function renderDashboard(){
+  const h=auditHistory,total=h.length,avg=total?Math.round(h.reduce((a,b)=>a+b.score,0)/total):0,issues=h.reduce((a,b)=>a+b.issues,0),fixed=h.reduce((a,b)=>a+(b.fixes_applied||0),0);
+  document.getElementById("dashStats").innerHTML=`<div class="stat g"><div class="stat-l">Audits</div><div class="stat-v" style="color:var(--accent)">${total}</div></div><div class="stat b"><div class="stat-l">Avg Score</div><div class="stat-v" style="color:var(--blue)">${avg||"—"}%</div></div><div class="stat r"><div class="stat-l">Issues</div><div class="stat-v" style="color:var(--red)">${issues}</div></div><div class="stat y"><div class="stat-l">Fixed</div><div class="stat-v" style="color:var(--yellow)">${fixed}</div></div>`;
+  if(!total){document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Audit & Auto-Fix Ready</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">Go to <strong>New Audit</strong> to analyze your product with 100+ checkpoints.</div></div>`;}
+  else{const l=h[0];document.getElementById("dashAI").innerHTML=`<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">Latest: ${l.name} — ${l.score}%</div><div class="ai-sub">${l.launch_ready?"✅ Ready":"🚫 Blockers"}</div></div></div><div class="ai-body">${(l.analysis||"").substring(0,300)}...</div></div>`;}
+}
+
+async function scanWebsite(){const url=document.getElementById("webUrl").value.trim();if(!url)return;const btn=document.getElementById("scanBtn"),st=document.getElementById("webStatus"),res=document.getElementById("webResult");btn.disabled=true;btn.textContent="Scanning...";st.textContent="Scanning...";st.className="web-status";st.style.display="block";res.style.display="none;
 try{const r=await fetch(API+"/webscan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw new Error(d.error);webScanData=d;const a=d.analysis;
 res.innerHTML=`<div class="web-result-title">✅ ${d.url} (${d.status})</div><div class="web-result-grid"><div class="web-stat">HTTPS: <span>${a.hasHttps?"✅":"❌"}</span></div><div class="web-stat">CSP: <span>${a.hasCsp?"✅":"❌"}</span></div><div class="web-stat">HSTS: <span>${a.hasHsts?"✅":"❌"}</span></div><div class="web-stat">OG: <span>${a.hasOg?"✅":"❌"}</span></div><div class="web-stat">Schema: <span>${a.hasStructuredData?"✅":"❌"}</span></div><div class="web-stat">Scripts: <span>${a.scripts}</span></div></div>`;
 res.style.display="block";st.textContent="✓ Scanned";st.className="web-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="web-status err";}finally{btn.disabled=false;btn.textContent="🔍 Scan";}}
@@ -265,18 +348,16 @@ function initPlatforms(){document.getElementById("platformSlots").innerHTML=plat
     </div>
     <div class="input-panel active" id="panel-${p.key}-github">
       <div class="github-row">
-        <div><label class="form-label">GitHub Repository URL</label>
-        <div class="github-url-row"><input class="form-input" id="repo-${p.key}" placeholder="https://github.com/username/repo" oninput="platforms[${i}].repoUrl=this.value"></div></div>
-        <div><label class="form-label">🔐 GitHub Personal Access Token (required for read + apply fix)</label>
-        <div class="github-pat-row"><input class="form-input" id="pat-${p.key}" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="platforms[${i}].githubPat=this.value;platforms[${i}].patValid=null;updatePatStatus(${i})"><button class="btn-validate" id="valbtn-${p.key}" onclick="validatePAT(${i})">🔐 Validate</button></div></div>
+        <div><label class="form-label">GitHub Repository URL</label><div class="github-url-row"><input class="form-input" id="repo-${p.key}" placeholder="https://github.com/username/repo" oninput="platforms[${i}].repoUrl=this.value"></div></div>
+        <div><label class="form-label">🔐 GitHub Personal Access Token</label><div class="github-pat-row"><input class="form-input" id="pat-${p.key}" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="platforms[${i}].githubPat=this.value;platforms[${i}].patValid=null;updatePatStatus(${i})"><button class="btn-validate" id="valbtn-${p.key}" onclick="validatePAT(${i})">🔐 Validate</button></div></div>
         <div id="pat-status-${p.key}"></div>
-        <div><button class="btn-fetch" id="fetch-${p.key}" onclick="fetchRepo(${i})">📥 Fetch Code from GitHub</button></div>
+        <div><button class="btn-fetch" id="fetch-${p.key}" onclick="fetchRepo(${i})">📥 Fetch Code</button></div>
         <div class="fetch-status" id="status-${p.key}"></div>
       </div>
     </div>
     <div class="input-panel" id="panel-${p.key}-folder">
-      <label class="form-label">Select Local Project Folder (Chrome/Edge)</label>
-      <div style="display:flex;gap:8px;align-items:center"><button class="btn-browse" onclick="browseFolder(${i})">📁 Browse Folder</button><span id="folder-name-${p.key}" style="font-size:12px;color:var(--text3)">No folder selected</span></div>
+      <label class="form-label">Select Local Folder (Chrome/Edge)</label>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn-browse" onclick="browseFolder(${i})">📁 Browse</button><span id="folder-name-${p.key}" style="font-size:12px;color:var(--text3)">No folder selected</span></div>
       <div class="fetch-status" id="folder-status-${p.key}"></div>
     </div>
     <div class="input-panel" id="panel-${p.key}-upload">
@@ -298,148 +379,69 @@ function initPlatforms(){document.getElementById("platformSlots").innerHTML=plat
 function togglePlat(i){platforms[i].enabled=!platforms[i].enabled;document.getElementById("slot-"+platforms[i].key).classList.toggle("active");document.getElementById("tog-"+platforms[i].key).classList.toggle("on");}
 function setInputMode(i,mode){const p=platforms[i];p.inputMode=mode;const slot=document.getElementById("slot-"+p.key);slot.querySelectorAll(".input-tab").forEach(t=>t.classList.remove("active"));slot.querySelectorAll(".input-panel").forEach(t=>t.classList.remove("active"));const modes=["github","folder","upload","paste"];const tabs=slot.querySelectorAll(".input-tab");tabs[modes.indexOf(mode)]?.classList.add("active");document.getElementById("panel-"+p.key+"-"+mode)?.classList.add("active");}
 
-// ===== PAT VALIDATION =====
-function updatePatStatus(i){const p=platforms[i],el=document.getElementById("pat-status-"+p.key);if(p.patValid===null){el.style.display="none";return;}
-el.style.display="flex";if(p.patValid===true){el.className="pat-status valid";el.innerHTML=`✅ Validated as <strong>${p.patInfo.username}</strong> — ${p.patInfo.can_write?"read/write access":"read-only (fix won't be applied)"}`;}
-else{el.className="pat-status invalid";el.innerHTML=`❌ ${p.patInfo?.error||"Invalid token"}`;}}
+function updatePatStatus(i){const p=platforms[i],el=document.getElementById("pat-status-"+p.key);if(p.patValid===null){el.style.display="none";return;}el.style.display="flex";if(p.patValid===true){el.className="pat-status valid";el.innerHTML="✅ Validated as <strong>"+p.patInfo.username+"</strong> — "+(p.patInfo.can_write?"Read/Write":"Read-Only");}else{el.className="pat-status invalid";el.innerHTML="❌ "+(p.patInfo?.error||"Invalid token");}}
 
-async function validatePAT(i){const p=platforms[i],btn=document.getElementById("valbtn-"+p.key),url=p.repoUrl.trim(),pat=p.githubPat.trim();
-if(!url||!url.includes("github.com")){p.patValid=false;p.patInfo={error:"Enter a valid GitHub repo URL first"};updatePatStatus(i);return;}
-if(!pat){p.patValid=false;p.patInfo={error:"Enter your GitHub Personal Access Token"};updatePatStatus(i);return;}
-btn.disabled=true;btn.textContent="Validating...";
-try{const r=await fetch(API+"/validate-token",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url,github_token:pat})});const d=await r.json();
-if(d.valid){p.patValid=true;p.patInfo=d;}else{p.patValid=false;p.patInfo=d;}
-}catch(e){p.patValid=false;p.patInfo={error:e.message};}
-finally{btn.disabled=false;btn.textContent="🔐 Validate";updatePatStatus(i);}}
+async function validatePAT(i){const p=platforms[i],btn=document.getElementById("valbtn-"+p.key),url=p.repoUrl.trim(),pat=p.githubPat.trim();if(!url||!url.includes("github.com")){p.patValid=false;p.patInfo={error:"Enter a valid repo URL first"};updatePatStatus(i);return;}if(!pat){p.patValid=false;p.patInfo={error:"Enter your GitHub PAT"};updatePatStatus(i);return;}btn.disabled=true;btn.textContent="Validating...";try{const r=await fetch(API+"/validate-token",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url,github_token:pat})});const d=await r.json();if(d.valid){p.patValid=true;p.patInfo=d;}else{p.patValid=false;p.patInfo=d;}}catch(e){p.patValid=false;p.patInfo={error:e.message};}finally{btn.disabled=false;btn.textContent="🔐 Validate";updatePatStatus(i);}}
 
-async function fetchRepo(i){const p=platforms[i],btn=document.getElementById("fetch-"+p.key),st=document.getElementById("status-"+p.key),url=p.repoUrl.trim();if(!url||!url.includes("github.com")){st.textContent="Enter a valid GitHub URL";st.className="fetch-status err";st.style.display="block";return;}
-btn.disabled=true;btn.textContent="Fetching...";st.textContent="Connecting...";st.className="fetch-status";st.style.display="block";
-try{const r=await fetch(API+"/github",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url,github_token:p.githubPat||undefined})});const d=await r.json();if(!r.ok)throw new Error(d.error);p.code=d.code;p.repo=d.repo;st.innerHTML="✓ <strong>"+d.filesCount+"</strong> files from <strong>"+d.repo+"</strong>";st.className="fetch-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="fetch-status err";}finally{btn.disabled=false;btn.textContent="📥 Fetch Code";}}
+async function fetchRepo(i){const p=platforms[i],btn=document.getElementById("fetch-"+p.key),st=document.getElementById("status-"+p.key),url=p.repoUrl.trim();if(!url||!url.includes("github.com")){st.textContent="Enter a valid GitHub URL";st.className="fetch-status err";st.style.display="block";return;}btn.disabled=true;btn.textContent="Fetching...";st.textContent="Connecting...";st.className="fetch-status";st.style.display="block";try{const r=await fetch(API+"/github",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:url,github_token:p.githubPat||undefined})});const d=await r.json();if(!r.ok)throw new Error(d.error);p.code=d.code;p.repo=d.repo;st.innerHTML="✓ <strong>"+d.filesCount+"</strong> files from <strong>"+d.repo+"</strong>";st.className="fetch-status ok";}catch(e){st.textContent="✗ "+e.message;st.className="fetch-status err";}finally{btn.disabled=false;btn.textContent="📥 Fetch Code";}}
 
-async function browseFolder(i){if(!window.showDirectoryPicker){alert("Folder picker requires Chrome or Edge. Use GitHub URL or Upload instead.");return;}
-const p=platforms[i];try{const dir=await window.showDirectoryPicker({mode:"readwrite"});document.getElementById("folder-name-"+p.key).textContent="📁 "+dir.name;const st=document.getElementById("folder-status-"+p.key);st.textContent="Reading...";st.className="fetch-status";st.style.display="block";
-let code="",count=0;const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];
-async function rd(handle,path=""){for await(const entry of handle.values()){if(entry.kind==="file"){if(exts.some(e=>entry.name.endsWith(e))&&!entry.name.includes("node_modules")){try{const file=await entry.getFile();const text=await file.text();if(text.length<40000){code+="=== "+(path?path+"/":"")+entry.name+" ===\n"+text+"\n\n";count++;}}catch{}}}
-else if(entry.kind==="directory"&&!["node_modules",".git","build","dist",".next",".vercel","__pycache__",".gradle","Pods","vendor",".output",".expo"].includes(entry.name)){await rd(entry,(path?path+"/":"")+entry.name);}}}
-await rd(dir);p.code=code;p.dirHandle=dir;p.inputMode="folder";st.innerHTML="✓ <strong>"+count+"</strong> files";st.className="fetch-status ok";}catch(e){if(e.name!=="AbortError")alert("Error: "+e.message);}}
+async function browseFolder(i){if(!window.showDirectoryPicker){alert("Folder picker requires Chrome or Edge. Use GitHub URL or Upload instead.");return;}const p=platforms[i];try{const dir=await window.showDirectoryPicker({mode:"readwrite"});document.getElementById("folder-name-"+p.key).textContent="📁 "+dir.name;const st=document.getElementById("folder-status-"+p.key);st.textContent="Reading...";st.className="fetch-status";st.style.display="block";let code="",count=0;const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];async function rd(handle,path){path=path||"";for await(const entry of handle.values()){if(entry.kind==="file"){if(exts.some(e=>entry.name.endsWith(e))&&!entry.name.includes("node_modules")){try{const file=await entry.getFile();const text=await file.text();if(text.length<40000){code+="=== "+(path?path+"/":"")+entry.name+" ===\n"+text+"\n\n";count++;}}catch{}}}else if(entry.kind==="directory"&&!["node_modules",".git","build","dist",".next",".vercel","__pycache__",".gradle","Pods","vendor",".output",".expo"].includes(entry.name)){await rd(entry,(path?path+"/":"")+entry.name);}}}await rd(dir);p.code=code;p.dirHandle=dir;p.inputMode="folder";st.innerHTML="✓ <strong>"+count+"</strong> files";st.className="fetch-status ok";}catch(e){if(e.name!=="AbortError")alert("Error: "+e.message);}}
 
 function handleFiles(e,i){processFiles(e.target.files,i);}
 function handleDrop(e,i){e.preventDefault();e.target.closest(".drop-zone").classList.remove("drag");processFiles(e.dataTransfer.files,i);}
-async function processFiles(files,i){const p=platforms[i];const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];let code="",count=0,fileNames=[];
-for(const file of files){if(file.name.endsWith(".zip")||file.name.endsWith(".aab")||file.name.endsWith(".apk")){fileNames.push(file.name+" (binary noted)");continue;}
-if(exts.some(e=>file.name.endsWith(e))){try{const text=await file.text();if(text.length<40000){code+="=== "+file.name+" ===\n"+text+"\n\n";count++;fileNames.push(file.name);}}catch{}}}
-if(code)p.code+=(p.code?"\n":"")+code;const el=document.getElementById("uploaded-"+p.key);el.style.display="block";el.innerHTML=fileNames.map(f=>`<div class="uploaded-file"><span class="uf-name">📄 ${f}</span></div>`).join("")+`<div style="font-size:11px;color:var(--accent);margin-top:6px">✓ ${count} files loaded</div>`;}
+async function processFiles(files,i){const p=platforms[i];const exts=[".js",".jsx",".ts",".tsx",".vue",".kt",".java",".swift",".dart",".json",".xml",".gradle",".yaml",".yml",".css",".scss",".html"];let code="",count=0,fileNames=[];for(const file of files){if(file.name.endsWith(".zip")||file.name.endsWith(".aab")||file.name.endsWith(".apk")){fileNames.push(file.name+" (binary noted)");continue;}if(exts.some(e=>file.name.endsWith(e))){try{const text=await file.text();if(text.length<40000){code+="=== "+file.name+" ===\n"+text+"\n\n";count++;fileNames.push(file.name);}}catch{}}}if(code)p.code+=(p.code?"\n":"")+code;const el=document.getElementById("uploaded-"+p.key);el.style.display="block";el.innerHTML=fileNames.map(f=>`<div class="uploaded-file"><span class="uf-name">📄 ${f}</span></div>`).join("")+`<div style="font-size:11px;color:var(--accent);margin-top:6px">✓ ${count} files loaded</div>`;}
 
-// ===== AUDIT =====
-async function runAudit(){const name=document.getElementById("projName").value.trim(),ver=document.getElementById("projVer").value.trim(),err=document.getElementById("newError"),btn=document.getElementById("runBtn"),st=document.getElementById("analyzingEl");err.style.display="none";
-if(!name){err.textContent="Project name required";err.style.display="block";return;}
-const active=platforms.filter(p=>p.enabled&&(p.code.trim().length>20||p.repoUrl.includes("github.com")));
-if(!active.length&&!webScanData){err.textContent="Provide source code or scan a URL";err.style.display="block";return;}
-btn.disabled=true;btn.textContent="Auditing...";st.classList.add("show");
-try{const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,filesCount:0,totalFiles:0,repo:p.repo||""})),webScan:webScanData?{url:webScanData.url,status:webScanData.status,analysis:webScanData.analysis,html:(webScanData.html||"").substring(0,80000)}:null})});
-if(!r.ok){const d=await r.json();throw new Error(d.error||"Failed");}
-const d=await r.json();
-const platInfo=active.map(p=>({key:p.key,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,repo:p.repo||""}));
-const entry={id:d.id,name:name,ver:ver,date:new Date().toISOString(),score:d.overall_score||0,issues:d.failed_checks||0,plat:d.platform_scores||{},plats:active.map(p=>p.key),analysis:d.ai_analysis||"",issues_list:d.issues||[],recommendations:d.recommendations||[],total_checks:d.total_checks||0,passed:d.passed_checks||0,failed:d.failed_checks||0,warnings:d.warning_checks||0,cross_score:d.cross_platform_score||0,estimated_fix:d.estimated_fix_hours||"",category_scores:d.category_scores||{},launch_ready:d.launch_readiness?.ready||false,launch_blockers:d.launch_readiness?.blockers||[],launch_warnings:d.launch_readiness?.warnings||[],sourceCode:active.map(p=>p.code).join("\n"),platInfo:platInfo,fixes_applied:0,fix_data:null};
-auditHistory.unshift(entry);localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));currentFixes=null;showResult(entry);
-}catch(e){err.textContent=e.message;err.style.display="block";}finally{btn.disabled=false;btn.textContent="🧠 Run Full Audit & Fix";st.classList.remove("show");}}
+async function runAudit(){const name=document.getElementById("projName").value.trim(),ver=document.getElementById("projVer").value.trim(),err=document.getElementById("newError"),btn=document.getElementById("runBtn"),st=document.getElementById("analyzingEl");err.style.display="none";if(!name){err.textContent="Project name required";err.style.display="block";return;}const active=platforms.filter(p=>p.enabled&&(p.code.trim().length>20||p.repoUrl.includes("github.com")));if(!active.length&&!webScanData){err.textContent="Provide source code or scan a URL";err.style.display="block";return;}btn.disabled=true;btn.textContent="Auditing...";st.classList.add("show");try{const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:name,project_version:ver,platforms:active.map(p=>({platform:p.key,name:p.label,code:p.code,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,filesCount:0,totalFiles:0,repo:p.repo||""})),webScan:webScanData?{url:webScanData.url,status:webScanData.status,analysis:webScanData.analysis,html:(webScanData.html||"").substring(0,80000)}:null})});if(!r.ok){const d=await r.json();throw new Error(d.error||"Failed");}const d=await r.json();const platInfo=active.map(p=>({key:p.key,repoUrl:p.repoUrl,githubPat:p.githubPat,patValid:p.patValid,patInfo:p.patInfo,repo:p.repo||""}));const entry={id:d.id,name:name,ver:ver,date:new Date().toISOString(),score:d.overall_score||0,issues:d.failed_checks||0,plat:d.platform_scores||{},plats:active.map(p=>p.key),analysis:d.ai_analysis||"",issues_list:d.issues||[],recommendations:d.recommendations||[],total_checks:d.total_checks||0,passed:d.passed_checks||0,failed:d.failed_checks||0,warnings:d.warning_checks||0,cross_score:d.cross_platform_score||0,estimated_fix:d.estimated_fix_hours||"",category_scores:d.category_scores||{},launch_ready:d.launch_readiness?.ready||false,launch_blockers:d.launch_readiness?.blockers||[],launch_warnings:d.launch_readiness?.warnings||[],sourceCode:"",platInfo:platInfo,fixes_applied:0,fix_data:null};auditHistory.unshift(sanitizeAudit(entry));saveHistory();currentFixes=null;showResult(entry);}catch(e){err.textContent=e.message;err.style.display="block";}finally{btn.disabled=false;btn.textContent="🧠 Run Full Audit & Fix";st.classList.remove("show");}}
 
-// ===== FIX =====
-async function generateFixes(audit){const btn=document.getElementById("fixBtn"),st=document.getElementById("fixStatus");btn.disabled=true;btn.textContent="Generating fixes...";st.style.display="flex";
-try{const r=await fetch(API+"/fix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:audit.name,issues:audit.issues_list,sourceCode:audit.sourceCode||""})});
-if(!r.ok){const d=await r.json();throw new Error(d.error);}const d=await r.json();currentFixes=d;audit.fix_data=d;audit.fixes_applied=d.total_fixes||0;
-const idx=auditHistory.findIndex(a=>a.id===audit.id);if(idx>=0){auditHistory[idx]=audit;localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));}
-showResult(audit);}catch(e){alert("Fix error: "+e.message);}finally{btn.disabled=false;btn.textContent="🔧 Generate Fixes";st.style.display="none";}}
+async function generateFixes(audit){const btn=document.getElementById("fixBtn"),st=document.getElementById("fixStatus");btn.disabled=true;btn.textContent="Generating fixes...";st.style.display="flex";try{const r=await fetch(API+"/fix",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project_name:audit.name,issues:audit.issues_list,sourceCode:audit.sourceCode||""})});if(!r.ok){const d=await r.json();throw new Error(d.error);}const d=await r.json();currentFixes=d;audit.fix_data=d;audit.fixes_applied=d.total_fixes||0;const idx=auditHistory.findIndex(a=>a.id===audit.id);if(idx>=0){auditHistory[idx]=sanitizeAudit(audit);saveHistory();}showResult(audit);}catch(e){alert("Fix error: "+e.message);}finally{btn.disabled=false;btn.textContent="🔧 Generate Fixes";st.style.display="none";}}
 
-// ===== APPLY FIXES (per-platform with their own PAT) =====
-async function applyFixes(audit){const platformsToApply=(audit.platInfo||[]).filter(p=>p.repoUrl&&p.githubPat&&p.patValid);
-if(!platformsToApply.length){alert("No validated GitHub repos with tokens found. Validate a GitHub token for at least one platform.");return;}
-if(!currentFixes?.fixes?.length){alert("Generate fixes first.");return;}
+async function applyFixes(audit){const platformsToApply=(audit.platInfo||[]).filter(p=>p.repoUrl&&p.githubPat&&p.patValid);if(!platformsToApply.length){alert("No validated GitHub repos. Validate a token first.");return;}if(!currentFixes?.fixes?.length){alert("Generate fixes first.");return;}const applyBtn=document.getElementById("applyBtn");applyBtn.disabled=true;applyBtn.textContent="Applying...";const allResults=[];for(const plat of platformsToApply){try{const r=await fetch(API+"/apply",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes,branch:plat.patInfo?.default_branch||"main"})});const d=await r.json();if(r.ok){allResults.push({platform:plat.key,repo:plat.repo,status:"success",summary:d.summary,results:d.results||[],commit_url:d.commit_url});}else{allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:d.error});}}catch(e){allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:e.message});}}const el=document.getElementById("applyResults");el.style.display="block";el.innerHTML=allResults.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:13px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:12px;color:${r.status==="success"?"var(--accent)":"var(--red)"}">${r.summary||r.error||""}</div>${r.commit_url?`<div style="font-size:11px;margin-top:4px"><a href="${r.commit_url}" target="_blank" style="color:var(--blue)">${r.commit_url}</a></div>`:""}</div>`).join("");audit.fixes_applied=allResults.reduce((a,r)=>a+(r.results?.filter(x=>x.status!=="error").length||0),0);audit.apply_results=allResults;const idx=auditHistory.findIndex(a=>a.id===audit.id);if(idx>=0){auditHistory[idx]=sanitizeAudit(audit);saveHistory();}applyBtn.disabled=false;applyBtn.textContent="🚀 Apply All Fixes";}
 
-const applyBtn=document.getElementById("applyBtn");applyBtn.disabled=true;applyBtn.textContent="Applying...";
+// ===== SHOW RESULT =====
+function showResult(a){
+  currentAudit=a;const sc=s=>s>=80?"var(--accent)":s>=60?"var(--yellow)":"var(--red)";
+  const catHtml=Object.entries(a.category_scores||{}).map(([k,v])=>{const labels={security:"🔒 Security",cross_platform:"🔗 Cross-Platform",performance:"⚡ Performance",seo:"🔍 SEO",accessibility:"♿ Accessibility",code_quality:"📝 Code Quality",dependencies:"📦 Dependencies",api_design:"🔌 API Design",auth:"🔐 Auth",database:"🗄️ Database",testing:"🧪 Testing",build_deploy:"🚀 Build & Deploy",mobile:"📱 Mobile",pwa:"📲 PWA",i18n:"🌍 i18n",monitoring:"📊 Monitoring",documentation:"📚 Documentation",state_management:"🗃️ State Mgmt"};return`<div class="cat-card"><div class="cat-name">${labels[k]||k}</div><div class="cat-score" style="color:${sc(v.score)}">${v.score}%</div><div class="cat-bar"><div class="cat-fill" style="width:${v.score}%;background:${sc(v.score)}"></div></div><div class="cat-detail">${v.passed||0}✓ ${v.failed||0}✗ ${v.warning||0}⚠</div></div>`;}).join("");
 
-const allResults=[];
-for(const plat of platformsToApply){
-  try{
-    const r=await fetch(API+"/apply",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes.filter(f=>{const p=f.file||"";return true;}),branch:plat.patInfo?.default_branch||"main"})});
-    const d=await r.json();
-    if(r.ok){allResults.push({platform:plat.key,repo:plat.repo,status:"success",summary:d.summary,results:d.results||[],commit_url:d.commit_url});}
-    else{allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:d.error});}
-  }catch(e){allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:e.message});}
+  const issHtml=(a.issues_list||[]).map(i=>{const sev=i.severity==="error"?"e":i.severity==="warning"?"w":"i";return`<div class="iss-row" onclick="this.nextElementSibling.classList.toggle('open')"><div class="sev ${sev}"></div><div style="font-size:9px;font-weight:700;color:var(--text3)">${i.id||""}</div><div style="font-size:11px;color:var(--text)">${i.title||i.message||""}</div><div style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3)">${i.category||i.type||""}</div></div><div class="issue-detail"><div class="issue-msg">${i.message||""}</div>${i.file?`<div class="issue-file">📄 ${i.file}</div>`:""}${i.fix?`<div class="issue-fix"><strong>Fix:</strong> ${i.fix}</div>`:""}</div>`;}).join("");
+
+  const platStatusHtml=(a.platInfo||[]).map(p=>{if(!p.repoUrl)return"";const icon=p.patValid===true?"✅":p.patValid===false?"❌":"⚠️";const status=p.patValid===true?"Validated — "+(p.patInfo?.can_write?"Read/Write":"Read-Only"):p.patValid===false?"Token invalid":"No token";return`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px;font-size:11px"><span>${p.key==="web"?"🌐":p.key==="ios"?"🍎":"🤖"}</span><span style="flex:1;font-family:'JetBrains Mono',monospace;color:var(--text)">${p.repo||p.repoUrl}</span><span style="color:${p.patValid===true?"var(--accent)":p.patValid===false?"var(--red)":"var(--yellow)"}">${icon} ${status}</span></div>`;}).join("");
+
+  let fixHtml=`<div class="fix-section"><div class="fix-head"><div class="fix-icon">🔧</div><div class="fix-title">Auto-Fix Engine</div><button class="btn-fix btn-generate" id="fixBtn" onclick="generateFixes(currentAudit)">🔧 Generate Fixes</button>${a.platInfo?.some(p=>p.patValid)?`<button class="btn-fix btn-apply" id="applyBtn" onclick="applyFixes(currentAudit)">🚀 Apply All Fixes</button>`:""}</div><div id="fixStatus" class="analyzing" style="display:none"><div class="spinner-sm"></div><span>AI generating code fixes... (20-60s)</span></div><div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Repository Access</div>${platStatusHtml||"<div style='font-size:11px;color:var(--text3)'>No repos configured</div>"}</div>`;
+
+  if(a.fix_data?.fixes?.length){fixHtml+=`<div style="font-size:12px;color:var(--accent);margin-bottom:10px">✅ ${a.fix_data.total_fixes} fixes generated</div>`;a.fix_data.fixes.forEach(f=>{fixHtml+=`<div class="fix-card"><div class="fix-card-head"><span class="fix-issue-id">${f.issue_id||""}</span><span class="fix-file">${f.file||""}</span><span class="fix-status pending">Ready</span></div><div class="fix-desc">${f.explanation||""}</div>${f.original_snippet?`<div class="diff-block">${(f.original_snippet||"").split("\n").map(l=>`<span class="diff-del">- ${l}</span>`).join("")}</div>`:""}${f.fixed_snippet?`<div class="diff-block">${(f.fixed_snippet||"").split("\n").map(l=>`<span class="diff-add">+ ${l}</span>`).join("")}</div>`:""}</div>`;});}else if(a.issues_list?.length){fixHtml+=`<div style="font-size:12px;color:var(--text2);padding:12px 0">Click <strong>🔧 Generate Fixes</strong> for ${a.issues_list.length} issues.</div>`;}
+  fixHtml+=`</div>`;
+
+  let applyHtml="";
+  if(a.apply_results?.length){applyHtml=`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🚀 Applied Fixes</div>`+a.apply_results.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:12px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:11px;color:var(--text2)">${r.summary||r.error||""}</div></div>`).join("");}
+
+  const launchHtml=a.launch_ready!==undefined?`<div class="launch-box"><div class="launch-head"><div class="launch-icon">${a.launch_ready?"🚀":"🚫"}</div><div class="launch-title">${a.launch_ready?"Ready for Launch":"Launch Blockers Found"}</div><div class="launch-badge ${a.launch_ready?"ready":"not"}">${a.launch_ready?"PASS":"BLOCKED"}</div></div>${(a.launch_blockers||[]).length?`<ul class="launch-list">${a.launch_blockers.map(b=>`<li>🚫 ${b}</li>`).join("")}</ul>`:""}${(a.launch_warnings||[]).length?`<ul class="launch-list">${a.launch_warnings.map(w=>`<li>⚠️ ${w}</li>`).join("")}</ul>`:""}</div>`:"";
+
+  document.getElementById("resultContent").innerHTML=`
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button onclick="showTab('dashboard')" style="font-size:12px;color:var(--text2);background:none;border:none">← Back</button><span style="font-size:18px;font-weight:900;color:var(--text)">${a.name}</span><span style="font-size:12px;color:var(--text3)">${a.ver||""}</span>${a.fixes_applied?`<span style="font-size:11px;color:var(--accent);font-weight:700">🔧 ${a.fixes_applied} fixed</span>`:""}</div>
+  ${launchHtml}
+  <div class="stats"><div class="stat g"><div class="stat-l">Overall</div><div class="stat-v" style="color:${sc(a.score)}">${a.score}%</div></div><div class="stat b"><div class="stat-l">Cross-Platform</div><div class="stat-v" style="color:${sc(a.cross_score)}">${a.cross_score}%</div></div><div class="stat"><div class="stat-l">Checks</div><div class="stat-v">${a.passed||0}/${a.total_checks||0}</div></div><div class="stat r"><div class="stat-l">Errors</div><div class="stat-v" style="color:var(--red)">${a.failed||0}</div></div><div class="stat y"><div class="stat-l">Warnings</div><div class="stat-v" style="color:var(--yellow)">${a.warnings||0}</div></div></div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">📊 Category Scores</div><div class="cat-grid">${catHtml}</div>
+  ${fixHtml}${applyHtml}
+  ${Object.keys(a.plat||{}).length?`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🔗 Platform Scores</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px">${Object.entries(a.plat).map(([p,s])=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center"><div style="font-size:22px;margin-bottom:6px">${p==="web"?"🌐":p==="ios"?"🍎":"🤖"}</div><div style="font-weight:700;font-size:12px;text-transform:capitalize">${p}</div><div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:${sc(s)}">${s}</div><div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:${s}%;height:100%;background:${sc(s)};border-radius:2px"></div></div></div>`).join("")}</div>`:""}
+  ${issHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">🐛 Issues (${a.issues_list.length})</div><div class="iss-wrap"><div class="iss-top">Click to expand</div>${issHtml}</div>`:""}
+  <div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">AI Summary</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">${(a.analysis||"").replace(/\n/g,"<br>")}</div></div>
+  ${(a.recommendations||[]).length?`<div class="recs"><h3>💡 Recommendations</h3><ol>${a.recommendations.map(r=>`<li>${r}</li>`).join("")}</ol></div>`:""}`;
+  showTab("result");
 }
 
-const el=document.getElementById("applyResults");el.style.display="block";
-el.innerHTML=allResults.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:14px">${r.status==="success"?"✅":"❌"}</span><span style="font-weight:700;font-size:13px;color:var(--text)">${r.platform.toUpperCase()} — ${r.repo}</span></div>
-  ${r.summary?`<div style="font-size:12px;color:var(--accent)">${r.summary}</div>`:""}
-  ${r.error?`<div style="font-size:12px;color:var(--red)">${r.error}</div>`:""}
-  ${r.commit_url?`<div style="font-size:11px;margin-top:4px"><a href="${r.commit_url}" target="_blank" style="color:var(--blue)">${r.commit_url}</a></div>`:""}
-  ${(r.results||[]).map(x=>`<div style="font-size:10px;color:var(--text3);padding:2px 0">${x.status==="error"?"✗":"✓"} ${x.file} (${x.status})</div>`).join("")}
-</div>`).join("");
-
-audit.fixes_applied=allResults.reduce((a,r)=>a+(r.results?.filter(x=>x.status!=="error").length||0),0);
-const idx=auditHistory.findIndex(a=>a.id===audit.id);if(idx>=0){auditHistory[idx]=audit;localStorage.setItem("gm_audit_hist",JSON.stringify(auditHistory));}
-
-applyBtn.disabled=false;applyBtn.textContent="🚀 Apply All Fixes";}
-
-// ===== RESULT =====
-function showResult(a){currentAudit=a;const sc=s=>s>=80?"var(--accent)":s>=60?"var(--yellow)":"var(--red)";
-const catHtml=Object.entries(a.category_scores||{}).map(([k,v])=>{const labels={security:"🔒 Security",cross_platform:"🔗 Cross-Platform",performance:"⚡ Performance",seo:"🔍 SEO",accessibility:"♿ Accessibility",code_quality:"📝 Code Quality",dependencies:"📦 Dependencies",api_design:"🔌 API Design",auth:"🔐 Auth",database:"🗄️ Database",testing:"🧪 Testing",build_deploy:"🚀 Build & Deploy",mobile:"📱 Mobile",pwa:"📲 PWA",i18n:"🌍 i18n",monitoring:"📊 Monitoring",documentation:"📚 Documentation",state_management:"🗃️ State Mgmt"};
-return`<div class="cat-card"><div class="cat-name">${labels[k]||k}</div><div class="cat-score" style="color:${sc(v.score)}">${v.score}%</div><div class="cat-bar"><div class="cat-fill" style="width:${v.score}%;background:${sc(v.score)}"></div></div><div class="cat-detail">${v.passed}✓ ${v.failed}✗ ${v.warning}⚠</div></div>`;}).join("");
-
-const issHtml=(a.issues_list||[]).map(i=>{const sev=i.severity==="error"?"e":i.severity==="warning"?"w":"i";
-return`<div class="iss-row" onclick="this.nextElementSibling.classList.toggle('open')"><div class="sev ${sev}"></div><div class="iss-cat" style="font-size:9px;font-weight:700;color:var(--text3)">${i.id||""}</div><div style="font-size:11px;color:var(--text)">${i.title||i.message||""}</div><div class="iss-type" style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text3)">${i.category||i.type||""}</div></div>
-<div class="issue-detail"><div class="issue-msg">${i.message||""}</div>${i.file?`<div class="issue-file">📄 ${i.file}</div>`:""}${i.fix?`<div class="issue-fix"><strong>Fix:</strong> ${i.fix}</div>`:""}</div>`;}).join("");
-
-// Fix section with per-platform status
-const platStatusHtml=(a.platInfo||[]).map(p=>{
-  if(!p.repoUrl)return "";
-  const icon=p.patValid===true?"✅":p.patValid===false?"❌":"⚠️";
-  const status=p.patValid===true?`Validated — ${p.patInfo?.can_write?"Read/Write":"Read-Only"}`:p.patValid===false?"Token not validated":"Token not provided";
-  return`<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:4px;font-size:11px"><span>${p.key==="web"?"🌐":p.key==="ios"?"🍎":"🤖"}</span><span style="flex:1;font-family:'JetBrains Mono',monospace;color:var(--text)">${p.repo||p.repoUrl}</span><span style="color:${p.patValid===true?"var(--accent)":p.patValid===false?"var(--red)":"var(--yellow)"}">${icon} ${status}</span></div>`;
-}).join("");
-
-let fixHtml=`<div class="fix-section"><div class="fix-head"><div class="fix-icon">🔧</div><div class="fix-title">Auto-Fix Engine</div>
-<button class="btn-fix btn-generate" id="fixBtn" onclick="generateFixes(currentAudit)">🔧 Generate Fixes</button>
-${a.platInfo?.some(p=>p.patValid)?`<button class="btn-fix btn-apply" id="applyBtn" onclick="applyFixes(currentAudit)">🚀 Apply All Fixes</button>`:""}</div>
-<div id="fixStatus" class="analyzing" style="display:none"><div class="spinner-sm"></div><span>AI generating code fixes... (20-60s)</span></div>
-<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Repository Access Status</div>${platStatusHtml||"<div style='font-size:11px;color:var(--text3)'>No GitHub repos configured</div>"}</div>`;
-
-if(a.fix_data?.fixes?.length){
-  fixHtml+=`<div style="font-size:12px;color:var(--accent);margin-bottom:10px">✅ ${a.fix_data.total_fixes} fixes generated — ${a.fix_data.summary||""}</div>`;
-  a.fix_data.fixes.forEach(f=>{
-    fixHtml+=`<div class="fix-card"><div class="fix-card-head"><span class="fix-issue-id">${f.issue_id||""}</span><span class="fix-file">${f.file||""}</span><span class="fix-status pending">Ready</span></div><div class="fix-desc">${f.explanation||""}</div>`;
-    if(f.original_snippet){fixHtml+=`<div class="diff-block">${(f.original_snippet||"").split("\n").map(l=>`<span class="diff-del">- ${l}</span>`).join("")}</div>`;}
-    if(f.fixed_snippet){fixHtml+=`<div class="diff-block">${(f.fixed_snippet||"").split("\n").map(l=>`<span class="diff-add">+ ${l}</span>`).join("")}</div>`;}
-    fixHtml+=`</div>`;
+// ===== HISTORY - FIXED: uses index lookup instead of JSON.stringify =====
+function renderHistory(){
+  const c=document.getElementById("histContent");
+  if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
+  let html='<div class="hist-grid">';
+  auditHistory.forEach((a,idx)=>{
+    const sc=a.score>=80?"var(--accent)":a.score>=60?"var(--yellow)":"var(--red)";
+    html+=`<div class="hist-card" onclick="showResult(auditHistory[${idx}])"><div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div><div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues${a.fixes_applied?" · 🔧 "+a.fixes_applied+" fixed":""}</div><div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div><div style="color:var(--text3)">→</div></div>`;
   });
-}else if(a.issues_list?.length){
-  fixHtml+=`<div style="font-size:12px;color:var(--text2);padding:12px 0">Click <strong>🔧 Generate Fixes</strong> to have AI generate code fixes for ${a.issues_list.length} issues. To apply fixes directly, make sure each platform has a validated GitHub PAT with write access.</div>`;
+  html+='</div>';
+  c.innerHTML=html;
 }
-fixHtml+=`</div>`;
 
-const launchHtml=a.launch_ready!==undefined?`<div class="launch-box"><div class="launch-head"><div class="launch-icon">${a.launch_ready?"🚀":"🚫"}</div><div class="launch-title">${a.launch_ready?"Ready for Launch":"Launch Blockers Found"}</div><div class="launch-badge ${a.launch_ready?"ready":"not"}">${a.launch_ready?"PASS":"BLOCKED"}</div></div>${(a.launch_blockers||[]).length?`<ul class="launch-list">${a.launch_blockers.map(b=>`<li>🚫 ${b}</li>`).join("")}</ul>`:""}${(a.launch_warnings||[]).length?`<ul class="launch-list">${a.launch_warnings.map(w=>`<li>⚠️ ${w}</li>`).join("")}</ul>`:""}</div>`:"";
-
-// Apply results display
-let applyHtml="";
-if(a.apply_results?.length){applyHtml=`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🚀 Applied Fixes</div>`+a.apply_results.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:12px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:11px;color:var(--text2)">${r.summary||r.error||""}</div></div>`).join("");}
-
-document.getElementById("resultContent").innerHTML=`
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button onclick="showTab('dashboard')" style="font-size:12px;color:var(--text2);background:none;border:none">← Back</button><span style="font-size:18px;font-weight:900;color:var(--text)">${a.name}</span><span style="font-size:12px;color:var(--text3)">${a.ver||""}</span>${a.fixes_applied?`<span style="font-size:11px;color:var(--accent);font-weight:700">🔧 ${a.fixes_applied} fixed</span>`:""}</div>
-${launchHtml}
-<div class="stats"><div class="stat g"><div class="stat-l">Overall</div><div class="stat-v" style="color:${sc(a.score)}">${a.score}%</div></div><div class="stat b"><div class="stat-l">Cross-Platform</div><div class="stat-v" style="color:${sc(a.cross_score)}">${a.cross_score}%</div></div><div class="stat"><div class="stat-l">Checks</div><div class="stat-v">${a.passed||0}/${a.total_checks||0}</div></div><div class="stat r"><div class="stat-l">Errors</div><div class="stat-v" style="color:var(--red)">${a.failed||0}</div></div><div class="stat y"><div class="stat-l">Warnings</div><div class="stat-v" style="color:var(--yellow)">${a.warnings||0}</div></div></div>
-<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">📊 Category Scores</div><div class="cat-grid">${catHtml}</div>
-${fixHtml}
-${applyHtml}
-${Object.keys(a.plat||{}).length?`<div style="font-weight:700;font-size:14px;margin:20px 0 10px;color:var(--text)">🔗 Platform Scores</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px">${Object.entries(a.plat).map(([p,s])=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center"><div style="font-size:22px;margin-bottom:6px">${p==="web"?"🌐":p==="ios"?"🍎":"🤖"}</div><div style="font-weight:700;font-size:12px;text-transform:capitalize">${p}</div><div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:${sc(s)}">${s}</div><div style="height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:${s}%;height:100%;background:${sc(s)};border-radius:2px"></div></div></div>`).join("")}</div>`:""}
-${issHtml?`<div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text)">🐛 Issues (${a.issues_list.length})</div><div class="iss-wrap"><div class="iss-top">Click to expand</div>${issHtml}</div>`:""}
-<div class="ai-panel"><div class="ai-head"><div class="ai-avatar">🧠</div><div><div class="ai-name">AI Executive Summary</div><div class="ai-sub">Claude Sonnet 4</div></div></div><div class="ai-body">${(a.analysis||"").replace(/\n/g,"<br>")}</div></div>
-${(a.recommendations||[]).length?`<div class="recs"><h3>💡 Recommendations</h3><ol>${a.recommendations.map(r=>`<li>${r}</li>`).join("")}</ol></div>`:""}`;
-showTab("result");}
-
-function renderHistory(){const c=document.getElementById("histContent");if(!auditHistory.length){c.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audits yet</div><button class="btn-new" onclick="showTab('new')">Start Audit →</button></div>`;return;}
-c.innerHTML=`<div class="hist-grid">${auditHistory.map(a=>{const sc=a.score>=80?"var(--accent)":a.score>=60?"var(--yellow)":"var(--red)";
-return`<div class="hist-card" onclick='showResult(${JSON.stringify(a)})'><div class="hist-score" style="background:var(--accent-dim);color:${sc}">${a.score}</div><div style="flex:1"><div style="font-weight:700;font-size:14px;color:var(--text)">${a.name} <span style="font-size:11px;color:var(--text3)">${a.ver||""}</span></div><div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(a.date).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"})} · ${a.issues||0} issues${a.fixes_applied?" · 🔧 "+a.fixes_applied+" fixed":""}</div><div style="display:flex;gap:3px;margin-top:4px">${(a.plats||[]).map(p=>`<span class="pp ${p==="web"?"w":p==="ios"?"i":"a"}">${p}</span>`).join("")}</div></div><div style="color:var(--text3)">→</div></div>`}).join("")}</div>`;}
 checkAuth();
 </script>
 </body>
