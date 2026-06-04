@@ -46,7 +46,7 @@ async function callMiMo(systemPrompt, userPrompt) {
 function buildAuditPrompt(projectName, projectVersion, platforms, webScan) {
   let codeSections = [];
   for (const p of platforms) {
-    codeSections.push("### " + p.platform.toUpperCase() + " (" + p.name + ")\n" + (p.code || "No code provided").substring(0, 80000));
+    codeSections.push("### " + p.platform.toUpperCase() + " (" + p.name + ")\n" + (p.code || "No code provided").substring(0, 30000));
   }
   const codeBlock = codeSections.join("\n\n");
 
