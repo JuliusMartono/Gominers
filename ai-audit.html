@@ -495,10 +495,33 @@ async function generateFixes(audit){
         addFixLog(logEl,idx,"❌ "+fp.error,issues[idx]);
       }
     }catch(e){
-      fp.status="error";
-      fp.error=e.message.substring(0,100);
-      errors++;
-      addFixLog(logEl,idx,"❌ "+fp.error,issues[idx]);
+      // Retry up to 3 times on network errors
+      let retried=false;
+      for(let retry=0;retry<3;retry++){
+        try{
+          await new Promise(r=>setTimeout(r,5000));
+          const r2=await fetch(API+"/fix",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({project_name:audit.name,issues:issues,issue_index:idx,sourceCode:""})
+          });
+          if(r2.ok){
+            const d2=await r2.json();
+            if(d2.fixes&&d2.fixes.length){
+              fp.status="done";fp.fix=d2.fixes[0];fp.error=null;
+              allFixes.push(d2.fixes[0]);done++;
+              addFixLog(logEl,idx,"✅ Fixed (retry "+(retry+1)+"): "+(d2.fixes[0].explanation||"OK").substring(0,80),issues[idx]);
+              retried=true;break;
+            }
+          }
+        }catch(e2){}
+      }
+      if(!retried){
+        fp.status="error";
+        fp.error=e.message.substring(0,100);
+        errors++;
+        addFixLog(logEl,idx,"❌ "+fp.error,issues[idx]);
+      }
     }
 
     renderFixProgress(audit);
