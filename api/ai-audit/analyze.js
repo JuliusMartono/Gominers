@@ -55,9 +55,26 @@ function buildAuditPrompt(projectName, projectVersion, platforms, webScan) {
     webBlock = "\n\n### WEBSITE SCAN: " + webScan.url + "\nStatus: " + webScan.status + "\nAnalysis: " + JSON.stringify(webScan.analysis) + "\nHTML preview: " + (webScan.html || "").substring(0, 5000);
   }
 
+  // File consistency check
+  let consistencyBlock = "";
+  if (platforms.length > 1) {
+    const allFiles = {};
+    for (const p of platforms) {
+      const files = (p.fileList || []).map(f => f.toLowerCase());
+      for (const f of files) {
+        if (!allFiles[f]) allFiles[f] = [];
+        allFiles[f].push(p.platform);
+      }
+    }
+    const onlyInOne = Object.entries(allFiles).filter(([f, plats]) => plats.length === 1);
+    if (onlyInOne.length) {
+      consistencyBlock = "\n\n### FILE CONSISTENCY CHECK\n" + onlyInOne.length + " files exist in only 1 platform:\n" + onlyInOne.slice(0, 50).map(([f, p]) => "- " + f + " (only in " + p.join(", ") + ")").join("\n");
+    }
+  }
+
   const sys = "You are a senior software engineer. Analyze the code and respond with ONLY a JSON object, no markdown fences, no explanation. Raw JSON format:\n{\"overall_score\":0-100,\"cross_platform_score\":0-100,\"total_checks\":0,\"passed_checks\":0,\"failed_checks\":0,\"warning_checks\":0,\"category_scores\":{\"security\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"performance\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"code_quality\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"seo\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"accessibility\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"dependencies\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"auth\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"api_design\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"database\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"testing\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"build_deploy\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"mobile\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0},\"documentation\":{\"score\":0-100,\"passed\":0,\"failed\":0,\"warning\":0}},\"platform_scores\":{\"web\":0-100,\"ios\":0-100,\"android\":0-100},\"issues\":[{\"id\":\"\",\"severity\":\"error|warning|info\",\"title\":\"\",\"message\":\"\",\"file\":\"\",\"category\":\"\",\"fix\":\"\"}],\"recommendations\":[\"\"],\"launch_readiness\":{\"ready\":true|false,\"blockers\":[\"\"],\"warnings\":[\"\"]},\"ai_analysis\":\"summary\",\"estimated_fix_hours\":\"X hours\"}\n\nPerform 100+ checkpoints across all categories. Be thorough and strict.";
 
-  const user = "Project: " + projectName + " v" + (projectVersion || "1.0.0") + "\n\n" + codeBlock + webBlock;
+  const user = "Project: " + projectName + " v" + (projectVersion || "1.0.0") + "\n\n" + codeBlock + webBlock + consistencyBlock;
 
   return { sys, user };
 }
