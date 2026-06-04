@@ -77,9 +77,8 @@ async function updateFile(owner, repo, filePath, content, sha, token, branch, me
   return { ok: true, commit_url: data.commit.html_url };
 }
 
-async function listRepoFiles(owner, repo, token, branch, path) {
-  path = path || "";
-  const url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path + "?ref=" + branch;
+async function listRepoFiles(owner, repo, token, branch) {
+  const url = "https://api.github.com/repos/" + owner + "/" + repo + "/git/trees/" + branch + "?recursive=1";
   const r = await fetch(url, {
     headers: {
       "Authorization": "Bearer " + token,
@@ -88,17 +87,11 @@ async function listRepoFiles(owner, repo, token, branch, path) {
     }
   });
   if (!r.ok) return [];
-  const items = await r.json();
-  let files = [];
-  for (const item of items) {
-    if (item.type === "file") {
-      files.push(item.path);
-    } else if (item.type === "directory" && !["node_modules", ".git", ".next", "build", "dist", ".vercel"].includes(item.name)) {
-      const subFiles = await listRepoFiles(owner, repo, token, branch, item.path);
-      files = files.concat(subFiles);
-    }
-  }
-  return files;
+  const data = await r.json();
+  const skip = ["node_modules", ".git", ".next", "build", "dist", ".vercel"];
+  return (data.tree || [])
+    .filter(item => item.type === "blob" && !item.path.split("/").some(s => skip.includes(s)))
+    .map(item => item.path);
 }
 
 module.exports = async function handler(req, res) {
