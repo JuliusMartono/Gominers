@@ -576,19 +576,90 @@ function addFixLog(el,idx,msg,iss){
 }
 
 async function applyFixes(audit){
-  const platformsToApply=(audit.platInfo||[]).filter(p=>p.repoUrl&&p.githubPat&&p.patValid);
+  var platformsToApply=(audit.platInfo||[]).filter(function(p){return p.repoUrl&&p.githubPat&&p.patValid;});
   if(!platformsToApply.length){alert("No validated GitHub repos. Validate a token first.");return;}
-  if(!currentFixes?.fixes?.length){alert("Generate fixes first.");return;}
-  const applyBtn=document.getElementById("applyBtn");applyBtn.disabled=true;applyBtn.textContent="Applying...";
-  const allResults=[];
-  for(const plat of platformsToApply){
-    try{const r=await fetch(API+"/apply",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes,branch:plat.patInfo?.default_branch||"main"})});const d=await r.json();if(r.ok){allResults.push({platform:plat.key,repo:plat.repo,status:"success",summary:d.summary,results:d.results||[],commit_url:d.commit_url});}else{allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:d.error});}}catch(e){allResults.push({platform:plat.key,repo:plat.repo,status:"error",error:e.message});}
-  }
-  const el=document.getElementById("applyResults");el.style.display="block";el.innerHTML=allResults.map(r=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-weight:700;font-size:13px">${r.status==="success"?"✅":"❌"} ${r.platform} — ${r.repo}</div><div style="font-size:12px;color:${r.status==="success"?"var(--accent)":"var(--red)"}">${r.summary||r.error||""}</div>${r.commit_url?`<div style="font-size:11px;margin-top:4px"><a href="${r.commit_url}" target="_blank" style="color:var(--blue)">${r.commit_url}</a></div>`:""}</div>`).join("");
-  audit.apply_results=allResults;
-  const idx=auditHistory.findIndex(a=>a.id===audit.id);
-  if(idx>=0){auditHistory[idx]=sanitizeAudit(audit);saveHistory();}
-  applyBtn.disabled=false;applyBtn.textContent="🚀 Apply All Fixes";
+  if(!currentFixes||!currentFixes.fixes||!currentFixes.fixes.length){alert("Generate fixes first.");return;}
+
+  var el=document.getElementById("applyResults");
+  el.style.display="block";
+  el.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:12px"><div class="spinner-sm"></div><span>Loading preview...</span></div>';
+
+  var plat=platformsToApply[0];
+
+  fetch(API+"/apply",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes,branch:plat.patInfo?plat.patInfo.default_branch||"main":"main",mode:"preview"})
+  }).then(function(r){return r.json();}).then(function(preview){
+    if(preview.error){el.innerHTML='<div style="color:var(--red);padding:12px">Error: '+preview.error+'</div>';return;}
+
+    var h='<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px">';
+    h+='<div style="font-weight:800;font-size:15px;margin-bottom:12px">Preview Before Apply</div>';
+    h+='<div style="font-size:12px;color:var(--text2);margin-bottom:12px">'+preview.will_edit+' files will be edited, '+preview.will_skip+' will be skipped</div>';
+
+    var items=preview.preview||[];
+    for(var i=0;i<items.length;i++){
+      var item=items[i];
+      var icon=item.action==="edit"?"<span style='color:var(--accent)'>EDIT</span>":"<span style='color:var(--text3)'>SKIP</span>";
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;border-bottom:1px solid var(--border)">';
+      h+='<span style="width:40px">'+icon+'</span>';
+      h+='<span style="font-family:JetBrains Mono,monospace;color:var(--text);flex:1">'+(item.file||"unknown")+'</span>';
+      h+='<span style="color:var(--text3);font-size:10px">'+(item.reason||item.explanation||"").substring(0,50)+'</span>';
+      h+='</div>';
+    }
+
+    h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
+    h+='<button onclick="document.getElementById(\'applyResults\').style.display=\'none\'" style="padding:10px 20px;background:var(--border);color:var(--text);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Cancel</button>';
+    h+='<button onclick="confirmApply()" id="confirmApplyBtn" style="padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Confirm Apply ('+preview.will_edit+' files)</button>';
+    h+='</div></div>';
+    el.innerHTML=h;
+  }).catch(function(e){
+    el.innerHTML='<div style="color:var(--red);padding:12px">Preview error: '+e.message+'</div>';
+  });
+}
+
+function confirmApply(){
+  var btn=document.getElementById("confirmApplyBtn");
+  if(btn){btn.disabled=true;btn.textContent="Applying...";}
+  var el=document.getElementById("applyResults");
+
+  var platformsToApply=(currentAudit.platInfo||[]).filter(function(p){return p.repoUrl&&p.githubPat&&p.patValid;});
+  var plat=platformsToApply[0];
+
+  fetch(API+"/apply",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({repo_url:plat.repoUrl,github_token:plat.githubPat,fixes:currentFixes.fixes,branch:plat.patInfo?plat.patInfo.default_branch||"main":"main",mode:"apply"})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error){el.innerHTML='<div style="color:var(--red);padding:12px">Error: '+d.error+'</div>';return;}
+
+    var h='<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px">';
+    h+='<div style="font-weight:800;font-size:15px;margin-bottom:8px">Apply Results</div>';
+    h+='<div style="font-size:13px;color:var(--accent);margin-bottom:12px">'+d.summary+'</div>';
+
+    var results=d.results||[];
+    for(var i=0;i<results.length;i++){
+      var r=results[i];
+      var icon=r.status==="applied"?"<span style='color:var(--accent)'>OK</span>":r.status==="skipped"?"<span style='color:var(--text3)'>SKIP</span>":"<span style='color:var(--red)'>ERR</span>";
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;border-bottom:1px solid var(--border)">';
+      h+='<span style="width:40px">'+icon+'</span>';
+      h+='<span style="font-family:JetBrains Mono,monospace;color:var(--text);flex:1">'+(r.file||"")+'</span>';
+      h+='<span style="color:var(--text3);font-size:10px">'+(r.reason||"").substring(0,50)+'</span>';
+      if(r.commit_url)h+='<a href="'+r.commit_url+'" target="_blank" style="color:var(--blue);font-size:10px">commit</a>';
+      h+='</div>';
+    }
+
+    h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
+    h+='<button onclick="showTab(\'dashboard\')" style="padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Done</button>';
+    h+='</div></div>';
+    el.innerHTML=h;
+
+    currentAudit.apply_results=d.results;
+    var aIdx=auditHistory.findIndex(function(a){return a.id===currentAudit.id;});
+    if(aIdx>=0){auditHistory[aIdx]=sanitizeAudit(currentAudit);saveHistory();}
+  }).catch(function(e){
+    el.innerHTML='<div style="color:var(--red);padding:12px">Apply error: '+e.message+'</div>';
+  });
 }
 
 function showResult(a){
