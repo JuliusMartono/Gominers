@@ -608,7 +608,7 @@ async function applyFixes(audit){
       h+='</div>';
     }
 
-    h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
+    if(d.pr_url){h+='<div style="margin-top:14px;padding:14px;background:var(--surface2);border:1px solid var(--accent);border-radius:10px">';h+='<div style="font-weight:800;font-size:14px;color:var(--accent);margin-bottom:6px">Pull Request Created</div>';h+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Review changes in GitHub before merging to production</div>';h+='<a href="'+d.pr_url+'" target="_blank" style="display:inline-block;padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;text-decoration:none">Review Pull Request</a></div>';}h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
     h+='<button onclick="document.getElementById(\'applyResults\').style.display=\'none\'" style="padding:10px 20px;background:var(--border);color:var(--text);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Cancel</button>';
     h+='<button onclick="confirmApply()" id="confirmApplyBtn" style="padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Confirm Apply ('+preview.will_edit+' files)</button>';
     h+='</div></div>';
@@ -649,7 +649,7 @@ function confirmApply(){
       h+='</div>';
     }
 
-    h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
+    if(d.pr_url){h+='<div style="margin-top:14px;padding:14px;background:var(--surface2);border:1px solid var(--accent);border-radius:10px">';h+='<div style="font-weight:800;font-size:14px;color:var(--accent);margin-bottom:6px">Pull Request Created</div>';h+='<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Review changes in GitHub before merging to production</div>';h+='<a href="'+d.pr_url+'" target="_blank" style="display:inline-block;padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;text-decoration:none">Review Pull Request</a></div>';}h+='<div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">';
     h+='<button onclick="showTab(\'dashboard\')" style="padding:10px 20px;background:var(--accent);color:var(--bg);font-size:12px;font-weight:700;border-radius:10px;border:none;cursor:pointer">Done</button>';
     h+='</div></div>';
     el.innerHTML=h;
