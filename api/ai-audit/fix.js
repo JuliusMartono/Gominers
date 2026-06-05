@@ -108,7 +108,7 @@ module.exports = async function handler(req, res) {
 
     console.log("[Fix] Issues summary:", issuesSummary.substring(0, 500));
 
-    const sys = "You are a senior engineer. Generate code fixes for audit issues. IMPORTANT: Respond with ONLY a raw JSON object. No markdown, no code fences, no backticks, no explanation before or after the JSON. Just the raw JSON object.\n\nFormat:\n{\"summary\":\"overview\",\"total_fixes\":number,\"fixes\":[{\"issue_id\":\"id\",\"file\":\"path\",\"original_snippet\":\"the old code\",\"fixed_snippet\":\"the new code\",\"explanation\":\"what was fixed\",\"new_files\":[]}]}";
+    const sys = "You are a senior engineer. Generate code fixes for audit issues. IMPORTANT: Respond with ONLY a raw JSON object. No markdown, no code fences, no backticks, no explanation before or after the JSON. Just the raw JSON object.\n\nCRITICAL RULES:\n- NEVER target these excluded files: next.config.js, package.json, package-lock.json, middleware.ts, .env, .gitignore, vercel.json, tsconfig.json, app/layout.tsx, app/layout.js, Dockerfile, pages/_app.tsx, pages/_document.tsx\n- For issues about excluded files, set file to null\n- Only fix files that exist in the provided source code\n\nFormat:\n{\"summary\":\"overview\",\"total_fixes\":number,\"fixes\":[{\"issue_id\":\"id\",\"file\":\"path\",\"original_snippet\":\"the old code\",\"fixed_snippet\":\"the new code\",\"explanation\":\"what was fixed\",\"new_files\":[]}]}";
     const user = "Project: " + (project_name||"Project") + "\n\nIssues to fix:\n" + issuesSummary + "\n\n" + contextBlock;
 
     console.log("[Fix] Calling MiMo...");
