@@ -228,4 +228,5 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error('[GoMiners Webhook] Processing error:', err.message)
   }
+  res.status(200).json({ message: 'OK' })
 }
