@@ -2,7 +2,6 @@
 // UPDATED CGI handler: user_profiles + subscription_tier + multi-plan
 
 const crypto = require('crypto')
-const https  = require('https')
 
 const DOKU_SECRET_KEY = 'SK-QKbcPUHEiwGFsqws0Wts'
 
@@ -112,35 +111,32 @@ const PRODUCT_HANDLERS = {
 function supabaseGet(url, key, path)        { return supabaseReq(url, key, 'GET',   path, null) }
 function supabasePatch(url, key, path, body){ return supabaseReq(url, key, 'PATCH', path, body) }
 
-function supabaseReq(baseUrl, key, method, path, body) {
-  return new Promise((resolve, reject) => {
-    if (!baseUrl || !key) {
-      console.error(`Supabase not configured: baseUrl=${!!baseUrl} key=${!!key}`)
-      return resolve(null)
-    }
+async function supabaseReq(baseUrl, key, method, path, body) {
+  if (!baseUrl || !key) {
+    console.error(`Supabase not configured: baseUrl=${!!baseUrl} key=${!!key}`)
+    return null
+  }
+  try {
     const url      = `${baseUrl}/rest/v1/${path}`
     const bodyJson = body ? JSON.stringify(body) : undefined
-    const urlObj   = new URL(url)
-    const options  = {
-      hostname: urlObj.hostname, port: 443,
-      path: urlObj.pathname + urlObj.search, method,
+    console.log(`[Supabase] ${method} ${url.slice(0,60)}`)
+    const res = await fetch(url, {
+      method,
       headers: {
         'Content-Type':  'application/json',
         'apikey':        key,
         'Authorization': `Bearer ${key}`,
         'Prefer':        method === 'PATCH' ? 'return=minimal' : 'return=representation',
       },
-    }
-    if (bodyJson) options.headers['Content-Length'] = Buffer.byteLength(bodyJson)
-    const req = https.request(options, (res) => {
-      let data = ''
-      res.on('data', chunk => data += chunk)
-      res.on('end', () => { try { resolve(data ? JSON.parse(data) : null) } catch { resolve(null) } })
+      body: bodyJson,
     })
-    req.on('error', (err) => { console.error('Supabase request error:', err.message); resolve(null) })
-    if (bodyJson) req.write(bodyJson)
-    req.end()
-  })
+    const text = await res.text()
+    console.log(`[Supabase] response ${res.status}: ${text.slice(0,100)}`)
+    return text ? JSON.parse(text) : null
+  } catch(e) {
+    console.error(`[Supabase] fetch error:`, e.message)
+    return null
+  }
 }
 
 // ─── Signature Verification (unchanged) ──────────────────────────────────────
