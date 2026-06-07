@@ -15,7 +15,7 @@ const PRODUCT_HANDLERS = {
     async findInvoice(invoiceNumber) {
       const res = await supabaseGet(
         process.env.CEKGEJALA_SUPABASE_URL,
-        process.env.CEKGEJALA_SUPABASE_KEY,
+        process.env.CEKGEJALA_SUPABASE_SERVICE_KEY,
         `invoices?invoice_number=eq.${invoiceNumber}&select=*`
       )
       return res?.[0] || null
@@ -24,7 +24,7 @@ const PRODUCT_HANDLERS = {
     async updateInvoice(invoiceNumber, data) {
       return supabasePatch(
         process.env.CEKGEJALA_SUPABASE_URL,
-        process.env.CEKGEJALA_SUPABASE_KEY,
+        process.env.CEKGEJALA_SUPABASE_SERVICE_KEY,
         `invoices?invoice_number=eq.${invoiceNumber}`,
         data
       )
@@ -54,7 +54,7 @@ const PRODUCT_HANDLERS = {
 
       return supabasePatch(
         process.env.CEKGEJALA_SUPABASE_URL,
-        process.env.CEKGEJALA_SUPABASE_KEY,
+        process.env.CEKGEJALA_SUPABASE_SERVICE_KEY,
         `user_profiles?id=eq.${userId}`,            // was: profiles?id=eq.${userId}
         profileUpdate
       )
