@@ -190,6 +190,9 @@ module.exports = async (req, res) => {
     const channel       = payload?.channel?.id || payload?.payment?.channel_type || ''
 
     console.log(`[GoMiners Webhook] invoice=${invoiceNumber} status=${status}`)
+    console.log(`[GoMiners Webhook] URL exists: ${!!process.env.CEKGEJALA_SUPABASE_URL}`)
+    console.log(`[GoMiners Webhook] KEY exists: ${!!process.env.CEKGEJALA_SUPABASE_SERVICE_KEY}`)
+    console.log(`[GoMiners Webhook] URL value: ${(process.env.CEKGEJALA_SUPABASE_URL||'').slice(0,30)}`)
 
     if (!invoiceNumber || !status) return
 
