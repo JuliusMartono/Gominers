@@ -231,9 +231,10 @@ module.exports = async (req, res) => {
     })
 
     if (mappedStatus === 'paid' && invoice.user_id) {
-      // UPDATED: pass full invoice so upgradeUser can read plan metadata
-      await handler.upgradeUser(invoice.user_id, invoice.plan_days, invoice)
-      console.log(`[GoMiners Webhook] ✅ ${handler.name} — user ${invoice.user_id} upgraded (${invoice.plan_id})`)
+      // Re-fetch invoice after update to get fresh data including plan_id
+      const freshInvoice = await handler.findInvoice(invoiceNumber)
+      await handler.upgradeUser(invoice.user_id, invoice.plan_days, freshInvoice || invoice)
+      console.log(`[GoMiners Webhook] ✅ ${handler.name} — user ${invoice.user_id} upgraded (${(freshInvoice||invoice).plan_id})`)
     }
 
   } catch (err) {
