@@ -177,8 +177,6 @@ module.exports = async (req, res) => {
     return res.status(200).json({ message: 'OK' })
   }
 
-  res.status(200).json({ message: 'OK' })
-
   try {
     const payload       = JSON.parse(bodyJson)
     const invoiceNumber = payload?.order?.invoice_number
