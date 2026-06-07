@@ -101,8 +101,8 @@ const PRODUCT_HANDLERS = {
       return supabasePatch(
         process.env.FIXMINE_SUPABASE_URL,
         process.env.FIXMINE_SUPABASE_KEY,
-        `profiles?id=eq.${userId}`,
-        { plan: 'pro', plan_expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() }
+        `user_profiles?id=eq.${userId}`,
+        { subscription_tier: invoice?.plan_tier||'pro_individu', plan_limit: Number(invoice?.plan_limit||30), plan_devices: Number(invoice?.plan_devices||1), is_mitra_klinik: invoice?.is_mitra===true||invoice?.is_mitra==='true', plan_expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() }
       )
     }
   },
