@@ -198,6 +198,8 @@ module.exports = async (req, res) => {
 
     const prefix  = invoiceNumber.split('-')[0]
     const handler = PRODUCT_HANDLERS[prefix]
+    console.log(`[GoMiners Webhook] prefix=${prefix} handler=${!!handler}`)
+    console.log(`[GoMiners Webhook] Supabase URL: ${process.env.CEKGEJALA_SUPABASE_URL}`)
     if (!handler) { console.log(`[GoMiners Webhook] Unknown prefix: ${prefix}`); return }
 
     let invoice
