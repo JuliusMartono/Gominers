@@ -200,7 +200,12 @@ module.exports = async (req, res) => {
     const handler = PRODUCT_HANDLERS[prefix]
     if (!handler) { console.log(`[GoMiners Webhook] Unknown prefix: ${prefix}`); return }
 
-    const invoice = await handler.findInvoice(invoiceNumber)
+    let invoice
+    try {
+      invoice = await handler.findInvoice(invoiceNumber)
+    } catch(findErr) {
+      console.log(`[GoMiners Webhook] findInvoice error: ${findErr.message}`)
+    }
     if (!invoice)  { console.log(`[GoMiners Webhook] Invoice not found: ${invoiceNumber}`); return }
 
     const mappedStatus =
