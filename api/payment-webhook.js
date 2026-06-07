@@ -35,11 +35,23 @@ const PRODUCT_HANDLERS = {
       expiresAt.setDate(expiresAt.getDate() + (planDays || 30))
 
       // Read plan metadata from invoice (saved by payment/create route)
-      const tier         = invoice?.plan_tier         || 'pro_individu'
-      const planLimit    = invoice?.plan_limit         || 30
-      const planDevices  = invoice?.plan_devices       || 1
-      const isMitra      = invoice?.is_mitra           || false
-      const businessName = invoice?.additional_info?.business_name || null
+      const PLAN_MAP = {
+        'pro_monthly':          { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
+        'pro_individu_monthly': { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
+        'pro_individu_yearly':  { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
+        'pro_bisnis_monthly':   { tier: 'pro_bisnis',   limit: 300,   devices: 2, mitra: false },
+        'pro_bisnis_yearly':    { tier: 'pro_bisnis',   limit: 300,   devices: 2, mitra: false },
+        'komunitas_monthly':    { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
+        'komunitas_yearly':     { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
+        'enterprise_dp':        { tier: 'enterprise',   limit: 99999, devices: 999, mitra: true },
+      }
+      const planConf     = PLAN_MAP[invoice?.plan_id] || { tier: 'pro_individu', limit: 30, devices: 1, mitra: false }
+      const tier         = planConf.tier
+      const planLimit    = invoice?.plan_limit   || planConf.limit
+      const planDevices  = invoice?.plan_devices || planConf.devices
+      const isMitra      = invoice?.is_mitra === true || invoice?.is_mitra === 'true' || planConf.mitra
+      const businessName = invoice?.additional_info?.business_name || invoice?.business_name || null
+      console.log('[CGI] planId=' + invoice?.plan_id + ' tier=' + tier + ' limit=' + planLimit)
 
       const profileUpdate = {
         subscription_tier: tier,                    // was: plan: 'pro'
