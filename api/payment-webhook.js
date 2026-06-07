@@ -111,15 +111,15 @@ const PRODUCT_HANDLERS = {
 function supabaseGet(url, key, path)        { return supabaseReq(url, key, 'GET',   path, null) }
 function supabasePatch(url, key, path, body){ return supabaseReq(url, key, 'PATCH', path, body) }
 
-async function supabaseReq(baseUrl, key, method, path, body) {
+async async function supabaseReq(baseUrl, key, method, path, body) {
   if (!baseUrl || !key) {
-    console.error(`Supabase not configured: baseUrl=${!!baseUrl} key=${!!key}`)
+    console.error(`[Supabase] not configured: url=${!!baseUrl} key=${!!key}`)
     return null
   }
+  const url = `${baseUrl}/rest/v1/${path}`
+  const bodyJson = body ? JSON.stringify(body) : undefined
+  console.log(`[Supabase] ${method} ${path.slice(0,50)}`)
   try {
-    const url      = `${baseUrl}/rest/v1/${path}`
-    const bodyJson = body ? JSON.stringify(body) : undefined
-    console.log(`[Supabase] ${method} ${url.slice(0,60)}`)
     const res = await fetch(url, {
       method,
       headers: {
@@ -128,13 +128,14 @@ async function supabaseReq(baseUrl, key, method, path, body) {
         'Authorization': `Bearer ${key}`,
         'Prefer':        method === 'PATCH' ? 'return=minimal' : 'return=representation',
       },
-      body: bodyJson,
+      ...(bodyJson ? { body: bodyJson } : {}),
     })
     const text = await res.text()
-    console.log(`[Supabase] response ${res.status}: ${text.slice(0,100)}`)
-    return text ? JSON.parse(text) : null
+    console.log(`[Supabase] ${res.status} ${text.slice(0,100)}`)
+    if (!text) return null
+    return JSON.parse(text)
   } catch(e) {
-    console.error(`[Supabase] fetch error:`, e.message)
+    console.error(`[Supabase] fetch error: ${e.message}`)
     return null
   }
 }
