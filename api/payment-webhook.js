@@ -111,7 +111,7 @@ const PRODUCT_HANDLERS = {
 function supabaseGet(url, key, path)        { return supabaseReq(url, key, 'GET',   path, null) }
 function supabasePatch(url, key, path, body){ return supabaseReq(url, key, 'PATCH', path, body) }
 
-async async function supabaseReq(baseUrl, key, method, path, body) {
+async function supabaseReq(baseUrl, key, method, path, body) {
   if (!baseUrl || !key) {
     console.error(`[Supabase] not configured: url=${!!baseUrl} key=${!!key}`)
     return null
