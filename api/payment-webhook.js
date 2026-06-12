@@ -44,6 +44,10 @@ const PRODUCT_HANDLERS = {
         'komunitas_monthly':    { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
         'komunitas_yearly':     { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
         'enterprise_dp':        { tier: 'enterprise',   limit: 99999, devices: 999, mitra: true },
+        'starter_monthly':      { tier: 'starter',      limit: 10,    devices: 1,   mitra: false },
+        'pro_keluarga_monthly': { tier: 'pro_keluarga', limit: 20,    devices: 5,   mitra: false },
+        'pro_keluarga_yearly':  { tier: 'pro_keluarga_yearly', limit: 200,   devices: 5,   mitra: false },
+        'enterprise_growth':    { tier: 'enterprise',   limit: 99999, devices: 200, mitra: true  },
       }
       const planConf     = PLAN_MAP[invoice?.plan_id] || { tier: 'pro_individu', limit: 30, devices: 1, mitra: false }
       const tier         = planConf.tier
