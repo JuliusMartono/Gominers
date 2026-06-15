@@ -175,8 +175,47 @@ function verifySignature(headers, bodyJson) {
 }
 
 // ─── Main Handler ─────────────────────────────────────────────────────────────
+const crypto = require('crypto');
+
+function verifyDokuSignature(req, secretKey) {
+  const signature = req.headers['signature'];
+  const clientId = req.headers['client-id'];
+  const requestId = req.headers['request-id'];
+  const requestTimestamp = req.headers['request-timestamp'];
+  if (!signature) {
+    console.error('[WEBHOOK] Missing signature header');
+    return false;
+  }
+  const bodyJson = JSON.stringify(req.body);
+  const digest = 'SHA-256=' + crypto.createHash('sha256').update(bodyJson).digest('base64');
+  const component = [
+    'Client-Id:' + clientId,
+    'Request-Id:' + requestId,
+    'Request-Timestamp:' + requestTimestamp,
+    'Request-Target:/api/payment-webhook',
+    'Digest:' + digest
+  ].join('\n');
+  const expected = 'HMACSHA256=' + crypto.createHmac('sha256', secretKey).update(component).digest('base64');
+  console.log('[WEBHOOK] Sig check — expected:', expected, '| received:', signature);
+  return signature === expected;
+}
+
 module.exports = async (req, res) => {
   if (req.method === 'GET') {
+
+  // === DOKU SIGNATURE VERIFICATION ===
+  if (!verifyDokuSignature(req, process.env.DOKU_SECRET_KEY)) {
+    console.error('[WEBHOOK] INVALID SIGNATURE — request rejected');
+    return res.status(401).json({ message: 'Invalid signature' });
+  }
+
+  // === STATUS MUST BE SUCCESS ===
+  const txStatus = req.body?.transaction?.status;
+  if (txStatus !== 'SUCCESS') {
+    console.log('[WEBHOOK] Non-success status:', txStatus, '— ignored');
+    return res.status(200).json({ message: 'Non-success status ignored' });
+  }
+
     return res.status(200).json({ status: 'GoMiners DOKU webhook active', products: Object.keys(PRODUCT_HANDLERS), timestamp: new Date().toISOString() })
   }
   if (req.method !== 'POST') return res.status(200).json({ message: 'OK' })
