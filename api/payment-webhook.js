@@ -36,19 +36,37 @@ const PRODUCT_HANDLERS = {
 
       // Read plan metadata from invoice (saved by payment/create route)
       const PLAN_MAP = {
-        'pro_monthly':          { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
-        'pro_individu_monthly': { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
-        'pro_individu_yearly':  { tier: 'pro_individu', limit: 30,    devices: 1, mitra: false },
-        'pro_bisnis_monthly':   { tier: 'pro_bisnis',   limit: 300,   devices: 2, mitra: false },
-        'pro_bisnis_yearly':    { tier: 'pro_bisnis',   limit: 300,   devices: 2, mitra: false },
-        'komunitas_monthly':    { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
-        'komunitas_yearly':     { tier: 'komunitas',    limit: 99999, devices: 5, mitra: true  },
-        'enterprise_dp':        { tier: 'enterprise',   limit: 99999, devices: 999, mitra: true },
-        'starter_monthly':      { tier: 'starter',      limit: 10,    devices: 1,   mitra: false },
-        'pro_keluarga_monthly': { tier: 'pro_keluarga', limit: 20,    devices: 5,   mitra: false },
-        'pro_keluarga_yearly':  { tier: 'pro_keluarga_yearly', limit: 200,   devices: 5,   mitra: false },
-        'enterprise_growth':    { tier: 'enterprise',   limit: 99999, devices: 200, mitra: true  },
-      }
+  // STARTER
+  'starter_monthly':           { tier: 'starter',           limit: 10,    devices: 1,   mitra: false },
+  'starter_yearly':            { tier: 'starter',           limit: 10,    devices: 1,   mitra: false },
+
+  // PRO INDIVIDU
+  'pro_monthly':               { tier: 'pro_individu',      limit: 30,    devices: 1,   mitra: false },
+  'pro_individu_monthly':      { tier: 'pro_individu',      limit: 30,    devices: 1,   mitra: false },
+  'pro_individu_yearly':       { tier: 'pro_individu',      limit: 30,    devices: 1,   mitra: false },
+
+  // PRO KELUARGA
+  'pro_keluarga_monthly':      { tier: 'pro_keluarga',      limit: 20,    devices: 5,   mitra: false },
+  'pro_keluarga_yearly':       { tier: 'pro_keluarga',      limit: 200,   devices: 5,   mitra: false },
+
+  // PRO BISNIS
+  'pro_bisnis_monthly':        { tier: 'pro_bisnis',        limit: 300,   devices: 5,   mitra: false },
+  'pro_bisnis_yearly':         { tier: 'pro_bisnis',        limit: 300,   devices: 5,   mitra: false },
+
+  // KOMUNITAS
+  'komunitas_monthly':         { tier: 'komunitas',         limit: 99999, devices: 10,  mitra: true  },
+  'komunitas_yearly':          { tier: 'komunitas',         limit: 99999, devices: 10,  mitra: true  },
+
+  // ENTERPRISE
+  'enterprise_dp':             { tier: 'enterprise',        limit: 99999, devices: 999, mitra: true  },
+  'enterprise_monthly':        { tier: 'enterprise',        limit: 99999, devices: 50,  mitra: true  },
+  'enterprise_yearly':         { tier: 'enterprise',        limit: 99999, devices: 50,  mitra: true  },
+
+  // ENTERPRISE GROWTH
+  'enterprise_growth':         { tier: 'enterprise_growth', limit: 99999, devices: 200, mitra: true  },
+  'enterprise_growth_monthly': { tier: 'enterprise_growth', limit: 99999, devices: 200, mitra: true  },
+  'enterprise_growth_yearly':  { tier: 'enterprise_growth', limit: 99999, devices: 200, mitra: true  },
+}
       const planConf     = PLAN_MAP[invoice?.plan_id] || { tier: 'pro_individu', limit: 30, devices: 1, mitra: false }
       const tier         = planConf.tier
       const planLimit    = invoice?.plan_limit   || planConf.limit
