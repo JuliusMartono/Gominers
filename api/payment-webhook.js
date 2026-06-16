@@ -204,6 +204,11 @@ function verifyDokuSignature(req, secretKey) {
   return signature === expected;
 }
 
+// Disable Vercel body-parser so the raw stream is available for DOKU signature verification.
+// DOKU signs the exact bytes it sends; JSON.stringify(req.body) changes number precision
+// (e.g. 9900.00 → 9900, 1.0 → 1) and breaks HMAC comparison.
+module.exports.config = { api: { bodyParser: false } }
+
 module.exports = async (req, res) => {
   if (req.method === 'GET') {
 
@@ -236,6 +241,30 @@ module.exports = async (req, res) => {
     console.error('[GoMiners Webhook] Failed to read body:', err.message)
     return res.status(200).json({ message: 'OK' })
   }
+
+  // ── Non-fatal DOKU signature check using raw body ────────────────
+  // Raw body preserves DOKU's exact byte sequence (number precision etc.).
+  // NOT fatal yet — log only until verified against a real DOKU POST.
+  const receivedSig = req.headers['signature'] || ''
+  if (receivedSig && process.env.DOKU_SECRET_KEY) {
+    try {
+      const digestB64 = crypto.createHash('sha256').update(bodyJson, 'utf8').digest('base64')
+      const component = [
+        'Client-Id:'         + (req.headers['client-id']         || ''),
+        'Request-Id:'        + (req.headers['request-id']        || ''),
+        'Request-Timestamp:' + (req.headers['request-timestamp'] || ''),
+        'Request-Target:/api/payment-webhook',
+        'Digest:SHA-256='    + digestB64,
+      ].join('\n')
+      const expected = 'HMACSHA256=' + crypto.createHmac('sha256', process.env.DOKU_SECRET_KEY)
+        .update(component, 'utf8').digest('base64')
+      const sigMatch = expected === receivedSig
+      console.log(`[SIG] expected=${expected} received=${receivedSig} match=${sigMatch}`)
+    } catch (sigErr) {
+      console.error('[SIG] verification error:', sigErr.message)
+    }
+  }
+  // ── End signature check ───────────────────────────────────────────
 
   try {
     const payload       = JSON.parse(bodyJson)
