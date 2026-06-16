@@ -181,8 +181,6 @@ function verifySignature(headers, bodyJson) {
 }
 
 // ─── Main Handler ─────────────────────────────────────────────────────────────
-const crypto = require('crypto');
-
 function verifyDokuSignature(req, secretKey) {
   const signature = req.headers['signature'];
   const clientId = req.headers['client-id'];
