@@ -36,24 +36,20 @@ const PRODUCT_HANDLERS = {
 
       // Read plan metadata from invoice (saved by payment/create route)
       const PLAN_MAP = {
-        'starter_monthly':           { tier: 'starter',              limit: 10,    devices: 1,   mitra: false },
-        'pro_monthly':               { tier: 'pro_individu',         limit: 30,    devices: 1,   mitra: false },
-        'pro_individu_monthly':      { tier: 'pro_individu',         limit: 30,    devices: 1,   mitra: false },
-        'pro_individu_yearly':       { tier: 'pro_individu_yearly',  limit: 400,   devices: 1,   mitra: false },
-        'pro_keluarga_monthly':      { tier: 'pro_keluarga',         limit: 100,   devices: 5,   mitra: false },
-        'pro_keluarga_yearly':       { tier: 'pro_keluarga_yearly',  limit: 1500,  devices: 5,   mitra: false },
-        'pro_bisnis_monthly':        { tier: 'pro_bisnis',           limit: 300,   devices: 5,   mitra: false },
-        'pro_bisnis_yearly':         { tier: 'pro_bisnis_yearly',    limit: 4000,  devices: 5,   mitra: false },
-        'komunitas_monthly':         { tier: 'komunitas',            limit: 99999, devices: 10,  mitra: true  },
-        'komunitas_yearly':          { tier: 'komunitas_yearly',     limit: 99999, devices: 10,  mitra: true  },
-        'enterprise_starter':        { tier: 'enterprise',           limit: 99999, devices: 50,  mitra: true  },
-        'enterprise_growth':         { tier: 'enterprise_growth',    limit: 99999, devices: 200, mitra: true  },
-        'pro_yearly':                { tier: 'pro_individu_yearly',  limit: 400,   devices: 1,   mitra: false },
-        'enterprise_dp':             { tier: 'enterprise',           limit: 99999, devices: 999, mitra: true  },
-        'enterprise_monthly':        { tier: 'enterprise',           limit: 99999, devices: 50,  mitra: true  },
-        'enterprise_yearly':         { tier: 'enterprise',           limit: 99999, devices: 50,  mitra: true  },
-        'enterprise_growth_monthly': { tier: 'enterprise_growth',    limit: 99999, devices: 200, mitra: true  },
-        'enterprise_growth_yearly':  { tier: 'enterprise_growth',    limit: 99999, devices: 200, mitra: true  },
+        'starter_monthly':      { tier: 'starter',             limit: 10,     devices: 1,   mitra: false },
+        'pro_monthly':          { tier: 'pro_individu',        limit: 30,     devices: 1,   mitra: false },
+        'pro_individu_monthly': { tier: 'pro_individu',        limit: 30,     devices: 1,   mitra: false },
+        'pro_individu_yearly':  { tier: 'pro_individu_yearly', limit: 400,    devices: 1,   mitra: false },
+        'pro_keluarga_monthly': { tier: 'pro_keluarga',        limit: 100,    devices: 5,   mitra: false },
+        'pro_keluarga_yearly':  { tier: 'pro_keluarga_yearly', limit: 1500,   devices: 5,   mitra: false },
+        'pro_bisnis_monthly':   { tier: 'pro_bisnis',          limit: 300,    devices: 6,   mitra: true  },
+        'pro_bisnis_yearly':    { tier: 'pro_bisnis_yearly',   limit: 4000,   devices: 6,   mitra: true  },
+        'komunitas_monthly':    { tier: 'komunitas',           limit: 999999, devices: 20,  mitra: true  },
+        'komunitas_yearly':     { tier: 'komunitas_yearly',    limit: 999999, devices: 20,  mitra: true  },
+        'enterprise_monthly':   { tier: 'enterprise',          limit: 999999, devices: 100, mitra: true  },
+        'enterprise_growth':    { tier: 'enterprise_growth',   limit: 999999, devices: 300, mitra: true  },
+        'pro_yearly':           { tier: 'pro_individu_yearly', limit: 400,    devices: 1,   mitra: false },
+        'enterprise_dp':        { tier: 'enterprise',          limit: 999999, devices: 100, mitra: true  },
       }
       const planConf     = PLAN_MAP[invoice?.plan_id] || { tier: 'pro_individu', limit: 30, devices: 1, mitra: false }
       const tier         = planConf.tier
@@ -204,6 +200,11 @@ function verifyDokuSignature(req, secretKey) {
   return signature === expected;
 }
 
+// Disable Vercel body-parser so the raw stream is available for DOKU signature verification.
+// DOKU signs the exact bytes it sends; JSON.stringify(req.body) changes number precision
+// (e.g. 9900.00 → 9900, 1.0 → 1) and breaks HMAC comparison.
+module.exports.config = { api: { bodyParser: false } }
+
 module.exports = async (req, res) => {
   if (req.method === 'GET') {
 
@@ -236,6 +237,30 @@ module.exports = async (req, res) => {
     console.error('[GoMiners Webhook] Failed to read body:', err.message)
     return res.status(200).json({ message: 'OK' })
   }
+
+  // ── Non-fatal DOKU signature check using raw body ────────────────
+  // Raw body preserves DOKU's exact byte sequence (number precision etc.).
+  // NOT fatal yet — log only until verified against a real DOKU POST.
+  const receivedSig = req.headers['signature'] || ''
+  if (receivedSig && process.env.DOKU_SECRET_KEY) {
+    try {
+      const digestB64 = crypto.createHash('sha256').update(bodyJson, 'utf8').digest('base64')
+      const component = [
+        'Client-Id:'         + (req.headers['client-id']         || ''),
+        'Request-Id:'        + (req.headers['request-id']        || ''),
+        'Request-Timestamp:' + (req.headers['request-timestamp'] || ''),
+        'Request-Target:/api/payment-webhook',
+        'Digest:SHA-256='    + digestB64,
+      ].join('\n')
+      const expected = 'HMACSHA256=' + crypto.createHmac('sha256', process.env.DOKU_SECRET_KEY)
+        .update(component, 'utf8').digest('base64')
+      const sigMatch = expected === receivedSig
+      console.log(`[SIG] expected=${expected} received=${receivedSig} match=${sigMatch}`)
+    } catch (sigErr) {
+      console.error('[SIG] verification error:', sigErr.message)
+    }
+  }
+  // ── End signature check ───────────────────────────────────────────
 
   try {
     const payload       = JSON.parse(bodyJson)
