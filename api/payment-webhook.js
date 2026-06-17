@@ -238,58 +238,40 @@ module.exports = async (req, res) => {
     return res.status(200).json({ message: 'OK' })
   }
 
-  // ── [M3a SIGPROBE] 4-variant non-fatal signature probe ──────────
-  const receivedSig      = req.headers['signature']         || ''
-  const hClientId        = req.headers['client-id']         || ''
-  const hRequestId       = req.headers['request-id']        || ''
-  const hRequestTs       = req.headers['request-timestamp'] || ''
-  const hRequestTarget   = req.headers['request-target']    || ''   // DOKU mungkin kirim ini
-  console.log('[SIGPROBE] headers — client-id=' + hClientId
-    + ' request-id=' + hRequestId
-    + ' request-timestamp=' + hRequestTs
-    + ' request-target=' + (hRequestTarget || '(none)')
-    + ' signature=' + receivedSig)
+  // ── DOKU Signature Verification (FATAL) ─────────────────────────
+  // V2 format confirmed via probe: Digest = plain base64, no "SHA-256=" prefix.
+  const receivedSig    = req.headers['signature']         || ''
+  const sigClientId    = req.headers['client-id']         || ''
+  const sigRequestId   = req.headers['request-id']        || ''
+  const sigRequestTs   = req.headers['request-timestamp'] || ''
 
-  if (receivedSig && process.env.DOKU_SECRET_KEY) {
-    try {
-      const secret   = process.env.DOKU_SECRET_KEY
-      const digestB64 = crypto.createHash('sha256').update(bodyJson, 'utf8').digest('base64')
-
-      function hmac(component) {
-        return 'HMACSHA256=' + crypto.createHmac('sha256', secret).update(component, 'utf8').digest('base64')
-      }
-      function build(digestLine, targetLine) {
-        return [
-          'Client-Id:'         + hClientId,
-          'Request-Id:'        + hRequestId,
-          'Request-Timestamp:' + hRequestTs,
-          'Request-Target:'    + targetLine,
-          'Digest:'            + digestLine,
-        ].join('\n')
-      }
-
-      const v1 = hmac(build('SHA-256=' + digestB64, '/api/payment-webhook'))
-      const v2 = hmac(build(digestB64,              '/api/payment-webhook'))
-      const v3 = hmac(build('SHA-256=' + digestB64, '/payment-webhook'))
-      const v4 = hmac(build(digestB64,              '/payment-webhook'))
-
-      const hit = v1 === receivedSig ? 'v1'
-                : v2 === receivedSig ? 'v2'
-                : v3 === receivedSig ? 'v3'
-                : v4 === receivedSig ? 'v4'
-                : 'none'
-
-      console.log('[SIGPROBE] received=' + receivedSig
-        + ' v1=' + v1
-        + ' v2=' + v2
-        + ' v3=' + v3
-        + ' v4=' + v4
-        + ' hit=' + hit)
-    } catch (sigErr) {
-      console.error('[SIGPROBE] error:', sigErr.message)
-    }
+  if (!receivedSig) {
+    console.error('[SIG] Missing signature header — rejected')
+    return res.status(401).json({ message: 'Invalid signature' })
   }
-  // ── End SIGPROBE ──────────────────────────────────────────────────
+
+  try {
+    const digestRaw = crypto.createHash('sha256').update(bodyJson, 'utf8').digest('base64')
+    const component = [
+      'Client-Id:'         + sigClientId,
+      'Request-Id:'        + sigRequestId,
+      'Request-Timestamp:' + sigRequestTs,
+      'Request-Target:/api/payment-webhook',
+      'Digest:'            + digestRaw,       // no "SHA-256=" prefix — V2 confirmed
+    ].join('\n')
+    const expected = 'HMACSHA256=' + crypto.createHmac('sha256', process.env.DOKU_SECRET_KEY)
+      .update(component, 'utf8').digest('base64')
+    const match = expected === receivedSig
+    console.log('[SIG] expected=' + expected + ' received=' + receivedSig + ' match=' + match)
+    if (!match) {
+      console.error('[SIG] Signature mismatch — request rejected')
+      return res.status(401).json({ message: 'Invalid signature' })
+    }
+  } catch (sigErr) {
+    console.error('[SIG] Verification error:', sigErr.message)
+    return res.status(401).json({ message: 'Invalid signature' })
+  }
+  // ── End signature verification ────────────────────────────────────
 
   try {
     const payload       = JSON.parse(bodyJson)
