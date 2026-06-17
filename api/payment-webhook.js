@@ -238,29 +238,58 @@ module.exports = async (req, res) => {
     return res.status(200).json({ message: 'OK' })
   }
 
-  // ── Non-fatal DOKU signature check using raw body ────────────────
-  // Raw body preserves DOKU's exact byte sequence (number precision etc.).
-  // NOT fatal yet — log only until verified against a real DOKU POST.
-  const receivedSig = req.headers['signature'] || ''
+  // ── [M3a SIGPROBE] 4-variant non-fatal signature probe ──────────
+  const receivedSig      = req.headers['signature']         || ''
+  const hClientId        = req.headers['client-id']         || ''
+  const hRequestId       = req.headers['request-id']        || ''
+  const hRequestTs       = req.headers['request-timestamp'] || ''
+  const hRequestTarget   = req.headers['request-target']    || ''   // DOKU mungkin kirim ini
+  console.log('[SIGPROBE] headers — client-id=' + hClientId
+    + ' request-id=' + hRequestId
+    + ' request-timestamp=' + hRequestTs
+    + ' request-target=' + (hRequestTarget || '(none)')
+    + ' signature=' + receivedSig)
+
   if (receivedSig && process.env.DOKU_SECRET_KEY) {
     try {
+      const secret   = process.env.DOKU_SECRET_KEY
       const digestB64 = crypto.createHash('sha256').update(bodyJson, 'utf8').digest('base64')
-      const component = [
-        'Client-Id:'         + (req.headers['client-id']         || ''),
-        'Request-Id:'        + (req.headers['request-id']        || ''),
-        'Request-Timestamp:' + (req.headers['request-timestamp'] || ''),
-        'Request-Target:/api/payment-webhook',
-        'Digest:SHA-256='    + digestB64,
-      ].join('\n')
-      const expected = 'HMACSHA256=' + crypto.createHmac('sha256', process.env.DOKU_SECRET_KEY)
-        .update(component, 'utf8').digest('base64')
-      const sigMatch = expected === receivedSig
-      console.log(`[SIG] expected=${expected} received=${receivedSig} match=${sigMatch}`)
+
+      function hmac(component) {
+        return 'HMACSHA256=' + crypto.createHmac('sha256', secret).update(component, 'utf8').digest('base64')
+      }
+      function build(digestLine, targetLine) {
+        return [
+          'Client-Id:'         + hClientId,
+          'Request-Id:'        + hRequestId,
+          'Request-Timestamp:' + hRequestTs,
+          'Request-Target:'    + targetLine,
+          'Digest:'            + digestLine,
+        ].join('\n')
+      }
+
+      const v1 = hmac(build('SHA-256=' + digestB64, '/api/payment-webhook'))
+      const v2 = hmac(build(digestB64,              '/api/payment-webhook'))
+      const v3 = hmac(build('SHA-256=' + digestB64, '/payment-webhook'))
+      const v4 = hmac(build(digestB64,              '/payment-webhook'))
+
+      const hit = v1 === receivedSig ? 'v1'
+                : v2 === receivedSig ? 'v2'
+                : v3 === receivedSig ? 'v3'
+                : v4 === receivedSig ? 'v4'
+                : 'none'
+
+      console.log('[SIGPROBE] received=' + receivedSig
+        + ' v1=' + v1
+        + ' v2=' + v2
+        + ' v3=' + v3
+        + ' v4=' + v4
+        + ' hit=' + hit)
     } catch (sigErr) {
-      console.error('[SIG] verification error:', sigErr.message)
+      console.error('[SIGPROBE] error:', sigErr.message)
     }
   }
-  // ── End signature check ───────────────────────────────────────────
+  // ── End SIGPROBE ──────────────────────────────────────────────────
 
   try {
     const payload       = JSON.parse(bodyJson)
