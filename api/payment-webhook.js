@@ -61,6 +61,7 @@ const PRODUCT_HANDLERS = {
 
       const profileUpdate = {
         subscription_tier: tier,                    // was: plan: 'pro'
+        monthly_usage:     0,                        // Model A: counter periode lahir bersih saat beli
         plan_limit:        Number(planLimit),
         plan_devices:      Number(planDevices),
         is_mitra_klinik:   isMitra === true || isMitra === 'true',
